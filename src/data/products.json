@@ -1,0 +1,147 @@
+[
+  {
+    "id": 1,
+    "name": "Setelan Updated Olahraga Pelangi",
+    "price": "Rp 150.000",
+    "image": "https://images.unsplash.com/photo-1632232963035-bc14755747c9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxraWRzJTIwY2xvdGhpbmclMjBmYXNoaW9uJTIwcHJvZHVjdHN8ZW58MXx8fHwxNzc1MzYxMTY2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+    "tag": "Baru",
+    "color": "#A8E6CF",
+    "categories": [
+      "boys",
+      "girls",
+      "new",
+      "sale"
+    ],
+    "details": "Setelan olahraga berbahan katun yang lembut untuk kulit si kecil.",
+    "linktreeUrl": "https://linktr.ee/yourstore"
+  },
+  {
+    "id": 2,
+    "name": "Setelan Santai Nyaman",
+    "price": "Rp 165.000",
+    "image": "https://images.unsplash.com/photo-1632232963236-9846f0503a90?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwyfHxraWRzJTIwY2xvdGhpbmclMjBmYXNoaW9uJTIwcHJvZHVjdHN8ZW58MXx8fHwxNzc1MzYxMTY2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+    "tag": "Tren",
+    "color": "#B4D7F1",
+    "categories": [
+      "boys",
+      "new"
+    ],
+    "details": "Setelan santai dengan desain modern dan bahan sejuk.",
+    "linktreeUrl": "https://linktr.ee/yourstore"
+  },
+  {
+    "id": 3,
+    "name": "Gaun Pesta Ungu",
+    "price": "Rp 185.000",
+    "originalPrice": "Rp 250.000",
+    "image": "https://images.unsplash.com/photo-1637161066165-e263bed16a94?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw3fHxraWRzJTIwY2xvdGhpbmclMjBmYXNoaW9uJTIwcHJvZHVjdHN8ZW58MXx8fHwxNzc1MzYxMTY2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+    "tag": "Diskon",
+    "color": "#E0BBE4",
+    "categories": [
+      "girls",
+      "sale"
+    ],
+    "details": "Gaun cantik warna ungu cocok untuk pergi ke pesta.",
+    "linktreeUrl": "https://linktr.ee/yourstore"
+  },
+  {
+    "id": 4,
+    "name": "Setelan Sporty Duo",
+    "price": "Rp 195.000",
+    "image": "https://images.unsplash.com/photo-1632232962967-0740a757380d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw0fHxraWRzJTIwY2xvdGhpbmclMjBmYXNoaW9uJTIwcHJvZHVjdHN8ZW58MXx8fHwxNzc1MzYxMTY2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+    "tag": "Baru",
+    "color": "#FFF9B0",
+    "categories": [
+      "boys",
+      "new"
+    ],
+    "details": "Setelan olahraga dengan kombinasi dua warna.",
+    "linktreeUrl": "https://linktr.ee/yourstore"
+  },
+  {
+    "id": 5,
+    "name": "Setelan Kasual Keren",
+    "price": "Rp 140.000",
+    "image": "https://images.unsplash.com/photo-1632232963262-0e5cd712d44c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw1fHxraWRzJTIwY2xvdGhpbmclMjBmYXNoaW9uJTIwcHJvZHVjdHN8ZW58MXx8fHwxNzc1MzYxMTY2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+    "color": "#A8E6CF",
+    "categories": [
+      "boys",
+      "sale"
+    ],
+    "details": "Tampil keren di mana saja dengan pakaian santai yang gaya.",
+    "linktreeUrl": "https://linktr.ee/yourstore"
+  },
+  {
+    "id": 6,
+    "name": "Penjelajah Akhir Pekan",
+    "price": "Rp 170.000",
+    "image": "https://images.unsplash.com/photo-1632232963030-b5d9dd08a1f8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw5fHxraWRzJTIwY2xvdGhpbmclMjBmYXNoaW9uJTIwcHJvZHVjdHN8ZW58MXx8fHwxNzc1MzYxMTY2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+    "color": "#FFD1DC",
+    "categories": [
+      "boys",
+      "girls"
+    ],
+    "details": "Cocok untuk aktivitas bermain luar di akhir pekan.",
+    "linktreeUrl": "https://linktr.ee/yourstore"
+  },
+  {
+    "id": 7,
+    "name": "Setelan Kuning Cerah",
+    "price": "Rp 155.000",
+    "image": "https://images.unsplash.com/photo-1710425805333-906c53afa4bc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw4fHxoYXBweSUyMGNoaWxkcmVuJTIwd2VhcmluZyUyMHN0eWxpc2glMjBjbG90aGVzJTIwZmFzaGlvbnxlbnwxfHx8fDE3NzUzNjExNjZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+    "tag": "Populer",
+    "color": "#FFF9B0",
+    "categories": [
+      "girls",
+      "new",
+      "sale"
+    ],
+    "details": "Mencerahkan hari anak dengan gaya dominan warna kuning.",
+    "linktreeUrl": "https://linktr.ee/yourstore"
+  },
+  {
+    "id": 8,
+    "name": "Klasik Bisbol",
+    "price": "Rp 135.000",
+    "image": "https://images.unsplash.com/photo-1759313560190-d160c3567170?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoYXBweSUyMGNoaWxkcmVuJTIwd2VhcmluZyUyMHN0eWxpc2glMjBjbG90aGVzJTIwZmFzaGlvbnxlbnwxfHx8fDE3NzUzNjExNjZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+    "color": "#B4D7F1",
+    "categories": [
+      "boys"
+    ],
+    "details": "Setelan dengan tema jaket baseball klasik.",
+    "linktreeUrl": "https://linktr.ee/yourstore"
+  },
+  {
+    "id": 1775388427303,
+    "name": "test",
+    "price": "Rp 100.000",
+    "image": "https://images.unsplash.com/photo-1632232963035-bc14755747c9?auto=format&fit=crop&w=500&q=60",
+    "color": "#cccccc",
+    "linktreeUrl": "https://linktr.ee/",
+    "categories": [
+      "new"
+    ]
+  },
+  {
+    "id": 1775392168072,
+    "name": "test1",
+    "price": "Rp 200000",
+    "image": "https://images.unsplash.com/photo-1632232963035-bc14755747c9?auto=format&fit=crop&w=500&q=60",
+    "color": "#cccccc",
+    "linktreeUrl": "https://linktr.ee/",
+    "categories": [
+      "toddler"
+    ]
+  },
+  {
+    "id": 1775392189902,
+    "name": "Produk Baru",
+    "price": "Rp 150000",
+    "image": "https://images.unsplash.com/photo-1632232963035-bc14755747c9?auto=format&fit=crop&w=500&q=60",
+    "color": "#cccccc",
+    "linktreeUrl": "https://linktr.ee/",
+    "categories": [
+      "baby"
+    ]
+  }
+]

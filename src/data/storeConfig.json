@@ -1,0 +1,173 @@
+{
+  "name": {
+    "prefix": "Gakha",
+    "highlight": "Kids"
+  },
+  "announcement": {
+    "text": "Promo Ramadhan: Diskon hingga 50% untuk koleksi pilihan! Belanja sekarang.",
+    "link": "/shop/sale",
+    "isEnabled": true
+  },
+  "navigation": {
+    "links": [
+      {
+        "label": "BERANDA",
+        "href": "/"
+      },
+      {
+        "label": "PRODUK",
+        "href": "/shop/all"
+      },
+      {
+        "label": "TERBARU",
+        "href": "/shop/new"
+      },
+      {
+        "label": "BAYI",
+        "href": "/shop/baby"
+      },
+      {
+        "label": "TODDLER",
+        "href": "/shop/toddler"
+      },
+      {
+        "label": "BLOG",
+        "href": "/page/blog"
+      },
+      {
+        "label": "HALAMAN",
+        "href": "/page/about"
+      }
+    ]
+  },
+  "hero": {
+    "backgroundImage": "https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=600&auto=format&fit=crop",
+    "badge": "Koleksi Musim Semi 2026",
+    "headingLine1": "Gaya Nyaman &",
+    "headingLine2": "Keren",
+    "description": "Temukan koleksi pakaian anak premium kami. Didesain dengan kasih sayang, dibuat untuk kenyamanan bermain.",
+    "primaryButton": "Beli Koleksi Baru",
+    "secondaryButton": "Lihat Koleksi"
+  },
+  "features": [
+    {
+      "iconName": "Truck",
+      "title": "Gratis Ongkir",
+      "description": "Untuk pesanan di atas Rp 200.000",
+      "color": "#A8E6CF"
+    },
+    {
+      "iconName": "Shield",
+      "title": "Garansi Kualitas",
+      "description": "Hanya bahan premium",
+      "color": "#B4D7F1"
+    },
+    {
+      "iconName": "RefreshCw",
+      "title": "Mudah Diretur",
+      "description": "Kebijakan pengembalian 30 hari",
+      "color": "#FFF9B0"
+    },
+    {
+      "iconName": "Sparkles",
+      "title": "Koleksi Baru",
+      "description": "Model terbaru setiap minggu",
+      "color": "#FFD1DC"
+    }
+  ],
+  "footer": {
+    "description": "Pakaian anak premium untuk keluarga modern. Kualitas yang bisa Anda percayai, gaya yang pasti mereka sukai.",
+    "shopLinks": [
+      {
+        "label": "New Born (0-6 Bln)",
+        "href": "/shop/born"
+      },
+      {
+        "label": "Bayi (6-24 Bln)",
+        "href": "/shop/baby"
+      },
+      {
+        "label": "Toddler (2-5 Thn)",
+        "href": "/shop/toddler"
+      },
+      {
+        "label": "Koleksi Anak Laki",
+        "href": "/shop/boys"
+      },
+      {
+        "label": "Koleksi Anak Cewek",
+        "href": "/shop/girls"
+      }
+    ],
+    "customerCareLinks": [
+      {
+        "label": "Hubungi Kami",
+        "href": "/page/contact"
+      },
+      {
+        "label": "Info Pengiriman",
+        "href": "/page/shipping"
+      },
+      {
+        "label": "Pengembalian",
+        "href": "/page/returns"
+      },
+      {
+        "label": "Panduan Ukuran",
+        "href": "/page/size-guide"
+      },
+      {
+        "label": "FAQ",
+        "href": "/page/faq"
+      }
+    ],
+    "newsletterTitle": "Dapatkan Info Terbaru",
+    "newsletterDesc": "Berlangganan untuk mendapatkan penawaran spesial dan informasi terbaru.",
+    "newsletterPlaceholder": "Email Anda",
+    "newsletterButton": "Gabung",
+    "bottomText": "© 2026 Saksag-Go!. Hak Cipta Dilindungi.",
+    "bottomLinks": [
+      {
+        "label": "Kebijakan Privasi",
+        "href": "/page/privacy"
+      },
+      {
+        "label": "Syarat & Ketentuan",
+        "href": "/page/terms"
+      },
+      {
+        "label": "Cookies",
+        "href": "/page/cookies"
+      }
+    ]
+  },
+  "socialMedia": {
+    "instagram": "https://instagram.com/test",
+    "tiktok": "https://tiktok.com",
+    "twitter": "https://twitter.com",
+    "facebook": "https://facebook.com"
+  },
+  "topDeals": [
+    {
+      "title": "Koleksi Anak Laki",
+      "image": "https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?q=80&w=600&auto=format&fit=crop",
+      "bg": "bg-blue-100",
+      "route": "/shop/boys",
+      "isLarge": true
+    },
+    {
+      "title": "Perempuan",
+      "image": "https://images.unsplash.com/photo-1514090458221-65bb69cf63e6?q=80&w=400&auto=format&fit=crop",
+      "bg": "bg-orange-100",
+      "route": "/shop/girls",
+      "isLarge": false
+    },
+    {
+      "title": "Aksesoris",
+      "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=400&auto=format&fit=crop",
+      "bg": "bg-lime-100",
+      "route": "/shop/categories",
+      "isLarge": false
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "contact": {
+    "title": "Hubungi Kami",
+    "image": "https://images.unsplash.com/photo-1534536281715-e28d76689b4d?q=80&w=800&auto=format&fit=crop",
+    "content": "Kami sangat senang mendengarkan pertanyaan, masukan, dan cerita Anda bersama Saksag-Go!! Tim khusus kami berdedikasi untuk memberikan dukungan terbaik.\n\nJAM OPERASIONAL:\nSenin - Jumat: 09:00 - 17:00 WIB\nSabtu - Minggu: Libur (Respon H+1)\n\nSALURAN BANTUAN:\nEmail: halo@saksag-go.com\nWhatsApp: +62 811-2233-4455"
+  },
+  "shipping": {
+    "title": "Info Pengiriman",
+    "image": "/logistics.png",
+    "content": "Kami bekerja sama dengan partner logistik terpercaya untuk memastikan setiap pakaian anak sampai ke tangan Anda dengan aman dan tepat waktu.\n\nPARTNER LOGISTIK KAMI:\n- JNE Express\n- J&T Express\n- SiCepat Express\n- AnterAja\n- GoSend & GrabExpress (Layanan Sameday/Instant)\n\nGRATIS ONGKIR:\nDapatkan gratis ongkir untuk setiap pesanan minimal Rp 200.000 ke seluruh Indonesia!"
+  },
+  "returns": {
+    "title": "Kebijakan Pengembalian",
+    "image": "https://images.unsplash.com/photo-1607083206968-13611e3d76db?q=80&w=800&auto=format&fit=crop",
+    "content": "Kepuasan si kecil adalah prioritas kami. Apabila ukuran tidak sesuai atau terdapat cacat produksi, kami menyediakan kebijakan **Mudah Diretur**.\n\nSYARAT & KETENTUAN:\n- Klaim retur maksimal 7 hari sejak barang diterima.\n- Barang belum dicuci, Label/Tag masih terpasang utuh.\n- Wajib menyertakan video unboxing sebagai bukti sah."
+  },
+  "size-guide": {
+    "title": "Panduan Ukuran",
+    "image": "https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=800&auto=format&fit=crop",
+    "content": "Mencari ukuran yang pas sangat penting bagi kenyamanan anak yang aktif bergerak. Tabel ukuran kami standar lokal, namun tinggi tiap anak bisa bervariasi.\n\nTABEL UKURAN:\nS (1-2 Tahun) -> LD: 56cm | P. Baju: 36cm\nM (3-4 Tahun) -> LD: 60cm | P. Baju: 40cm\nL (5-6 Tahun) -> LD: 64cm | P. Baju: 44cm\nXL (7-8 Tahun) -> LD: 68cm | P. Baju: 48cm"
+  },
+  "faq": {
+    "title": "Pertanyaan yang - Updated Sering Diajukan (FAQ)",
+    "image": "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=80&w=800&auto=format&fit=crop",
+    "content": "Temukan jawaban cepat atas pertanyaan yang sering ditanyakan orang tua kepada kami.\n\nQ: Apakah bahan Saksag-Go! aman untuk kulit sensitif?\nA: Ya! Kami menggunakan Katun bambu organik (Cotton Bamboo) yang ramah kulit.\n\nQ: Bisa membungkus untuk kado?\nA: Tentu. Pilih opsi 'Bungkus Kado' saat checkout dengan biaya tambahan Rp 15.000 saja."
+  }
+}
