@@ -61,6 +61,28 @@ export function HeroBanner() {
         className="relative w-full rounded-[clamp(1.5rem,4vw,2.5rem)] bg-gradient-to-br from-[#1e3c72] via-[#2a5298] to-[#1e3c72] h-[clamp(450px,70vh,700px)] overflow-hidden flex items-center shadow-2xl transition-all duration-200 ease-out"
       >
         
+        {/* Interactive Mesh Gradient inside Hero */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <motion.div 
+               animate={{ 
+                 scale: [1, 1.2, 1],
+                 rotate: [0, 90, 0],
+                 x: [-20, 20, -20]
+               }}
+               transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+               className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] bg-[#fb246a]/20 blur-[100px] rounded-full"
+            />
+            <motion.div 
+               animate={{ 
+                 scale: [1.2, 1, 1.2],
+                 rotate: [90, 0, 90],
+                 x: [20, -20, 20]
+               }}
+               transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+               className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] bg-[#3e6b8c]/40 blur-[120px] rounded-full"
+            />
+        </div>
+
         {/* Parallax Background Cover */}
         <motion.div style={{ y: bgY }} className="absolute inset-0 w-full h-[130%] bg-gradient-to-r from-[#3e6b8c] to-[#4b80a6] -z-10 mix-blend-overlay opacity-60"></motion.div>
 
