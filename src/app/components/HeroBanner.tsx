@@ -19,7 +19,7 @@ export function HeroBanner() {
   const scaleText = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
 
   return (
-    <div className="w-full px-[clamp(1rem,5vw,4rem)] max-w-[1800px] mx-auto py-6 font-sans" ref={ref}>
+    <div className="w-full px-[clamp(1rem,5vw,4rem)] max-w-[1800px] mx-auto pt-1 sm:pt-6 pb-6 font-sans" ref={ref}>
       <div className="relative w-full rounded-[clamp(1.5rem,4vw,2.5rem)] bg-gradient-to-br from-[#1e3c72] via-[#2a5298] to-[#1e3c72] h-[clamp(450px,70vh,800px)] overflow-hidden flex items-center shadow-2xl">
         
         {/* Parallax Background Cover */}
