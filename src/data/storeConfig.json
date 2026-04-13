@@ -42,12 +42,12 @@
   },
   "hero": {
     "backgroundImage": "https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=600&auto=format&fit=crop",
-    "badge": "Koleksi Musim Semi 2026",
-    "headingLine1": "Gaya Nyaman &",
-    "headingLine2": "Keren",
-    "description": "Temukan koleksi pakaian anak premium kami. Didesain dengan kasih sayang, dibuat untuk kenyamanan bermain.",
-    "primaryButton": "Beli Koleksi Baru",
-    "secondaryButton": "Lihat Koleksi"
+    "badge": "Bayi & Balita Premium",
+    "headingLine1": "Fashion Spesialis",
+    "headingLine2": "Bayi & Balita",
+    "description": "Koleksi pakaian premium yang didesain khusus untuk kenyamanan kulit bayi dan balita. Modern, lembut, dan berkualitas tinggi untuk setiap petualangan si kecil.",
+    "primaryButton": "Belanja Koleksi Bayi",
+    "secondaryButton": "Koleksi Balita"
   },
   "features": [
     {

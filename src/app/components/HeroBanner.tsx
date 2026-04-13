@@ -64,7 +64,7 @@ export function HeroBanner() {
              whileTap={{ scale: 0.95 }}
              className="relative z-30"
            >
-             <Link to="/shop/boys" className="bg-[var(--accent)] text-white px-[clamp(2rem,4vw,3.5rem)] py-[clamp(0.85rem,2vw,1.15rem)] rounded-full font-bold uppercase tracking-widest text-[clamp(0.7rem,1.5vw,0.85rem)] shadow-xl block">
+             <Link to="/shop/all" className="bg-[var(--accent)] text-white px-[clamp(2rem,4vw,3.5rem)] py-[clamp(0.85rem,2vw,1.15rem)] rounded-full font-bold uppercase tracking-widest text-[clamp(0.7rem,1.5vw,0.85rem)] shadow-xl block">
                 Belanja Sekarang
              </Link>
            </motion.div>

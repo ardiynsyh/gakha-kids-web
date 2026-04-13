@@ -67,6 +67,7 @@ export function NewArrivals() {
                       
                       <ImageWithFallback 
                         src={product.image} 
+                        alt={product.name}
                         className="w-full h-full object-contain p-4 mix-blend-multiply dark:mix-blend-normal group-hover:scale-[1.05] group-hover:-translate-y-1 transition-transform duration-500" 
                       />
                    </div>

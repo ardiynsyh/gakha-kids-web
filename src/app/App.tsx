@@ -10,10 +10,12 @@ export default function App() {
     <div className="min-h-screen bg-white">
       <Toaster position="top-center" richColors />
       <NavigationBar />
-      <HeroBanner />
-      <Features />
-      <NewArrivals />
-      <Footer />
+      <main className="pt-[130px] sm:pt-[200px]">
+        <HeroBanner />
+        <Features />
+        <NewArrivals />
+        <Footer />
+      </main>
     </div>
   );
 }

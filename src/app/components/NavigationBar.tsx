@@ -41,25 +41,53 @@ export function NavigationBar() {
       <AnnouncementBar />
 
       {/* Main Header Row */}
-      <div className={`max-w-[1800px] mx-auto px-[clamp(1.5rem,5vw,4rem)] w-full transition-all duration-300 ${isScrolled ? 'py-2 sm:py-3' : 'py-4 sm:py-5'}`}>
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-5 sm:gap-0">
+      <div className={`max-w-[1800px] mx-auto px-[clamp(1rem,5vw,4rem)] w-full transition-all duration-300 ${isScrolled ? 'py-1.5 sm:py-3' : 'py-3 sm:py-5'}`}>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
           
-          {/* Left: Search Bar & Theme Toggle */}
-          <div className="w-full sm:w-[35%] flex items-center justify-start gap-4 order-2 sm:order-1">
-             <form onSubmit={handleSearch} className="relative flex items-center w-full max-w-[280px] bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-full overflow-hidden transition-all focus-within:shadow-sm focus-within:border-[var(--accent)]/50">
+          {/* Top Row for Mobile (Logo & Icons) */}
+          <div className="flex items-center justify-between w-full sm:hidden">
+            <Link to="/" className="flex items-center gap-2">
+              <img 
+                src="/logo.png" 
+                alt="Logo" 
+                className={`transition-all duration-300 ${isScrolled ? 'w-8 h-8' : 'w-10 h-10'} rounded-lg shadow-sm`}
+              />
+               <span className={`font-black tracking-tighter text-[var(--text-primary)] font-serif italic uppercase leading-none ${isScrolled ? 'text-lg' : 'text-xl'}`}>
+                  {storeConfig.name.prefix}<span className="text-[var(--accent)]">{storeConfig.name.highlight}</span>
+               </span>
+            </Link>
+            
+            <div className="flex items-center gap-4">
+              <Link to="/wishlist" className="relative">
+                <Heart className="w-5 h-5" />
+                {wishlist.length > 0 && <span className="absolute -top-1 -right-1 bg-[var(--accent)] text-white text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold">{wishlist.length}</span>}
+              </Link>
+              <div className="relative">
+                <ShoppingBag className="w-5 h-5" />
+                <span className="absolute -top-1 -right-1 bg-[var(--accent)] text-white text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold">0</span>
+              </div>
+              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Search & Theme - Second Row on Mobile, Left on Desktop */}
+          <div className={`${isScrolled && 'sm:flex'} w-full sm:w-[35%] flex items-center justify-start gap-4 order-2 sm:order-1`}>
+             <form onSubmit={handleSearch} className="relative flex items-center w-full max-w-full sm:max-w-[280px] bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-full overflow-hidden transition-all focus-within:shadow-sm focus-within:border-[var(--accent)]/50">
                <input 
                  type="text" 
                  placeholder="Cari..." 
                  value={searchQuery}
                  onChange={(e) => setSearchQuery(e.target.value)}
-                 className="w-full bg-transparent py-2 pl-6 pr-12 text-[13px] font-medium text-[var(--text-primary)] outline-none placeholder:text-[var(--text-secondary)]/50"
+                 className="w-full bg-transparent py-2.5 sm:py-2 pl-5 sm:pl-6 pr-12 text-[12px] sm:text-[13px] font-medium text-[var(--text-primary)] outline-none placeholder:text-[var(--text-secondary)]/50"
                />
-               <button type="submit" className="absolute right-1 top-1 bottom-1 bg-[var(--accent)] hover:opacity-90 text-white px-5 rounded-full transition-opacity flex items-center justify-center">
+               <button type="submit" className="absolute right-1 top-1 bottom-1 bg-[var(--accent)] hover:opacity-90 text-white px-4 sm:px-5 rounded-full transition-opacity flex items-center justify-center">
                  <Search className="w-3.5 h-3.5 stroke-[3]" />
                </button>
              </form>
              
-             {/* Dark Mode Toggle */}
+             {/* Dark Mode Toggle - Hidden on very small mobile if space is tight, but here it's fine */}
              <button 
                onClick={toggleTheme}
                className="p-2 rounded-full hover:bg-[var(--bg-secondary)] transition-colors shadow-inner"
@@ -68,17 +96,14 @@ export function NavigationBar() {
              </button>
           </div>
 
-          {/* Center: Logo */}
-          <div className="flex flex-col items-center justify-center w-full sm:w-[30%] order-1 sm:order-2">
+          {/* Center: Logo (Desktop Only) */}
+          <div className="hidden sm:flex flex-col items-center justify-center w-[30%] order-2">
             <Link to="/" className="flex flex-col items-center group transition-all duration-500">
               <motion.div 
                 animate={{ 
-                  width: isScrolled ? 70 : 120,
-                  height: isScrolled ? 70 : 120 
+                  width: isScrolled ? 60 : 100,
+                  height: isScrolled ? 60 : 100 
                 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 450, damping: 15 }}
                 className="relative mb-1 flex items-center justify-center p-2"
               >
                 <img 
@@ -88,7 +113,7 @@ export function NavigationBar() {
                 />
               </motion.div>
               <div className="flex flex-col items-center">
-                 <span className={`font-black tracking-tighter text-[var(--text-primary)] font-serif italic uppercase leading-[0.8] drop-shadow-sm group-hover:text-[var(--accent)] transition-all duration-300 ${isScrolled ? 'text-[24px] sm:text-[30px]' : 'text-[34px] sm:text-[42px]'}`}>
+                 <span className={`font-black tracking-tighter text-[var(--text-primary)] font-serif italic uppercase leading-[0.8] drop-shadow-sm group-hover:text-[var(--accent)] transition-all duration-300 ${isScrolled ? 'text-[24px] sm:text-[28px]' : 'text-[34px] sm:text-[38px]'}`}>
                     {storeConfig.name.prefix}<span className="text-[var(--accent)]">{storeConfig.name.highlight}</span>
                  </span>
                  {!isScrolled && (
@@ -96,7 +121,7 @@ export function NavigationBar() {
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 0.6, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="text-[11px] font-bold tracking-[0.4em] text-[var(--text-secondary)] uppercase mt-2"
+                    className="text-[10px] font-bold tracking-[0.4em] text-[var(--text-secondary)] uppercase mt-2"
                    >
                      Dunia Penuh Keceriaan Anak
                    </motion.span>
@@ -105,8 +130,8 @@ export function NavigationBar() {
             </Link>
           </div>
 
-          {/* Right: Icons */}
-          <div className="w-full sm:w-[35%] flex items-center justify-center sm:justify-end gap-6 order-3">
+          {/* Right: Icons (Desktop Only) */}
+          <div className="hidden sm:flex w-[35%] items-center justify-end gap-6 order-3">
              <Link to="/wishlist" className="hover:text-[var(--accent)] text-[var(--text-primary)] transition-colors relative cursor-pointer block">
                <Heart className="w-5 h-5 stroke-[1.5]" />
                {wishlist.length > 0 && (
@@ -116,7 +141,7 @@ export function NavigationBar() {
                )}
              </Link>
 
-             <div className="flex flex-col items-center sm:items-start text-[var(--text-primary)] cursor-pointer group">
+             <div className="flex items-center text-[var(--text-primary)] cursor-pointer group">
                 <div className="flex items-center gap-3">
                    <div className="relative hover:text-[var(--accent)] transition-colors">
                       <ShoppingBag className="w-5 h-5 stroke-[1.5]" />

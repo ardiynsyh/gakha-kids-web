@@ -5,6 +5,8 @@ import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { useWishlist } from '../context/WishlistContext';
 import { calculateDiscountBadge } from '../components/ui/utils';
 
+import { SEO } from '../components/SEO';
+
 export function ShopPage() {
   const { categoryId } = useParams();
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
@@ -15,18 +17,29 @@ export function ShopPage() {
       case 'boys': return 'Koleksi Anak Laki-Laki';
       case 'girls': return 'Koleksi Anak Perempuan';
       case 'sale': return 'Promo & Diskon';
-      default: return 'Semua Produk';
+      case 'toddler': return 'Koleksi Toddler (2-5 Thn)';
+      case 'baby': return 'Koleksi Bayi (6-24 Bln)';
+      case 'born': return 'Koleksi New Born (0-6 Bln)';
+      case 'all': return 'Semua Produk';
+      default: return 'Koleksi Produk';
     }
   };
 
   // Filter products based on URL parameter
   const filteredProducts = products.filter(product => {
-    if (!categoryId || categoryId === 'all') return true; // if no category route, show all
-    return product.categories?.includes(categoryId);
+    if (!categoryId || categoryId === 'all') return true;
+    
+    // Normalize categoryId and product categories for comparison
+    const targetCategory = categoryId.toLowerCase();
+    return product.categories?.some(cat => cat.toLowerCase() === targetCategory);
   });
 
   return (
     <div className="max-w-[1800px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-12">
+      <SEO 
+        title={getTitle()} 
+        description={`Lihat koleksi ${getTitle()} di Gakha Kids. Pakaian berkualitas tinggi untuk kenyamanan dan gaya buah hati Anda.`} 
+      />
       <h1 className="text-[clamp(1.8rem,4vw,2.5rem)] font-extrabold text-[var(--text-primary)] mb-8 tracking-tight border-b border-[var(--border-color)] pb-4">{getTitle()}</h1>
       
       {/* Products Grid */}
