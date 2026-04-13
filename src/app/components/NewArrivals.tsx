@@ -15,26 +15,56 @@ export function NewArrivals() {
         {/* Sticky Sidebar Title */}
         <div className="lg:w-1/4 h-full hidden lg:block">
            <div className="sticky top-32 pt-10">
-             <motion.h2 
-               initial={{ opacity: 0, x: -30 }} 
-               whileInView={{ opacity: 1, x: 0 }} 
-               viewport={{ once: true }}
-               className="text-[clamp(2rem,4vw,3.5rem)] font-black text-[var(--text-primary)] font-serif italic mb-4 tracking-tighter leading-none"
-             >
-               Koleksi<br/>Terbaru
-             </motion.h2>
-             <motion.p 
-               initial={{ opacity: 0 }}
-               whileInView={{ opacity: 1 }}
-               viewport={{ once: true }}
-               transition={{ delay: 0.2 }}
-               className="text-[var(--text-secondary)] text-sm mb-8 leading-relaxed max-w-[200px]"
-             >
-               Melihat dari dekat karya terbaru kami. Didesain untuk kenyamanan si kecil tanpa mengorbankan gaya modern.
-             </motion.p>
-             <Link to="/shop/new" className="inline-block border-2 border-[var(--text-primary)] text-[var(--text-primary)] hover:bg-[var(--text-primary)] hover:text-[var(--bg-primary)] transition-colors px-6 py-2.5 rounded-full font-bold text-xs uppercase tracking-widest">
-               Lihat Semua
-             </Link>
+              <motion.h2 
+                initial={{ opacity: 0, x: -30 }} 
+                whileInView={{ opacity: 1, x: 0 }} 
+                viewport={{ once: true }}
+                className="text-[clamp(1.8rem,4vw,3.2rem)] font-black text-[var(--text-primary)] font-serif italic mb-3 tracking-tighter leading-none"
+              >
+                Koleksi<br/>Terbaru
+              </motion.h2>
+              <motion.p 
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+                className="text-[var(--text-secondary)] text-sm mb-6 leading-relaxed max-w-[240px]"
+              >
+                Pilihan **baju bayi** terbaik dengan material ramah lingkungan. Didesain khusus untuk kulit sensitif dan kenyamanan maksimal balita Anda.
+              </motion.p>
+              
+              {/* Added Interactive List for SEO */}
+              <div className="space-y-4 mb-8">
+                 {[
+                   { label: "Katun Organik Premium", desc: "Serat lembut anti-bakteri" },
+                   { label: "Pewarna Non-Toksik", desc: "Aman jika tergigit si kecil" },
+                   { label: "Jahitan Flat-Lock", desc: "Tidak gatal di kulit bayi" }
+                 ].map((item, i) => (
+                   <motion.div 
+                     key={i}
+                     initial={{ opacity: 0, x: -20 }}
+                     whileInView={{ opacity: 1, x: 0 }}
+                     transition={{ delay: 0.3 + (i * 0.1) }}
+                     className="border-l-4 border-[var(--accent)] pl-3 py-1"
+                   >
+                     <h4 className="text-[11px] font-black uppercase tracking-widest text-[var(--text-primary)]">{item.label}</h4>
+                     <p className="text-[10px] text-[var(--text-secondary)]">{item.desc}</p>
+                   </motion.div>
+                 ))}
+              </div>
+
+              {/* Trending Hashtags */}
+              <div className="flex flex-wrap gap-2 mb-8 max-w-[200px]">
+                 {['#BajuBayi2026', '#GakhaKids', '#BahanOrganik', '#FashionBalita'].map((tag) => (
+                   <span key={tag} className="text-[9px] font-bold text-[var(--accent)] bg-[var(--accent)]/10 px-2 py-1 rounded-md">
+                      {tag}
+                   </span>
+                 ))}
+              </div>
+
+              <Link to="/shop/new" className="inline-flex items-center gap-2 bg-[var(--text-primary)] text-white hover:bg-[var(--accent)] transition-all px-8 py-3 rounded-full font-bold text-[10px] uppercase tracking-widest shadow-lg">
+                Lihat Semua <span className="text-sm">→</span>
+              </Link>
            </div>
         </div>
 
