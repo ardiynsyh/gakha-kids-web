@@ -10,7 +10,7 @@ export default function App() {
     <div className="min-h-screen bg-white">
       <Toaster position="top-center" richColors />
       <NavigationBar />
-      <main className="pt-[130px] sm:pt-[200px]">
+      <main className="pt-[100px] sm:pt-[200px]">
         <HeroBanner />
         <Features />
         <NewArrivals />

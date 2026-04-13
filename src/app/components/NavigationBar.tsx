@@ -41,8 +41,8 @@ export function NavigationBar() {
       <AnnouncementBar />
 
       {/* Main Header Row */}
-      <div className={`max-w-[1800px] mx-auto px-[clamp(1rem,5vw,4rem)] w-full transition-all duration-300 ${isScrolled ? 'py-1.5 sm:py-3' : 'py-3 sm:py-5'}`}>
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+      <div className={`max-w-[1800px] mx-auto px-[clamp(1rem,5vw,4rem)] w-full transition-all duration-300 ${isScrolled ? 'py-1 sm:py-3' : 'py-1.5 sm:py-5'}`}>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-1.5 sm:gap-0">
           
           {/* Top Row for Mobile (Logo & Icons) */}
           <div className="flex items-center justify-between w-full sm:hidden">

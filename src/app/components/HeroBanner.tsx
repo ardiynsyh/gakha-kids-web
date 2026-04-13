@@ -36,7 +36,7 @@ export function HeroBanner() {
         </motion.div>
 
         {/* Text Content (Kinetic + Parallax) */}
-        <div className="relative z-20 w-full md:w-[55%] px-[clamp(1.5rem,8vw,4rem)] text-center md:text-left flex flex-col items-center md:items-start text-white pt-10 md:pt-0">
+        <div className="relative z-20 w-full md:w-[55%] px-[clamp(1rem,5vw,4rem)] text-center md:text-left flex flex-col items-center md:items-start text-white">
            <motion.div style={{ y: textY, scale: scaleText }} className="relative transform-origin-left">
               <div className="absolute inset-[-20px] bg-[#325b7a] blur-3xl rounded-[3rem] -z-10 opacity-50 mix-blend-multiply"></div>
               
@@ -44,7 +44,7 @@ export function HeroBanner() {
                 initial={{ opacity: 0, x: -50 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                className="text-[clamp(3rem,8vw,5.5rem)] font-black leading-[1.05] mb-2 font-serif text-white drop-shadow-2xl"
+                className="text-[clamp(2rem,7vw,4.5rem)] md:text-[clamp(3.5rem,8vw,5.5rem)] font-black leading-[1.05] mb-2 font-serif text-white drop-shadow-2xl"
               >
                  {storeConfig.hero.headingLine1}<br/>
                  <span className="text-[var(--accent)] mix-blend-screen"> {storeConfig.hero.headingLine2}</span>
@@ -53,7 +53,7 @@ export function HeroBanner() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5, duration: 1 }}
-                className="text-[clamp(1.25rem,3vw,2rem)] font-medium tracking-widest mb-8 text-white drop-shadow-md font-sans italic opacity-90 backdrop-blur-sm bg-white/5 inline-block py-2 px-4 rounded-lg border border-white/10"
+                className="text-[clamp(1rem,2.5vw,1.5rem)] md:text-[clamp(1.25rem,3vw,2rem)] font-medium tracking-widest mb-8 text-white drop-shadow-md font-sans italic opacity-90 backdrop-blur-sm bg-white/5 inline-block py-2 px-4 rounded-lg border border-white/10"
               >
                  Diskon hingga 70%
               </motion.h2>
@@ -64,14 +64,14 @@ export function HeroBanner() {
              whileTap={{ scale: 0.95 }}
              className="relative z-30"
            >
-             <Link to="/shop/all" className="bg-[var(--accent)] text-white px-[clamp(2rem,4vw,3.5rem)] py-[clamp(0.85rem,2vw,1.15rem)] rounded-full font-bold uppercase tracking-widest text-[clamp(0.7rem,1.5vw,0.85rem)] shadow-xl block">
-                Belanja Sekarang
+             <Link to="/shop/all" className="bg-[var(--accent)] text-white px-[clamp(1.5rem,4vw,3rem)] py-[clamp(0.75rem,2vw,1.15rem)] rounded-full font-bold uppercase tracking-widest text-[clamp(0.65rem,1.5vw,0.85rem)] shadow-xl block">
+                {storeConfig.hero.primaryButton || 'Belanja Sekarang'}
              </Link>
            </motion.div>
         </div>
 
         {/* Model Kid (Mixed Media Overlap) */}
-        <motion.div style={{ y: modelY }} className="absolute bottom-[-5%] right-[2%] w-[50%] lg:w-[45%] h-[105%] hidden md:flex items-end justify-center z-10">
+        <motion.div style={{ y: modelY }} className="absolute bottom-[-5%] right-[2%] w-[70%] sm:w-[50%] lg:w-[45%] h-[105%] flex items-end justify-center z-10 opacity-40 md:opacity-100">
            <img 
                src={storeConfig.hero.backgroundImage} 
                alt="Hero Banner Element" 
