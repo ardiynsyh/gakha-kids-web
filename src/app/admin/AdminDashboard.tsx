@@ -370,9 +370,11 @@ export function AdminDashboard() {
                   <h2 className="text-xl font-bold text-gray-800">Tautan Sosial Media</h2>
                 </div>
                 <div className="space-y-4">
-                  {['instagram', 'tiktok', 'twitter', 'facebook'].map((platform) => (
+                  {['instagram', 'tiktok', 'twitter', 'facebook', 'resellerWhatsApp'].map((platform) => (
                     <div key={platform}>
-                      <label className="block text-sm font-semibold text-gray-600 mb-1 capitalize">{platform}</label>
+                      <label className="block text-sm font-semibold text-gray-600 mb-1 capitalize">
+                        {platform === 'resellerWhatsApp' ? 'WhatsApp Reseller (Hanya Angka: 628...)' : platform}
+                      </label>
                       <input 
                         type="text" 
                         value={config.socialMedia[platform]}

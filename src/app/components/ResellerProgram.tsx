@@ -1,7 +1,10 @@
 import { motion } from 'framer-motion';
 import { CheckCircle, Zap, ShieldCheck, DollarSign, Package, Users } from 'lucide-react';
+import { storeConfig } from '../../data/storeConfig';
 
 export function ResellerProgram() {
+  const resellerNumber = storeConfig.socialMedia.resellerWhatsApp || "628123456789";
+  
   const benefits = [
     {
       icon: <DollarSign className="w-8 h-8 text-green-500" />,
@@ -90,7 +93,7 @@ export function ResellerProgram() {
             Klik tombol di bawah ini untuk mendaftar via WhatsApp. Tim kami akan menghubungi Anda dalam 1x24 jam.
           </p>
           <a 
-            href="https://wa.me/628123456789?text=Halo%20Gakha%20Kids,%20saya%20tertarik%20bergabung%20menjadi%20reseller" 
+            href={`https://wa.me/${resellerNumber}?text=Halo%20Gakha%20Kids,%20saya%20tertarik%20bergabung%20menjadi%20reseller`} 
             target="_blank" 
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 bg-[var(--accent)] text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest text-sm hover:scale-105 transition-all shadow-xl"
