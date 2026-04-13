@@ -1,19 +1,30 @@
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router';
-import { products } from '../../data/products';
 import { Heart, ShoppingBag, SearchX } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { useWishlist } from '../context/WishlistContext';
+import { supabase } from '../../lib/supabase';
 
 export function SearchPage() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
+  const [products, setProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
 
-  // Search in name or details (case-insensitive)
-  const filteredProducts = products.filter(p => 
-    p.name.toLowerCase().includes(query.toLowerCase()) || 
-    (p.details && p.details.toLowerCase().includes(query.toLowerCase()))
-  );
+  useEffect(() => {
+    async function fetchProducts() {
+      setIsLoading(true);
+      const { data } = await supabase
+        .from('products')
+        .select('*')
+        .or(`name.ilike.%${query}%,details.ilike.%${query}%`);
+      
+      if (data) setProducts(data);
+      setIsLoading(false);
+    }
+    fetchProducts();
+  }, [query]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-[60vh]">
@@ -21,8 +32,10 @@ export function SearchPage() {
       
       {/* Products Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-        {filteredProducts.length > 0 ? (
-          filteredProducts.map((product) => {
+        {isLoading ? (
+          <div className="col-span-full py-16 text-center text-gray-400">Sedang mencari...</div>
+        ) : products.length > 0 ? (
+          products.map((product) => {
             const inWishlist = isInWishlist(product.id);
             return (
               <div key={product.id} className="group relative">
@@ -73,9 +86,9 @@ export function SearchPage() {
                   className="space-y-1 mt-4 cursor-pointer"
                   onClick={() => window.open(product.linktreeUrl || "#", "_blank")}
                 >
-                  <h3 className="text-gray-900 font-medium hover:text-[var(--mint-green)] transition-colors">{product.name}</h3>
+                  <h3 className="text-gray-900 font-medium hover:text-[var(--accent)] transition-colors line-clamp-2">{product.name}</h3>
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-900">{product.price}</span>
+                    <span className="text-gray-900 font-bold">{product.price}</span>
                     {product.originalPrice && (
                       <span className="text-gray-400 line-through text-sm">{product.originalPrice}</span>
                     )}

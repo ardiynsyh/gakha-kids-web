@@ -1,11 +1,29 @@
-import { products } from '../../data/products';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { motion } from 'framer-motion';
 import { calculateDiscountBadge } from './ui/utils';
+import { supabase } from '../../lib/supabase';
 
 export function NewArrivals() {
-  const displayedProducts = products.filter(p => p.categories?.includes('new')).slice(0, 8); 
+  const [products, setProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchProducts() {
+      const { data } = await supabase
+        .from('products')
+        .select('*')
+        .contains('categories', ['new'])
+        .limit(8);
+      
+      if (data) setProducts(data);
+      setIsLoading(false);
+    }
+    fetchProducts();
+  }, []);
+
+  if (isLoading) return <div className="py-20 text-center opacity-50 font-bold uppercase tracking-widest text-xs">Memuat Koleksi Terbaru...</div>;
 
   return (
     <section className="pb-32 pt-16 px-[clamp(1.5rem,5vw,4rem)] max-w-[1800px] mx-auto font-sans bg-[var(--bg-primary)]">
@@ -75,7 +93,7 @@ export function NewArrivals() {
 
         {/* Grid Cards with Neumorphism / Soft Shadow details */}
         <div className="lg:w-3/4 grid grid-cols-[repeat(auto-fit,minmax(clamp(160px,25vw,240px),1fr))] gap-[clamp(1rem,3vw,2rem)]">
-           {displayedProducts.map((product, idx) => {
+           {products.map((product, idx) => {
               const dynamicTag = calculateDiscountBadge(product.price, product.originalPrice);
               const tag = dynamicTag || product.tag || (idx < 2 ? "Hot" : "New");
               

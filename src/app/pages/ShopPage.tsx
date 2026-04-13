@@ -1,15 +1,36 @@
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
-import { products } from '../../data/products';
-import { Heart, ShoppingBag } from 'lucide-react';
+import { Heart, ShoppingBag } from 'lucide-center';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { useWishlist } from '../context/WishlistContext';
 import { calculateDiscountBadge } from '../components/ui/utils';
-
 import { SEO } from '../components/SEO';
+import { supabase } from '../../lib/supabase';
+
+// Helper icon mapping if lucide-center is not correct (it should be lucide-react)
+import { Heart as HeartIcon, ShoppingBag as ShoppingBagIcon } from 'lucide-react';
 
 export function ShopPage() {
   const { categoryId } = useParams();
+  const [products, setProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+
+  useEffect(() => {
+    async function fetchProducts() {
+      setIsLoading(true);
+      let query = supabase.from('products').select('*');
+      
+      if (categoryId && categoryId !== 'all') {
+        query = query.contains('categories', [categoryId.toLowerCase()]);
+      }
+      
+      const { data } = await query;
+      if (data) setProducts(data);
+      setIsLoading(false);
+    }
+    fetchProducts();
+  }, [categoryId]);
 
   const getTitle = () => {
     switch(categoryId) {
@@ -25,17 +46,10 @@ export function ShopPage() {
     }
   };
 
-  // Filter products based on URL parameter
-  const filteredProducts = products.filter(product => {
-    if (!categoryId || categoryId === 'all') return true;
-    
-    // Normalize categoryId and product categories for comparison
-    const targetCategory = categoryId.toLowerCase();
-    return product.categories?.some(cat => cat.toLowerCase() === targetCategory);
-  });
+  if (isLoading) return <div className="py-20 text-center opacity-50 font-bold uppercase tracking-widest text-xs">Menjelajahi Katalog...</div>;
 
   return (
-    <div className="max-w-[1800px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-12">
+    <div className="max-w-[1800px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-12 min-h-[60vh]">
       <SEO 
         title={getTitle()} 
         description={`Lihat koleksi ${getTitle()} di Gakha Kids. Pakaian berkualitas tinggi untuk kenyamanan dan gaya buah hati Anda.`} 
@@ -44,8 +58,8 @@ export function ShopPage() {
       
       {/* Products Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-        {filteredProducts.length > 0 ? (
-          filteredProducts.map((product) => {
+        {products.length > 0 ? (
+          products.map((product) => {
             const dynamicTag = calculateDiscountBadge(product.price, product.originalPrice);
             const tag = dynamicTag || product.tag;
             
@@ -75,7 +89,7 @@ export function ShopPage() {
                         inWish ? removeFromWishlist(product.id) : addToWishlist(product);
                       }}
                       className="bg-white p-2.5 rounded-full hover:scale-110 transition-transform shadow-lg cursor-pointer">
-                      <Heart className={`w-5 h-5 ${isInWishlist(product.id) ? 'fill-red-500 text-red-500' : 'text-gray-700'}`} />
+                      <HeartIcon className={`w-5 h-5 ${isInWishlist(product.id) ? 'fill-red-500 text-red-500' : 'text-gray-700'}`} />
                     </button>
                   </div>
                   <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -86,7 +100,7 @@ export function ShopPage() {
                       className="w-full bg-white text-gray-900 py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors shadow-lg"
                       onClick={(e) => { e.stopPropagation(); }}
                     >
-                      <ShoppingBag className="w-5 h-5" />
+                      <ShoppingBagIcon className="w-5 h-5" />
                       <span className="font-medium">Beli di Marketplace</span>
                     </a>
                   </div>
@@ -110,7 +124,7 @@ export function ShopPage() {
           )})
         ) : (
           <div className="col-span-full py-16 text-center text-gray-500">
-            <ShoppingBag className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+            <ShoppingBagIcon className="w-12 h-12 mx-auto mb-4 text-gray-300" />
             <p>Maaf, produk untuk kategori ini belum tersedia.</p>
           </div>
         )}

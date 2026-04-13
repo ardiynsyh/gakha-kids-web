@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion';
 import { CheckCircle, Zap, ShieldCheck, DollarSign, Package, Users } from 'lucide-react';
-import { storeConfig } from '../../data/storeConfig';
+import { useStore } from '../context/StoreContext';
 
 export function ResellerProgram() {
-  const resellerNumber = storeConfig.socialMedia.resellerWhatsApp || "628123456789";
+  const { config } = useStore();
+  const resellerNumber = config?.socialMedia?.resellerWhatsApp || "628123456789";
   
   const benefits = [
     {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Search, Heart, ShoppingBag, Menu, X, Moon, Sun } from 'lucide-react';
-import { storeConfig } from '../../data/storeConfig';
+import { useStore } from '../context/StoreContext';
 import { Link, useNavigate } from 'react-router';
 import { useWishlist } from '../context/WishlistContext';
 import { useTheme } from '../context/ThemeContext';
@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AnnouncementBar } from './AnnouncementBar';
 
 export function NavigationBar() {
+  const { config } = useStore();
   const navigate = useNavigate();
   const { wishlist } = useWishlist();
   const { theme, toggleTheme } = useTheme();
@@ -53,7 +54,7 @@ export function NavigationBar() {
                 className={`transition-all duration-300 ${isScrolled ? 'w-8 h-8' : 'w-10 h-10'} rounded-lg shadow-sm`}
               />
                <span className={`font-black tracking-tighter text-[var(--text-primary)] font-serif italic uppercase leading-none ${isScrolled ? 'text-lg' : 'text-xl'}`}>
-                  {storeConfig.name.prefix}<span className="text-[var(--accent)]">{storeConfig.name.highlight}</span>
+                  {config?.name?.prefix}<span className="text-[var(--accent)]">{config?.name?.highlight}</span>
                </span>
             </Link>
             
@@ -114,7 +115,7 @@ export function NavigationBar() {
               </motion.div>
               <div className="flex flex-col items-center">
                  <span className={`font-black tracking-tighter text-[var(--text-primary)] font-serif italic uppercase leading-[0.8] drop-shadow-sm group-hover:text-[var(--accent)] transition-all duration-300 ${isScrolled ? 'text-[24px] sm:text-[28px]' : 'text-[34px] sm:text-[38px]'}`}>
-                    {storeConfig.name.prefix}<span className="text-[var(--accent)]">{storeConfig.name.highlight}</span>
+                    {config?.name?.prefix}<span className="text-[var(--accent)]">{config?.name?.highlight}</span>
                  </span>
                  {!isScrolled && (
                    <motion.span 
@@ -168,7 +169,7 @@ export function NavigationBar() {
       {/* Bottom Menu Navigation */}
       <div className="hidden lg:flex items-center justify-center pb-6 pt-2">
          <div className="flex items-center space-x-10">
-            {storeConfig.navigation.links.map((link, index) => (
+            {config?.navigation?.links?.map((link: any, index: number) => (
               <Link key={index} to={link.href} className="flex items-center gap-1 text-[15px] font-black text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all uppercase tracking-tighter hover:scale-105 active:scale-95">
                 {link.label}
               </Link>
@@ -186,7 +187,7 @@ export function NavigationBar() {
             className="lg:hidden border-t border-[var(--border-color)] bg-[var(--bg-primary)] overflow-hidden"
           >
             <div className="px-4 pt-2 pb-6 space-y-2">
-              {storeConfig.navigation.links.map((link, index) => (
+              {config?.navigation?.links?.map((link: any, index: number) => (
                   <Link 
                   key={index} 
                   to={link.href} 

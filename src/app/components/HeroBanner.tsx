@@ -1,11 +1,15 @@
 import { Link } from 'react-router';
 import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { useRef } from 'react';
-import { storeConfig } from '../../data/storeConfig';
+import { useStore } from '../context/StoreContext';
 
 export function HeroBanner() {
+  const { config } = useStore();
   const ref = useRef<HTMLDivElement>(null);
   
+  // Backwards compatibility if config not loaded
+  const hero = config?.hero || { headingLine1: 'Gaya Nyaman &', headingLine2: 'Keren', description: 'Membuat sikecil senang' };
+
   // Mouse tracking for 3D Tilt
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -130,8 +134,8 @@ export function HeroBanner() {
                 transition={{ duration: 0.8 }}
                 className="text-[clamp(2.2rem,8vw,5rem)] font-black leading-[1.1] mb-2 font-serif text-white drop-shadow-[0_5px_15px_rgba(0,0,0,0.3)]"
               >
-                 {storeConfig.hero.headingLine1}<br/>
-                 <span className="text-[var(--accent)] drop-shadow-[0_0_10px_rgba(251,36,106,0.5)]"> {storeConfig.hero.headingLine2}</span>
+                 {hero.headingLine1}<br/>
+                 <span className="text-[var(--accent)] drop-shadow-[0_0_10px_rgba(251,36,106,0.5)]"> {hero.headingLine2}</span>
               </motion.h1>
               
               <motion.p 
@@ -140,7 +144,7 @@ export function HeroBanner() {
                 transition={{ delay: 0.4 }}
                 className="text-[clamp(0.9rem,2vw,1.1rem)] max-w-lg mb-8 font-medium leading-relaxed opacity-90"
               >
-                {storeConfig.hero.description}
+                {hero.description}
               </motion.p>
            </motion.div>
            
@@ -150,7 +154,7 @@ export function HeroBanner() {
              className="relative z-30"
            >
              <Link to="/shop/all" className="bg-[var(--accent)] text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest text-xs shadow-[0_10px_30px_rgba(251,36,106,0.4)] block hover:bg-white hover:text-[var(--accent)] transition-all duration-300">
-                {storeConfig.hero.primaryButton || 'Jelajahi Koleksi'}
+                {hero.primaryButton || 'Jelajahi Koleksi'}
              </Link>
            </motion.div>
         </div>
@@ -161,7 +165,7 @@ export function HeroBanner() {
           className="absolute bottom-[-5%] right-[0%] w-[80%] sm:w-[55%] lg:w-[50%] h-[110%] flex items-end justify-center z-10 opacity-80 md:opacity-100 transition-opacity"
         >
            <img 
-               src={storeConfig.hero.backgroundImage} 
+               src={hero.backgroundImage} 
                alt="Gakha Kids Premium Collection" 
                className="h-full w-auto object-cover object-bottom drop-shadow-[0_10px_50px_rgba(0,0,0,0.6)]"
                style={{ WebkitMaskImage: 'linear-gradient(to top, transparent 0%, black 15%)' }}

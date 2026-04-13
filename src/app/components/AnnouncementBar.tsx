@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion';
-import { storeConfig } from '../../data/storeConfig';
+import { useStore } from '../context/StoreContext';
 import { Link } from 'react-router';
 
 export function AnnouncementBar() {
-  const { announcement } = storeConfig as any;
+  const { config } = useStore();
+  const announcement = config?.announcement;
 
   if (!announcement || !announcement.isEnabled) return null;
 

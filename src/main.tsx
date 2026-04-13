@@ -10,6 +10,7 @@ import { SearchPage } from "./app/pages/SearchPage";
 import { BlogDetailPage } from "./app/pages/BlogDetailPage";
 import { WishlistProvider } from "./app/context/WishlistContext";
 import { ThemeProvider } from "./app/context/ThemeContext";
+import { StoreProvider } from "./app/context/StoreContext";
 import { AdminDashboard } from "./app/admin/AdminDashboard";
 import { AdminLogin } from "./app/admin/AdminLogin";
 import { HelmetProvider } from "react-helmet-async";
@@ -20,21 +21,23 @@ createRoot(document.getElementById("root")!).render(
     <HelmetProvider>
       <BrowserRouter>
         <ThemeProvider>
-          <WishlistProvider>
-            <Routes>
-              <Route path="/" element={<MainLayout />}>
-                <Route index element={<HomePage />} />
-                <Route path="shop/:categoryId" element={<ShopPage />} />
-                <Route path="page/:id" element={<InfoPage />} />
-                <Route path="blog/:id" element={<BlogDetailPage />} />
-                <Route path="wishlist" element={<WishlistPage />} />
-                <Route path="search" element={<SearchPage />} />
-              </Route>
-              <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
-              <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            </Routes>
-          </WishlistProvider>
+          <StoreProvider>
+            <WishlistProvider>
+              <Routes>
+                <Route path="/" element={<MainLayout />}>
+                  <Route index element={<HomePage />} />
+                  <Route path="shop/:categoryId" element={<ShopPage />} />
+                  <Route path="page/:id" element={<InfoPage />} />
+                  <Route path="blog/:id" element={<BlogDetailPage />} />
+                  <Route path="wishlist" element={<WishlistPage />} />
+                  <Route path="search" element={<SearchPage />} />
+                </Route>
+                <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              </Routes>
+            </WishlistProvider>
+          </StoreProvider>
         </ThemeProvider>
       </BrowserRouter>
     </HelmetProvider>

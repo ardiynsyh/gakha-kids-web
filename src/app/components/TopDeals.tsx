@@ -1,10 +1,11 @@
 import { Link } from 'react-router';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { motion } from 'framer-motion';
-import { storeConfig } from '../../data/storeConfig';
+import { useStore } from '../context/StoreContext';
 
 export function TopDeals() {
-  const deals = storeConfig.topDeals || [];
+  const { config } = useStore();
+  const deals = config?.topDeals || [];
 
   return (
     <section className="py-16 bg-[var(--bg-secondary)] px-[clamp(1rem,5vw,4rem)] font-sans">
@@ -26,7 +27,7 @@ export function TopDeals() {
 
          {/* BENTO GRID LAYOUT */}
          <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-[clamp(1rem,2vw,1.5rem)] md:h-[clamp(500px,65vh,700px)]">
-            {deals.map((deal, idx) => (
+            {deals.map((deal: any, idx: number) => (
                <motion.div
                  key={idx}
                  initial={{ opacity: 0, scale: 0.9 }}
@@ -35,7 +36,7 @@ export function TopDeals() {
                  transition={{ delay: idx * 0.15, duration: 0.6, type: "spring" }}
                  className={`${deal.isLarge ? 'md:col-span-2 md:row-span-2' : 'md:col-span-2 md:row-span-1'} h-[300px] md:h-auto group`}
                >
-                 <Link to={deal.route} className={`relative rounded-[2rem] overflow-hidden flex flex-col justify-end items-center pb-[clamp(1.5rem,4vw,3.5rem)] cursor-pointer ${deal.bg} transition-transform hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)] shadow-md border border-[var(--border-color)]/20 w-full h-full block`}>
+                 <Link to={deal.route || '/shop/all'} className={`relative rounded-[2rem] overflow-hidden flex flex-col justify-end items-center pb-[clamp(1.5rem,4vw,3.5rem)] cursor-pointer ${deal.bg || 'bg-blue-100'} transition-transform hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)] shadow-md border border-[var(--border-color)]/20 w-full h-full block`}>
                     
                     {/* Dark Mode Overlay Blending */}
                     <div className="absolute inset-0 bg-black/10 mix-blend-multiply z-10 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity"></div>
