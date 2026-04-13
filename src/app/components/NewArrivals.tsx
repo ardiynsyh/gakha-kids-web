@@ -65,39 +65,39 @@ export function NewArrivals() {
                     y: { type: "spring", stiffness: 300, damping: 20 },
                     opacity: { duration: 0.5, delay: idx * 0.1 }
                   }}
-                  className="group cursor-pointer flex flex-col items-center bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-3xl p-[clamp(0.5rem,1vw,1rem)] shadow-sm hover:border-[var(--accent)]/30 transition-all duration-300 relative z-0 hover:z-10"
+                  className="group cursor-pointer flex flex-col items-center bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-3xl p-3 shadow-sm hover:border-[var(--accent)]/30 transition-all duration-300 relative z-0 hover:z-10"
                 >
                    {/* 3D Reflection Effect on Hover */}
                    <motion.div 
                       className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-3xl pointer-events-none transition-opacity"
                    />
                    {/* Image Box */}
-                   <div className="relative w-full bg-white dark:bg-white rounded-2xl aspect-square mb-4 flex justify-center items-center transition-colors group-hover:bg-gray-50 overflow-hidden shadow-inner">
-                      <div className={`absolute top-3 left-3 text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-[3px] text-white shadow-sm z-10 ${tag.includes('%') ? 'bg-red-500' : 'bg-[#ffb000]'}`}>
+                   <div className="relative w-full bg-slate-50 dark:bg-slate-900/50 rounded-2xl aspect-[4/5] mb-5 flex justify-center items-center transition-colors group-hover:bg-gray-100 overflow-hidden shadow-inner border border-gray-100 dark:border-gray-800">
+                      <div className={`absolute top-4 left-4 text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-[4px] text-white shadow-sm z-10 ${tag.includes('%') ? 'bg-red-500' : 'bg-[#ffb000]'}`}>
                          {tag}
                       </div>
                       
                       <ImageWithFallback 
                         src={product.image} 
                         alt={product.name}
-                        className="w-full h-full object-contain p-4 mix-blend-multiply dark:mix-blend-normal group-hover:scale-[1.05] group-hover:-translate-y-1 transition-transform duration-500" 
+                        className="w-full h-full object-contain p-2 mix-blend-multiply dark:mix-blend-normal group-hover:scale-[1.1] transition-transform duration-700 ease-out" 
                       />
                    </div>
                    
                    {/* Text Info */}
                    <div className="text-center w-full px-2 flex flex-col justify-end h-full">
-                      <div className="flex justify-center items-center gap-1.5 mb-1.5">
-                         <div className="flex text-[#ffb000] text-[clamp(0.6rem,2vw,10px)]">
+                      <div className="flex justify-center items-center gap-1.5 mb-2">
+                         <div className="flex text-[#ffb000] text-[clamp(0.6rem,2vw,11px)]">
                             {'★'.repeat(product.rating || 5)}{'☆'.repeat(5 - (product.rating || 5))}
                          </div>
-                         <span className="text-[clamp(0.6rem,2vw,10px)] text-[var(--text-secondary)] font-medium whitespace-nowrap">({product.reviews || Math.floor(Math.random() * 100 + 10)})</span>
+                         <span className="text-[clamp(0.65rem,2vw,11px)] text-[var(--text-secondary)] font-medium whitespace-nowrap">({product.reviews || Math.floor(Math.random() * 100 + 10)})</span>
                       </div>
 
-                      <h3 className="font-semibold text-[clamp(0.75rem,2.5vw,0.85rem)] text-[var(--text-primary)] mb-2 leading-tight group-hover:text-[var(--accent)] transition-colors break-words line-clamp-2 flex-grow flex items-center justify-center">{product.name}</h3>
+                      <h3 className="font-bold text-[clamp(0.85rem,2.5vw,1.1rem)] text-[var(--text-primary)] mb-3 leading-tight group-hover:text-[var(--accent)] transition-colors break-words line-clamp-2">{product.name}</h3>
                       
-                      <div className="flex justify-center items-center gap-2 mb-4">
-                         {product.originalPrice && <span className="text-[var(--text-secondary)] text-[clamp(0.6rem,2vw,0.75rem)] font-medium line-through opacity-70">{product.originalPrice}</span>}
-                         <span className="font-bold text-[var(--accent)] text-[clamp(0.85rem,3vw,1rem)]">{product.price}</span>
+                      <div className="flex flex-col items-center gap-1 mb-5">
+                         {product.originalPrice && <span className="text-[var(--text-secondary)] text-[clamp(0.65rem,2vw,0.85rem)] font-medium line-through opacity-60 tracking-tight">{product.originalPrice}</span>}
+                         <span className="font-black text-[var(--accent)] text-[clamp(1rem,3.5vw,1.3rem)] drop-shadow-sm">{product.price}</span>
                       </div>
 
                       <button 
