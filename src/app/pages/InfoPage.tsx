@@ -1,6 +1,7 @@
 import { useParams, Link } from 'react-router';
 import infoPagesRaw from '../../data/infoPages.json';
 import blogPosts from '../../data/blogPosts.json';
+import { ResellerProgram } from '../components/ResellerProgram';
 
 const infoPages = infoPagesRaw as Record<string, any>;
 
@@ -20,6 +21,7 @@ export function InfoPage() {
       case 'cookies': return 'Kebijakan Cookies';
       case 'blog': return 'Blog & Artikel';
       case 'about': return 'Tentang Kami';
+      case 'reseller': return 'Program Kemitraan Reseller';
       default: return 'Halaman Informasi';
     }
   };
@@ -46,10 +48,12 @@ export function InfoPage() {
     }
 
     switch (id) {
+      case 'reseller':
+        return <ResellerProgram />;
       case 'gift-cards':
         return (
           <>
-            <p>Memilih pakaian sebagai hadiah kerap membingungkan. Berikan kebebasan berbelanja bagi si kecil di hari ulang tahunnya menggunakan <strong>E-Gift Card Saksag-Go!!</strong></p>
+            <p>Memilih pakaian sebagai hadiah kerap membingungkan. Berikan kebebasan berbelanja bagi si kecil di hari ulang tahunnya menggunakan <strong>E-Gift Card Gakha Kids</strong></p>
             <h3>Cara Kerja E-Gift Card</h3>
             <ol>
               <li>Pilih nominal (Rp 100rb, Rp 200rb, atau Rp 500rb).</li>
@@ -62,7 +66,7 @@ export function InfoPage() {
       case 'privacy':
         return (
           <>
-            <p>Kami menjunjung tinggi keamanan data pribadi Anda. Kebijakan privasi ini menetapkan penjelasan bagaimana *Saksag-Go!* melindungi informasi pengguna.</p>
+            <p>Kami menjunjung tinggi keamanan data pribadi Anda. Kebijakan privasi ini menetapkan penjelasan bagaimana *Gakha Kids* melindungi informasi pengguna.</p>
             <h3>Data yang Dikumpulkan</h3>
             <p>Hanya nama kontak, alamat email, no hp, alamat persinggahan, serta tipe gawai demi keperluan analitik semata.</p>
             <h3>Penggunaan Data</h3>
@@ -73,11 +77,11 @@ export function InfoPage() {
       case 'terms':
         return (
           <>
-            <p>Selamat datang di platform E-Commerce Saksag-Go!. Akses Anda patuh pada Syarat & Ketentuan dari pihak manajemen kami.</p>
+            <p>Selamat datang di platform E-Commerce Gakha Kids. Akses Anda patuh pada Syarat & Ketentuan dari pihak manajemen kami.</p>
             <h3>Ketersediaan Barang</h3>
             <p>Seluruh stok diatur secara otomatis oleh sistem kami. Namun dalam beberapa kejadian minor tabrakan checkout bersamaan, barang berhak diberikan ke nomor Invoice yang dibayarkan lunas terlebih dahulu (dengan garansi refund bagi pembatalan sistem).</p>
             <h3>Hak Kekayaan Intelektual</h3>
-            <p>Konten foto, penulisan artikel, dan logo Saksag-Go! adalah sah dilindungi oleh hukum. Penggandaan karya komersial di platform e-commerce lain tanpa seizin tim, merupakan pelanggaran.</p>
+            <p>Konten foto, penulisan artikel, dan logo Gakha Kids adalah sah dilindungi oleh hukum. Penggandaan karya komersial di platform e-commerce lain tanpa seizin tim, merupakan pelanggaran.</p>
           </>
         );
       case 'cookies':
@@ -97,7 +101,7 @@ export function InfoPage() {
         return (
           <>
             <p className="text-lg leading-relaxed text-[var(--text-secondary)] mb-8">
-              Selamat datang di Jurnal <strong>Saksag-Go!</strong>. Sebuah sudut literasi di mana kami berbagi pandangan seputar pola asuh cerdas, memilih material ramah anak, serta merangkum tren pakaian yang nyaman dan tidak membatasi ruang gerak.
+              Selamat datang di Jurnal <strong>Gakha Kids</strong>. Sebuah sudut literasi di mana kami berbagi pandangan seputar pola asuh cerdas, memilih material ramah anak, serta merangkum tren pakaian yang nyaman dan tidak membatasi ruang gerak.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
               {blogPosts.map((post) => (
@@ -131,7 +135,7 @@ export function InfoPage() {
         return (
           <>
             <div className="w-full relative rounded-3xl overflow-hidden mb-12 h-[350px] shadow-lg group">
-              <img src="https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=1600&auto=format&fit=crop" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt="Tentang Saksag-Go!" />
+              <img src="https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=1600&auto=format&fit=crop" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt="Tentang Gakha Kids" />
               <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent flex items-end justify-start p-10">
                  <div className="max-w-2xl text-left">
                    <h2 className="text-white text-[clamp(2rem,4vw,3.5rem)] font-black tracking-tight leading-none mb-4 drop-shadow-xl font-serif italic">Merajut Cerita<br/>Sejak 2024</h2>
@@ -147,7 +151,7 @@ export function InfoPage() {
                    <h3 className="text-2xl font-black text-[var(--text-primary)] m-0">Titik Mula Kami</h3>
                 </div>
                 <p className="text-lg text-[var(--text-secondary)] leading-relaxed">
-                  Saksag-Go! tidak lahir dari sekadar ambisi bisnis korporat. Perjalanan ini bermula dari kerisauan nyata seorang ibu muda di lorong panti asuhan pinggiran kota, yang kesulitan mencari pakaian sumbangan yang bukan sekadar 'murah', namun layak pakai, dan terbuat dari katun yang tidak menyakiti kulit sensitif bayi-bayi di sana. 
+                  Gakha Kids tidak lahir dari sekadar ambisi bisnis korporat. Perjalanan ini bermula dari kerisauan nyata seorang ibu muda di lorong panti asuhan pinggiran kota, yang kesulitan mencari pakaian sumbangan yang bukan sekadar 'murah', namun layak pakai, dan terbuat dari katun yang tidak menyakiti kulit sensitif bayi-bayi di sana. 
                 </p>
                 <p className="text-lg text-[var(--text-secondary)] leading-relaxed mt-4">
                   Frustrasi akan dominasi pasar yang memprioritaskan "desain heboh" tapi mengesampingkan keamanan serat kimia baju tempelan, kami memberanikan diri merombak standar itu. Lewat modal awal yang sederhana, kami menggandeng tiga pengrajin garmen lokal di Jawa Barat yang setuju dengan satu prinsip kami: <strong>"Baju anak harus bisa 'bernapas', dan mereka harus leluasa berkeringat saat berlari menyelami dunia."</strong>
@@ -171,7 +175,7 @@ export function InfoPage() {
                    <h3 className="text-2xl font-black text-[var(--text-primary)] m-0">Tujuan Terbesar (Our Mission)</h3>
                 </div>
                 <p className="text-lg text-[var(--text-secondary)] leading-relaxed">
-                  Misi dasar dari <strong>Saksag-Go!</strong> adalah melepaskan para orang tua dari kompromi antara harga dan kualitas. Kami mendedikasikan jam malam kami untuk melakukan pengetesan benang dan pola cuci, menekan biaya tengkulak, hingga menghasilkan purwarupa yang sempurna di mata anak, serta ramah di dompet keluarga.
+                  Misi dasar dari <strong>Gakha Kids</strong> adalah melepaskan para orang tua dari kompromi antara harga dan kualitas. Kami mendedikasikan jam malam kami untuk melakukan pengetesan benang dan pola cuci, menekan biaya tengkulak, hingga menghasilkan purwarupa yang sempurna di mata anak, serta ramah di dompet keluarga.
                 </p>
                 <p className="text-lg text-[var(--text-secondary)] leading-relaxed mt-4 font-bold italic text-[var(--text-primary)]">
                   "Sebab kami percaya penuh, dari pakaian yang tidak mengoyak dompet, lahir ketenangan ibu. Dan dari pakaian yang memeluk erat namun adem di kulit, lahir anak-anak hebat yang bebas berlari menebas rasa takutnya."
@@ -183,7 +187,7 @@ export function InfoPage() {
                  <p className="text-[var(--text-secondary)] mb-6">
                   Apabila Anda adalah seniman rajut lokal, distributor kapas organik, atau sekadar ibu yang ingin membagikan kisahnya kepada audiens kami, kanal komunikasi kami selalu terbuka secara profesional.
                  </p>
-                 <a href="mailto:partnership@saksag-go.com" className="inline-flex items-center gap-2 bg-[var(--text-primary)] text-[var(--bg-primary)] font-bold px-6 py-3 rounded-xl hover:bg-[var(--accent)] transition-colors">
+                 <a href="mailto:partnership@gakhakids.online" className="inline-flex items-center gap-2 bg-[var(--text-primary)] text-[var(--bg-primary)] font-bold px-6 py-3 rounded-xl hover:bg-[var(--accent)] transition-colors">
                     Mulai Kolaborasi <span className="text-xl">🤝</span>
                  </a>
               </section>
@@ -201,9 +205,9 @@ export function InfoPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-16 min-h-[50vh]">
-      <h1 className="text-4xl font-bold text-[var(--text-primary)] mb-6">{getTitle()}</h1>
-      <div className="prose text-[var(--text-secondary)] bg-[var(--bg-primary)] p-8 rounded-2xl border border-[var(--border-color)] shadow-sm leading-relaxed antialiased">
+    <div className="max-w-4xl mx-auto px-4 py-32 min-h-[50vh]">
+      <h1 className="text-[clamp(1.5rem,5vw,3rem)] font-black text-[var(--text-primary)] mb-8 text-center">{getTitle()}</h1>
+      <div className="prose prose-lg max-w-none text-[var(--text-secondary)] bg-[var(--bg-primary)] p-[clamp(1rem,5vw,3rem)] rounded-[2.5rem] border border-[var(--border-color)] shadow-xl leading-relaxed antialiased">
         {getContent()}
       </div>
     </div>
