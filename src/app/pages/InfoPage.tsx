@@ -2,11 +2,13 @@ import { useParams, Link } from 'react-router';
 import infoPagesRaw from '../../data/infoPages.json';
 import blogPosts from '../../data/blogPosts.json';
 import { ResellerProgram } from '../components/ResellerProgram';
+import { storeConfig } from '../../data/storeConfig';
 
 const infoPages = infoPagesRaw as Record<string, any>;
 
 export function InfoPage() {
   const { id } = useParams();
+  const resellerNumber = storeConfig.socialMedia.resellerWhatsApp || "628123456789";
 
   const getTitle = () => {
     switch (id) {
@@ -187,7 +189,12 @@ export function InfoPage() {
                  <p className="text-[var(--text-secondary)] mb-6">
                   Apabila Anda adalah seniman rajut lokal, distributor kapas organik, atau sekadar ibu yang ingin membagikan kisahnya kepada audiens kami, kanal komunikasi kami selalu terbuka secara profesional.
                  </p>
-                 <a href="mailto:partnership@gakhakids.online" className="inline-flex items-center gap-2 bg-[var(--text-primary)] text-[var(--bg-primary)] font-bold px-6 py-3 rounded-xl hover:bg-[var(--accent)] transition-colors">
+                 <a 
+                    href={`https://wa.me/${resellerNumber}?text=Halo%20Gakha%20Kids,%20saya%20tertarik%20untuk%20menjalin%20kolaborasi%20bisnis.`} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="inline-flex items-center gap-2 bg-[var(--text-primary)] text-[var(--bg-primary)] font-bold px-6 py-3 rounded-xl hover:bg-[var(--accent)] transition-colors"
+                 >
                     Mulai Kolaborasi <span className="text-xl">🤝</span>
                  </a>
               </section>
