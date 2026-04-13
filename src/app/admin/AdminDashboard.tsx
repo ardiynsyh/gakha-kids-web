@@ -384,7 +384,7 @@ export function AdminDashboard() {
             {/* Announcement, Sosmed, Hero, Pages Sections (Briefed but logic is fully cloud-aware now) */}
             <div className="grid grid-cols-1 gap-8">
                <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
-                  <h2 className="text-xl font-bold mb-4">📢 Announcement Bar</h2>
+                  <h2 className="text-xl font-bold mb-4">📢 Announcement Bar (Notif Bar)</h2>
                   <div className="flex items-center gap-4 mb-4">
                      <button onClick={() => setConfig({...config, announcement: {...config.announcement, isEnabled: !config.announcement.isEnabled}})} className={`px-4 py-2 rounded-lg font-bold text-xs uppercase ${config.announcement?.isEnabled ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-gray-100 text-gray-500 border border-gray-200'}`}>
                         {config.announcement?.isEnabled ? 'AKTIF' : 'NONAKTIF'}
@@ -400,6 +400,77 @@ export function AdminDashboard() {
                         <div key={plat}>
                            <label className="block text-[10px] font-black uppercase text-gray-400 mb-1">{plat}</label>
                            <input type="text" value={config.socialMedia?.[plat]} onChange={(e) => setConfig({...config, socialMedia: {...config.socialMedia, [plat]: e.target.value}})} className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm font-mono" />
+                        </div>
+                     ))}
+                  </div>
+               </div>
+
+               <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+                  <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                     <ImageIcon className="w-5 h-5 text-purple-500" /> Hero & Visual Banner
+                  </h2>
+                  <div className="space-y-6">
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                           <label className="block text-[10px] font-black uppercase text-gray-400 mb-2">Pesan Utama (Baris 1)</label>
+                           <input type="text" value={config.hero?.headingLine1} onChange={(e) => setConfig({...config, hero: {...config.hero, headingLine1: e.target.value}})} className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-bold" />
+                        </div>
+                        <div>
+                           <label className="block text-[10px] font-black uppercase text-gray-400 mb-2">Pesan Aksen (Baris 2)</label>
+                           <input type="text" value={config.hero?.headingLine2} onChange={(e) => setConfig({...config, hero: {...config.hero, headingLine2: e.target.value}})} className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-bold text-[var(--accent)]" />
+                        </div>
+                     </div>
+                     <div>
+                        <label className="block text-[10px] font-black uppercase text-gray-400 mb-2">Deskripsi Hero</label>
+                        <textarea value={config.hero?.description} onChange={(e) => setConfig({...config, hero: {...config.hero, description: e.target.value}})} className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm h-24 resize-none" />
+                     </div>
+                     <div>
+                        <label className="block text-[10px] font-black uppercase text-gray-400 mb-2">Gambar Background Hero (URL)</label>
+                        <div className="flex gap-3">
+                           <input type="text" value={config.hero?.backgroundImage} onChange={(e) => setConfig({...config, hero: {...config.hero, backgroundImage: e.target.value}})} className="flex-1 bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs font-mono" />
+                           <label className="cursor-pointer bg-white border border-gray-200 px-4 py-2 rounded-lg text-xs font-bold hover:bg-gray-50 flex items-center gap-2">
+                              Browse
+                              <input type="file" className="hidden" onChange={(e) => e.target.files && handleUploadImage(e.target.files[0], (url) => setConfig({...config, hero: {...config.hero, backgroundImage: url}}))} />
+                           </label>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
+               <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+                  <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                     <Edit3 className="w-5 h-5 text-green-500" /> Konten Halaman Info
+                  </h2>
+                  <div className="space-y-8 divide-y divide-gray-50">
+                     {infoPages.map((page, idx) => (
+                        <div key={page.id} className="pt-8 first:pt-0">
+                           <div className="flex justify-between items-center mb-4">
+                              <h3 className="font-black text-gray-900 uppercase tracking-wider text-xs">{page.id.replace('-', ' ')}</h3>
+                              <span className="text-[10px] font-bold text-gray-300">Sync ID: {page.id}</span>
+                           </div>
+                           <div className="space-y-4">
+                              <input 
+                                 type="text" 
+                                 value={page.title} 
+                                 onChange={(e) => {
+                                    const newPages = [...infoPages];
+                                    newPages[idx].title = e.target.value;
+                                    setInfoPages(newPages);
+                                 }}
+                                 className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm font-bold"
+                                 placeholder="Judul Halaman..."
+                              />
+                              <textarea 
+                                 value={page.content} 
+                                 onChange={(e) => {
+                                    const newPages = [...infoPages];
+                                    newPages[idx].content = e.target.value;
+                                    setInfoPages(newPages);
+                                 }}
+                                 className="w-full bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm h-48 leading-relaxed resize-none"
+                                 placeholder="Konten halaman (bersifat teks panjang)..."
+                              />
+                           </div>
                         </div>
                      ))}
                   </div>
