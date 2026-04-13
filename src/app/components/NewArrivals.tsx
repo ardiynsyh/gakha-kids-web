@@ -54,11 +54,23 @@ export function NewArrivals() {
                   key={product.id} 
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
+                  whileHover={{ 
+                    y: -15, 
+                    scale: 1.02,
+                    boxShadow: "0 25px 50px -12px rgba(251, 36, 106, 0.25)"
+                  }}
                   viewport={{ once: true, margin: "-50px" }}
-                  transition={{ delay: idx * 0.1, duration: 0.5 }}
-                  className="group cursor-pointer flex flex-col items-center bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-3xl p-[clamp(0.5rem,1vw,1rem)] shadow-[0_10px_30px_inherit] hover:shadow-[0_20px_40px_inherit] transition-all duration-300"
-                  style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}
+                  transition={{ 
+                    layout: { duration: 0.3 },
+                    y: { type: "spring", stiffness: 300, damping: 20 },
+                    opacity: { duration: 0.5, delay: idx * 0.1 }
+                  }}
+                  className="group cursor-pointer flex flex-col items-center bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-3xl p-[clamp(0.5rem,1vw,1rem)] shadow-sm hover:border-[var(--accent)]/30 transition-all duration-300 relative z-0 hover:z-10"
                 >
+                   {/* 3D Reflection Effect on Hover */}
+                   <motion.div 
+                      className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-3xl pointer-events-none transition-opacity"
+                   />
                    {/* Image Box */}
                    <div className="relative w-full bg-white dark:bg-white rounded-2xl aspect-square mb-4 flex justify-center items-center transition-colors group-hover:bg-gray-50 overflow-hidden shadow-inner">
                       <div className={`absolute top-3 left-3 text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-[3px] text-white shadow-sm z-10 ${tag.includes('%') ? 'bg-red-500' : 'bg-[#ffb000]'}`}>
