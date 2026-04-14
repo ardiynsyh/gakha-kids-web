@@ -61,7 +61,15 @@ export function AdminDashboard() {
       })
       .subscribe();
 
-    // 2. Intelligent Auto-Polling Fallback (Jika Realtime Mati)
+    // 2. Realtime Stock Updates
+    const productSubscription = supabase
+      .channel('products-realtime')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'products' }, (payload) => {
+        setProducts(current => current.map(p => p.id === payload.new.id ? payload.new : p));
+      })
+      .subscribe();
+
+    // 3. Intelligent Auto-Polling Fallback (Jika Realtime Mati)
     const pollingInterval = setInterval(async () => {
        const { data: latestOrders } = await supabase.from('orders').select('*').order('id', { ascending: false });
        if (latestOrders) {
@@ -75,10 +83,15 @@ export function AdminDashboard() {
              return latestOrders; // Sinkronisasi penuh
           });
        }
-    }, 5000); // Cek setiap 5 Detik
+
+       // Juga polling produk sesekali untuk memastikan sinkronisasi stok
+       const { data: latestProducts } = await supabase.from('products').select('*').order('id', { ascending: false });
+       if (latestProducts) setProducts(latestProducts);
+    }, 10000); // Cek setiap 10 Detik untuk fallback (interval lebih santai untuk performa)
 
     return () => { 
       supabase.removeChannel(orderSubscription); 
+      supabase.removeChannel(productSubscription);
       clearInterval(pollingInterval);
     };
   }, []);
