@@ -8,6 +8,7 @@ import { InfoPage } from "./app/pages/InfoPage";
 import { WishlistPage } from "./app/pages/WishlistPage";
 import { SearchPage } from "./app/pages/SearchPage";
 import { BlogDetailPage } from "./app/pages/BlogDetailPage";
+import { TrackOrderPage } from "./app/pages/TrackOrderPage";
 import { WishlistProvider } from "./app/context/WishlistContext";
 import { ThemeProvider } from "./app/context/ThemeContext";
 import { StoreProvider } from "./app/context/StoreContext";
@@ -31,6 +32,7 @@ createRoot(document.getElementById("root")!).render(
                   <Route path="blog/:id" element={<BlogDetailPage />} />
                   <Route path="wishlist" element={<WishlistPage />} />
                   <Route path="search" element={<SearchPage />} />
+                  <Route path="track-order" element={<TrackOrderPage />} />
                 </Route>
                 <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
                 <Route path="/admin/login" element={<AdminLogin />} />

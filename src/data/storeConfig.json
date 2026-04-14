@@ -35,6 +35,10 @@
         "href": "/page/reseller"
       },
       {
+        "label": "LACAK PESANAN",
+        "href": "/track-order"
+      },
+      {
         "label": "HALAMAN",
         "href": "/page/about"
       }
