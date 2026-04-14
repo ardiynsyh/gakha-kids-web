@@ -290,6 +290,37 @@ export function AdminDashboard() {
                             placeholder="Harga Coret"
                           />
                         </div>
+                        <div className="flex items-center gap-2">
+                           <div className="flex-1 relative">
+                              <span className="absolute left-2 top-1.5 text-[10px] text-gray-400 font-bold">%</span>
+                              <input 
+                                type="number" 
+                                placeholder="0"
+                                className="w-full bg-red-50 border border-red-100 rounded-lg pl-6 pr-2 py-1.5 focus:bg-white focus:border-red-300 outline-none text-red-500 font-black text-[11px] transition-all"
+                                onChange={(e) => {
+                                   const pct = parseInt(e.target.value);
+                                   if (!isNaN(pct) && p.originalPrice) {
+                                      const op = parseInt(p.originalPrice.replace(/\D/g, ''));
+                                      if (!isNaN(op)) {
+                                         const discountAmount = (op * pct) / 100;
+                                         const finalPrice = op - discountAmount;
+                                         handleUpdateProduct(p.id, 'price', `Rp ${finalPrice.toLocaleString('id-ID')}`);
+                                      }
+                                   }
+                                }}
+                              />
+                           </div>
+                           <div className="bg-red-500 text-white text-[9px] font-black px-2 py-1 rounded">
+                              {(() => {
+                                 const p_val = parseInt(p.price.replace(/\D/g, ''));
+                                 const op_val = parseInt((p.originalPrice || '0').replace(/\D/g, ''));
+                                 if (p_val && op_val && op_val > p_val) {
+                                    return `-${Math.round(((op_val - p_val) / op_val) * 100)}%`;
+                                 }
+                                 return '0%';
+                              })()}
+                           </div>
+                        </div>
                       </td>
                       <td className="p-6">
                          <div className="space-y-3">
