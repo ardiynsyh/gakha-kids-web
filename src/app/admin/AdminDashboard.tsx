@@ -41,6 +41,15 @@ export function AdminDashboard() {
     setUser(user);
   };
 
+  const refreshCoupons = async () => {
+    const { data, error } = await supabase.from('coupons').select('*');
+    if (error) {
+       console.error("Error coupons:", error);
+       return;
+    }
+    setCoupons(data || []);
+  };
+
   const fetchData = async () => {
     setIsSyncing(true);
     try {
@@ -50,14 +59,13 @@ export function AdminDashboard() {
       const { data: cData } = await supabase.from('store_config').select('*').eq('id', 'main').maybeSingle();
       if (cData?.config_data) setConfig({ ...config, ...cData.config_data });
 
-      const { data: resData } = await supabase.from('resellers').select('*').order('created_at', { ascending: false });
+      const { data: resData } = await supabase.from('resellers').select('*').order('id', { ascending: false });
       if (resData) setResellers(resData);
 
-      const { data: ordData } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+      const { data: ordData } = await supabase.from('orders').select('*').order('id', { ascending: false });
       if (ordData) setOrders(ordData || []);
 
-      const { data: coupData } = await supabase.from('coupons').select('*').order('created_at', { ascending: false });
-      if (coupData) setCoupons(coupData || []);
+      await refreshCoupons();
 
       const { data: iData } = await supabase.from('info_pages').select('*');
       if (iData) setInfoPages(iData);
@@ -454,45 +462,54 @@ export function AdminDashboard() {
                       <h1 className="text-3xl font-black text-gray-900 tracking-tighter uppercase">Promotion Engine</h1>
                       <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mt-1">Kelola voucher diskon pelanggan</p>
                    </div>
-                   <button 
-                     onClick={async () => {
-                        const code = prompt('Masukkan Kode Voucher (Contoh: HEMAT50):');
-                        if (!code) return;
-                        
-                        const valueStr = prompt('Berapa persen diskonnya? (Masukkan angka saja, 1-100):');
-                        const value = parseInt(valueStr || '10');
-                        
-                        if (isNaN(value)) {
-                           toast.error("Diskon harus berupa angka!");
-                           return;
-                        }
-
-                        const tid = toast.loading("Memproses kupon baru...");
-                        try {
-                           const newC = { 
-                              code: code.toUpperCase().trim(), 
-                              discount_type: 'Percentage', 
-                              value: value, 
-                              status: 'Active' 
-                           };
+                   <div className="flex gap-4">
+                      <button 
+                        onClick={() => {
+                           const tid = toast.loading("Sinkronisasi kupon...");
+                           refreshCoupons().then(() => toast.success("Data terbaru ditarik!", { id: tid }));
+                        }}
+                        className="bg-white border border-gray-200 text-gray-600 px-6 py-4 rounded-2xl font-black text-xs uppercase shadow-sm hover:bg-gray-50 transition-all flex items-center gap-2"
+                      >
+                         <Clock className="w-4 h-4" /> Sync Data
+                      </button>
+                      <button 
+                        onClick={async () => {
+                           const code = prompt('Masukkan Kode Voucher:');
+                           if (!code) return;
                            
-                           const { data, error } = await supabase.from('coupons').insert([newC]).select();
+                           const valueStr = prompt('Berapa persen diskonnya? (1-100):');
+                           const value = parseInt(valueStr || '10');
                            
-                           if (error) throw error;
-                           
-                           if (data) {
-                              setCoupons([data[0], ...coupons]);
-                              toast.success(`Kupon ${newC.code} berhasil aktif!`, { id: tid });
+                           if (isNaN(value)) {
+                              toast.error("Diskon harus angka!");
+                              return;
                            }
-                        } catch (err: any) {
-                           console.error(err);
-                           toast.error("Gagal buat kupon: " + err.message, { id: tid });
-                        }
-                     }} 
-                     className="bg-gray-900 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase shadow-xl hover:scale-105 transition-all flex items-center gap-2"
-                   >
-                      <Plus className="w-5 h-5 text-[var(--accent)]" /> Buat Kupon Baru
-                   </button>
+
+                           const tid = toast.loading("Memproses...");
+                           try {
+                              const newC = { 
+                                 id: Date.now(),
+                                 code: code.toUpperCase().trim(), 
+                                 discount_type: 'Percentage', 
+                                 value: value, 
+                                 status: 'Active' 
+                              };
+                              
+                              const { error } = await supabase.from('coupons').insert([newC]);
+                              
+                              if (error) throw error;
+                              
+                              await refreshCoupons();
+                              toast.success(`Kupon ${newC.code} aktif!`, { id: tid });
+                           } catch (err: any) {
+                              toast.error("Gagal: " + err.message, { id: tid });
+                           }
+                        }} 
+                        className="bg-gray-900 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase shadow-xl hover:scale-105 transition-all flex items-center gap-2"
+                      >
+                         <Plus className="w-5 h-5 text-[var(--accent)]" /> Buat Kupon Baru
+                      </button>
+                   </div>
                 </div>
 
                 {coupons.length === 0 ? (
