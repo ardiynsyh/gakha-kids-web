@@ -222,9 +222,21 @@ export function AdminDashboard() {
                           <input value={p.name} onChange={(e) => handleUpdateProduct(p.id, 'name', e.target.value)} className="w-full font-black text-2xl outline-none bg-transparent" placeholder="Product Name" />
                           <input value={p.price} onChange={(e) => handleUpdateProduct(p.id, 'price', e.target.value)} className="w-full font-bold text-blue-600 outline-none text-base" placeholder="Price (e.g. Rp 150.000)" />
                        </div>
-                       <div className="flex gap-3">
+                       <div className="flex flex-wrap gap-3">
                           {p.sizes?.map((s: string) => (
-                            <div key={s} className="bg-gray-50 border border-gray-200 rounded-2xl p-4 min-w-[70px] text-center group-hover:bg-white transition-colors">
+                            <div key={s} className="bg-gray-50 border border-gray-200 rounded-2xl p-4 min-w-[70px] text-center group/size relative">
+                               <button 
+                                 onClick={() => {
+                                    const newSizes = p.sizes.filter((size: string) => size !== s);
+                                    const newInv = { ...p.inventory };
+                                    delete newInv[s];
+                                    handleUpdateProduct(p.id, 'sizes', newSizes);
+                                    handleUpdateProduct(p.id, 'inventory', newInv);
+                                 }}
+                                 className="absolute -top-2 -right-2 bg-red-500 text-white w-5 h-5 rounded-full text-[10px] items-center justify-center opacity-0 group-hover/size:opacity-100 transition-opacity hidden group-hover/size:flex shadow-lg"
+                               >
+                                  <X className="w-3 h-3" />
+                               </button>
                                <p className="text-[10px] font-black text-gray-400 mb-2">{s}</p>
                                <input type="number" value={p.inventory?.[s] || 0} onChange={(e) => {
                                  const inv = { ...(p.inventory || {}), [s]: parseInt(e.target.value) || 0 };
@@ -232,6 +244,18 @@ export function AdminDashboard() {
                                }} className="w-full bg-transparent text-center font-black text-sm outline-none" />
                             </div>
                           ))}
+                          <button 
+                            onClick={() => {
+                               const newSizeName = prompt("Nama ukuran baru (contoh: XXL, 6Thn, dll):");
+                               if (newSizeName && !p.sizes.includes(newSizeName)) {
+                                  handleUpdateProduct(p.id, 'sizes', [...p.sizes, newSizeName]);
+                                  handleUpdateProduct(p.id, 'inventory', { ...(p.inventory || {}), [newSizeName]: 0 });
+                               }
+                            }}
+                            className="w-12 h-[74px] border-2 border-dashed border-gray-200 rounded-2xl flex items-center justify-center text-gray-300 hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all hover:bg-white"
+                          >
+                             <Plus className="w-6 h-6" />
+                          </button>
                        </div>
                        <button onClick={() => handleDelete(p.id)} className="p-5 text-red-200 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"><Trash className="w-6 h-6" /></button>
                     </div>
