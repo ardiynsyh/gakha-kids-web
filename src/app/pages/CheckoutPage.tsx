@@ -59,7 +59,7 @@ export function CheckoutPage() {
     const finalTotal = subtotal - discount + 15000; // Flat 15k shipping for now
 
     try {
-      const { error } = await supabase.from('orders').insert([{
+      const { error: orderError } = await supabase.from('orders').insert([{
         id: orderId,
         customer_name: formData.name,
         whatsapp: formData.whatsapp,
@@ -71,23 +71,27 @@ export function CheckoutPage() {
         status: 'Pending'
       }]);
 
-      if (error) throw error;
+      if (orderError) throw orderError;
 
-      // Deduct Stock
-      for (const item of cart) {
-        const { data: p } = await supabase.from('products').select('inventory').eq('id', item.id).single();
-        if (p) {
-          const newInv = { ...p.inventory, [item.size]: (p.inventory[item.size] || 0) - item.quantity };
-          await supabase.from('products').update({ inventory: newInv }).eq('id', item.id);
+      // Deduct Stock (Wrapped in another try-catch so it doesn't break the order if it fails)
+      try {
+        for (const item of cart) {
+          const { data: p } = await supabase.from('products').select('inventory').eq('id', item.id).single();
+          if (p && p.inventory) {
+            const newInv = { ...p.inventory, [item.size]: (p.inventory[item.size] || 0) - item.quantity };
+            await supabase.from('products').update({ inventory: newInv }).eq('id', item.id);
+          }
         }
+      } catch (stockErr) {
+        console.warn("Stock deduction failed (likely RLS), but order is created:", stockErr);
       }
 
       toast.success('Pesanan berhasil dibuat!');
       clearCart();
       navigate('/track-order', { state: { orderId } });
-    } catch (e) {
-      console.error(e);
-      toast.error('Gagal membuat pesanan. Silakan coba lagi.');
+    } catch (e: any) {
+      console.error("Order Creation Error:", e);
+      toast.error(`Gagal: ${e.message || 'Cek koneksi database'}`);
     } finally {
       setIsSubmitting(false);
     }
