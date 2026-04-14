@@ -212,6 +212,7 @@ export function AdminDashboard() {
   };
 
   // Derived Data
+  const filteredProducts = products.filter(p => selectedCategory === 'all' || p.categories?.includes(selectedCategory));
   const filteredOrders = orders.filter(o => orderStatusFilter === 'all' || o.status === orderStatusFilter);
   const dailyRecap = orders.filter(o => new Date(o.created_at).toDateString() === new Date().toDateString() && o.status === 'Completed').reduce((acc, o) => acc + (o.total || 0), 0);
   const monthlyRecap = orders.filter(o => new Date(o.created_at).getMonth() === new Date().getMonth() && o.status === 'Completed').reduce((acc, o) => acc + (o.total || 0), 0);
