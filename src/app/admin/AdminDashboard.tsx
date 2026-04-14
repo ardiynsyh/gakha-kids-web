@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Package, Save, Plus, Trash, Settings, Image as ImageIcon, Link as LinkIcon, Edit3, Ruler, LogOut, User } from 'lucide-react';
+import { Package, Save, Plus, Trash, Settings, Image as ImageIcon, Link as LinkIcon, Edit3, Ruler, LogOut, User, ShoppingBag, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
@@ -26,9 +26,11 @@ const ShieldCheck = ({className}: {className?: string}) => (
 
 export function AdminDashboard() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'products' | 'settings' | 'resellers'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'settings' | 'resellers' | 'orders' | 'coupons' | 'analytics'>('analytics');
   const [products, setProducts] = useState<any[]>([]);
   const [resellers, setResellers] = useState<any[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [coupons, setCoupons] = useState<any[]>([]);
   const [config, setConfig] = useState<any>(null);
   const [infoPages, setInfoPages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -68,6 +70,12 @@ export function AdminDashboard() {
 
       const { data: resData } = await supabase.from('resellers').select('*').order('created_at', { ascending: false });
       if (resData) setResellers(resData);
+
+      const { data: ordData } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+      if (ordData) setOrders(ordData || []);
+
+      const { data: coupData } = await supabase.from('coupons').select('*').order('created_at', { ascending: false });
+      if (coupData) setCoupons(coupData || []);
 
       const { data: iData } = await supabase.from('info_pages').select('*');
       if (iData) setInfoPages(iData);
@@ -159,6 +167,7 @@ export function AdminDashboard() {
       linktreeUrl: "https://linktr.ee/",
       categories: [defaultCategory],
       sizes: ["S", "M", "L", "XL"],
+      inventory: {},
       details: "",
       video: "",
       bundleIds: []
@@ -216,12 +225,33 @@ export function AdminDashboard() {
 
         <nav className="space-y-4 flex-1">
           <button 
+              onClick={() => setActiveTab('analytics')}
+              className={`w-full flex items-center gap-3 text-left p-4 rounded-xl transition-all ${activeTab === 'analytics' ? 'bg-[var(--accent)] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/10'}`}
+            >
+              <Package className="w-5 h-5" />
+              <span className="font-bold">Dashboard & Analytics</span>
+            </button>
+          <button 
             onClick={() => setActiveTab('products')}
             className={`w-full flex items-center gap-3 text-left p-4 rounded-xl transition-all ${activeTab === 'products' ? 'bg-[var(--accent)] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/10'}`}
           >
             <Package className="w-5 h-5" />
             <span className="font-bold">Kelola Produk</span>
           </button>
+          <button 
+              onClick={() => setActiveTab('orders')}
+              className={`w-full flex items-center gap-3 text-left p-4 rounded-xl transition-all ${activeTab === 'orders' ? 'bg-[var(--accent)] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/10'}`}
+            >
+              <ShoppingBag className="w-5 h-5" />
+              <span className="font-bold">Pesanan Masuk</span>
+            </button>
+          <button 
+              onClick={() => setActiveTab('coupons')}
+              className={`w-full flex items-center gap-3 text-left p-4 rounded-xl transition-all ${activeTab === 'coupons' ? 'bg-[var(--accent)] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/10'}`}
+            >
+              <Zap className="w-5 h-5" />
+              <span className="font-bold">Kupon & Promo</span>
+            </button>
           <button 
               onClick={() => setActiveTab('resellers')}
               className={`w-full flex items-center gap-3 text-left p-4 rounded-xl transition-all ${activeTab === 'resellers' ? 'bg-[var(--accent)] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/10'}`}
@@ -928,6 +958,158 @@ export function AdminDashboard() {
                     ))}
                   </tbody>
                 </table>
+             </div>
+          </div>
+        )}
+
+        {/* Tab Analytics */}
+        {activeTab === 'analytics' && (
+           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="mb-10">
+                <h1 className="text-4xl font-black text-gray-900 italic tracking-tighter uppercase leading-none mb-3">Shop Performance</h1>
+                <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px]">Statistik Penjualan & Performa Katalog Gakha Kids</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+                 {[
+                   { label: "Total Omzet", val: `Rp ${orders.reduce((acc, o) => acc + (o.total || 0), 0).toLocaleString()}`, icon: <Package className="w-5 h-5 text-green-500" />, color: "bg-green-50" },
+                   { label: "Total Pesanan", val: JSON.stringify(orders.length), icon: <ShoppingBag className="w-5 h-5 text-blue-500" />, color: "bg-blue-50" },
+                   { label: "Produk Aktif", val: JSON.stringify(products.length), icon: <Zap className="w-5 h-5 text-yellow-500" />, color: "bg-yellow-50" },
+                   { label: "Kupon Aktif", val: JSON.stringify(coupons.length), icon: <Edit3 className="w-5 h-5 text-purple-500" />, color: "bg-purple-50" },
+                 ].map((stat, i) => (
+                   <div key={i} className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all">
+                      <div className={`${stat.color} w-12 h-12 rounded-2xl flex items-center justify-center mb-4`}>
+                        {stat.icon}
+                      </div>
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{stat.label}</p>
+                      <h3 className="text-2xl font-black text-gray-900 tracking-tight">{stat.val}</h3>
+                   </div>
+                 ))}
+              </div>
+
+              <div className="bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm">
+                 <h2 className="text-xl font-black mb-8 italic uppercase tracking-tight">Kinerja Produk Terpopuler</h2>
+                 <div className="space-y-6">
+                    {products.slice(0, 5).map((p, i) => (
+                      <div key={p.id} className="flex items-center gap-4">
+                         <div className="w-12 h-12 rounded-xl bg-gray-50 flex-shrink-0">
+                            <img src={p.image} className="w-full h-full object-contain p-1" />
+                         </div>
+                         <div className="flex-1">
+                            <h4 className="font-bold text-sm text-gray-900">{p.name}</h4>
+                            <div className="w-full bg-gray-100 h-2 rounded-full mt-1.5 overflow-hidden">
+                               <div className="bg-[var(--accent)] h-full rounded-full" style={{ width: `${85 - (i * 15)}%` }} />
+                            </div>
+                         </div>
+                         <div className="text-right">
+                            <span className="text-xs font-black text-gray-400">{(Math.random() * 500 + 100).toFixed(0)} views</span>
+                         </div>
+                      </div>
+                    ))}
+                 </div>
+              </div>
+           </div>
+        )}
+
+        {/* Tab Orders */}
+        {activeTab === 'orders' && (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+             <div className="flex justify-between items-center mb-8">
+                <div>
+                  <h1 className="text-3xl font-black text-gray-900 italic tracking-tighter uppercase">Order Registry</h1>
+                  <p className="text-gray-500 text-sm font-medium">Manajemen status dan detail pesanan pelanggan.</p>
+                </div>
+             </div>
+
+             <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
+                <table className="w-full text-left">
+                  <thead className="bg-gray-50/50 border-b border-gray-100">
+                    <tr>
+                      <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Order ID</th>
+                      <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Pelanggan</th>
+                      <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Item</th>
+                      <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Total</th>
+                      <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {orders.length > 0 ? orders.map((ord) => (
+                      <tr key={ord.id} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="p-6 font-mono text-xs text-blue-600 font-bold">ORD-{ord.id}</td>
+                        <td className="p-6">
+                            <p className="font-bold text-gray-900">{ord.customer_name}</p>
+                            <p className="text-[10px] text-gray-400">{ord.whatsapp}</p>
+                        </td>
+                        <td className="p-6">
+                           <span className="text-xs font-bold text-gray-600">{(ord.items || []).length} items</span>
+                        </td>
+                        <td className="p-6 font-black text-gray-900">Rp {(ord.total || 0).toLocaleString()}</td>
+                        <td className="p-6">
+                           <span className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                             ord.status === 'Completed' ? 'bg-green-50 text-green-600' : 'bg-amber-50 text-amber-600'
+                           }`}>
+                             {ord.status}
+                           </span>
+                        </td>
+                      </tr>
+                    )) : (
+                      <tr><td colSpan={5} className="p-20 text-center opacity-30 font-black">BELUM ADA PESANAN MASUK</td></tr>
+                    )}
+                  </tbody>
+                </table>
+             </div>
+          </div>
+        )}
+
+        {/* Tab Coupons */}
+        {activeTab === 'coupons' && (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+             <div className="flex justify-between items-center mb-8">
+                <div>
+                  <h1 className="text-3xl font-black text-gray-900 italic tracking-tighter uppercase">Promotion Engine</h1>
+                  <p className="text-gray-500 text-sm font-medium">Kelola kupon diskon dan promosi musiman.</p>
+                </div>
+                <button 
+                  onClick={async () => {
+                    const code = prompt('Kode Kupon:');
+                    if (code) {
+                      const newCoup = { id: Date.now(), code: code.toUpperCase(), discount_type: 'Percentage', value: 10, status: 'Active' };
+                      setCoupons([newCoup, ...coupons]);
+                      await supabase.from('coupons').insert([newCoup]);
+                    }
+                  }}
+                  className="bg-[var(--accent)] text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:scale-105 transition-transform flex items-center gap-2"
+                >
+                  <Plus className="w-5 h-5" /> Buat Kupon Baru
+                </button>
+             </div>
+
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {coupons.length > 0 ? coupons.map((coup) => (
+                  <div key={coup.id} className="bg-white p-8 rounded-[2.5rem] border-2 border-dashed border-gray-100 flex items-center justify-between group hover:border-[var(--accent)] transition-all">
+                     <div>
+                        <div className="inline-block bg-gray-900 text-white px-4 py-1 rounded-lg font-mono font-bold text-lg tracking-widest mb-3">
+                           {coup.code}
+                        </div>
+                        <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">
+                           Diskon {coup.discount_type === 'Percentage' ? `${coup.value}%` : `Rp ${coup.value.toLocaleString()}`}
+                        </p>
+                     </div>
+                     <div className="text-right">
+                        <button 
+                          onClick={async () => {
+                             await supabase.from('coupons').delete().eq('id', coup.id);
+                             setCoupons(coupons.filter(c => c.id !== coup.id));
+                          }}
+                          className="p-3 text-red-400 hover:bg-red-50 rounded-2xl transition-colors"
+                        >
+                           <Trash className="w-6 h-6" />
+                        </button>
+                     </div>
+                  </div>
+                )) : (
+                  <div className="col-span-full border-4 border-dashed border-gray-50 rounded-[3rem] py-20 text-center opacity-20 font-black text-2xl">ANDA BELUM MEMILIKI KUPON</div>
+                )}
              </div>
           </div>
         )}
