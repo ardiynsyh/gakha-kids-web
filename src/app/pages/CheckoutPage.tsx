@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router';
 import { SEO } from '../components/SEO';
+import { useMidtrans } from '../hooks/useMidtrans';
 
 export function CheckoutPage() {
   const { cart, removeFromCart, updateQuantity, subtotal, clearCart } = useCart();
@@ -13,6 +14,7 @@ export function CheckoutPage() {
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  useMidtrans(); // Load Snap.js dynamically from VITE_MIDTRANS_CLIENT_KEY env var
 
   const [formData, setFormData] = useState({
     name: '',
