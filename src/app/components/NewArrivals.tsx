@@ -4,10 +4,13 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { motion } from 'framer-motion';
 import { calculateDiscountBadge } from './ui/utils';
 import { supabase } from '../../lib/supabase';
+import { ProductModal } from './ProductModal';
 
 export function NewArrivals() {
   const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     async function fetchProducts() {
@@ -149,16 +152,26 @@ export function NewArrivals() {
                       </div>
 
                       <button 
-                         onClick={(e) => { e.stopPropagation(); window.open(product.linktreeUrl || "#"); }}
+                         onClick={(e) => { 
+                           e.stopPropagation(); 
+                           setSelectedProduct(product);
+                           setIsModalOpen(true);
+                         }}
                          className="bg-[var(--text-primary)] text-[var(--bg-primary)] text-[clamp(0.55rem,2vw,0.75rem)] font-bold px-4 py-2.5 rounded-full uppercase tracking-wider hover:bg-[var(--accent)] hover:text-white transition-colors shadow-md w-full sm:w-[90%] mx-auto block mb-2"
                       >
-                         Beli Produk
+                         Lihat Detail
                       </button>
                    </div>
                 </motion.div>
               )
            })}
         </div>
+
+        <ProductModal 
+           product={selectedProduct} 
+           isOpen={isModalOpen} 
+           onClose={() => setIsModalOpen(false)} 
+        />
       </div>
     </section>
   )

@@ -6,6 +6,7 @@ import { useWishlist } from '../context/WishlistContext';
 import { useTheme } from '../context/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AnnouncementBar } from './AnnouncementBar';
+import { FlashSaleTimer } from './FlashSaleTimer';
 
 export function NavigationBar() {
   const { config } = useStore();
@@ -40,6 +41,7 @@ export function NavigationBar() {
       className={`fixed top-0 left-0 w-full z-50 flex flex-col font-sans transition-all duration-300 ${isScrolled ? 'bg-[var(--bg-primary)]/80 backdrop-blur-xl shadow-sm border-b border-[var(--border-color)]' : 'bg-[var(--bg-primary)]'}`}
     >
       <AnnouncementBar />
+      <FlashSaleTimer />
 
       {/* Main Header Row */}
       <div className={`max-w-[1800px] mx-auto px-[clamp(1rem,5vw,4rem)] w-full transition-all duration-300 ${isScrolled ? 'py-1 sm:py-3' : 'py-1.5 sm:py-5'}`}>

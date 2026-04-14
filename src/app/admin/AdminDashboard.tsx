@@ -4,6 +4,26 @@ import { useNavigate } from 'react-router';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 
+const Clock = ({className}: {className?: string}) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <circle cx="12" cy="12" r="10" />
+    <polyline points="12 6 12 12 16 14" />
+  </svg>
+);
+
+const Zap = ({className}: {className?: string}) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+  </svg>
+);
+
+const ShieldCheck = ({className}: {className?: string}) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    <path d="m9 12 2 2 4-4" />
+  </svg>
+);
+
 export function AdminDashboard() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'products' | 'settings'>('products');
@@ -135,7 +155,9 @@ export function AdminDashboard() {
       linktreeUrl: "https://linktr.ee/",
       categories: [defaultCategory],
       sizes: ["S", "M", "L", "XL"],
-      details: ""
+      details: "",
+      video: "",
+      bundleIds: []
     };
     setProducts([newProduct, ...products]);
   };
@@ -232,10 +254,11 @@ export function AdminDashboard() {
                   <tr className="bg-gray-50/50 border-b border-gray-100 text-gray-400 font-black text-[10px] uppercase tracking-[0.2em]">
                     <th className="p-6 w-16">Foto</th>
                     <th className="p-6 w-[15%]">Nama Produk</th>
-                    <th className="p-6 w-[12%]">Harga</th>
-                    <th className="p-6 w-[18%]">Varian Ukuran</th>
-                    <th className="p-6 w-[15%]">Kategori & Label</th>
-                    <th className="p-6 w-[20%]">Link Marketplace</th>
+                    <th className="p-6 w-[12%]">Harga & Diskon</th>
+                    <th className="p-6 w-[15%]">Ukuran</th>
+                    <th className="p-6 w-[15%]">Kategori</th>
+                    <th className="p-6 w-[15%]">Video & Bundle</th>
+                    <th className="p-6 w-[12%]">Link Marketplace</th>
                     <th className="p-6 w-[10%] text-right">Aksi</th>
                   </tr>
                 </thead>
@@ -410,9 +433,33 @@ export function AdminDashboard() {
                         <textarea 
                           value={p.linktreeUrl || ''} 
                           onChange={(e) => handleUpdateProduct(p.id, 'linktreeUrl', e.target.value)}
-                          className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 font-mono text-[9px] text-blue-600 h-20 resize-none outline-none focus:border-blue-300"
-                          placeholder="Linktree/Shopee/WA Link..."
+                          className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 font-mono text-[8px] text-blue-600 h-28 resize-none outline-none focus:border-blue-300"
+                          placeholder="Linktree/Shopee..."
                         />
+                      </td>
+                      <td className="p-6">
+                         <div className="space-y-3">
+                            <div className="relative">
+                               <label className="text-[9px] font-black text-gray-400 uppercase">Video URL (Direct MP4)</label>
+                               <input 
+                                 type="text" 
+                                 value={p.video || ''} 
+                                 onChange={(e) => handleUpdateProduct(p.id, 'video', e.target.value)}
+                                 className="w-full bg-gray-50 border border-gray-100 rounded-lg p-2 text-[10px] font-mono outline-none focus:border-purple-300"
+                                 placeholder="https://...mp4"
+                               />
+                            </div>
+                            <div>
+                               <label className="text-[9px] font-black text-gray-400 uppercase">Shop Look (Bundle IDs)</label>
+                               <input 
+                                 type="text" 
+                                 value={(p.bundleIds || []).join(', ')} 
+                                 onChange={(e) => handleUpdateProduct(p.id, 'bundleIds', e.target.value.split(',').map(v => v.trim()).filter(Boolean))}
+                                 className="w-full bg-gray-50 border border-gray-100 rounded-lg p-2 text-[10px] font-mono outline-none focus:border-green-300"
+                                 placeholder="ID1, ID2..."
+                               />
+                            </div>
+                         </div>
                       </td>
                       <td className="p-6 text-right">
                         <button 
@@ -460,7 +507,55 @@ export function AdminDashboard() {
                   </div>
                </div>
                
-                <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+                <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm border-l-4 border-red-400">
+                  <h2 className="text-xl font-bold mb-4 flex items-center gap-3">
+                     <Clock className="w-5 h-5 text-red-500" /> ⚡ Flash Sale & Urgency Timer
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                     <div className="space-y-4">
+                        <div className="flex items-center gap-4">
+                           <button onClick={() => setConfig({...config, flashSale: {...config.flashSale, isEnabled: !config.flashSale.isEnabled}})} className={`px-4 py-2 rounded-lg font-bold text-xs uppercase ${config.flashSale?.isEnabled ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-gray-100 text-gray-500 border border-gray-200'}`}>
+                              {config.flashSale?.isEnabled ? 'FLASH SALE AKTIF' : 'NONAKTIF'}
+                           </button>
+                           <input type="text" value={config.flashSale?.text} onChange={(e) => setConfig({...config, flashSale: {...config.flashSale, text: e.target.value}})} className="flex-1 bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm" placeholder="Judul promo..." />
+                        </div>
+                        <div>
+                           <label className="block text-[10px] font-black uppercase text-gray-400 mb-1">Berakhir Pada (Contoh: April 25, 2026 23:59:59)</label>
+                           <input type="text" value={config.flashSale?.endTime} onChange={(e) => setConfig({...config, flashSale: {...config.flashSale, endTime: e.target.value}})} className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm font-mono" placeholder="Target waktu..." />
+                        </div>
+                     </div>
+                     <div className="p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200 text-xs text-gray-500 leading-relaxed italic">
+                        Tip: Gunakan timer ini untuk meningkatkan rasa urgensi pembeli. Timer akan muncul di bawah bar pengumuman pada setiap halaman.
+                     </div>
+                  </div>
+               </div>
+
+               <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm border-l-4 border-purple-400">
+                  <h2 className="text-xl font-bold mb-4 flex items-center gap-3">
+                     <Zap className="w-5 h-5 text-purple-500" /> 🎁 Newsletter & Promo Popup
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                     <div className="space-y-4">
+                        <button onClick={() => setConfig({...config, newsletterPopup: {...config.newsletterPopup, isEnabled: !config.newsletterPopup.isEnabled}})} className={`px-4 py-2 rounded-lg font-bold text-xs uppercase ${config.newsletterPopup?.isEnabled ? 'bg-purple-100 text-purple-700 border border-purple-200' : 'bg-gray-100 text-gray-500 border border-gray-200'}`}>
+                           {config.newsletterPopup?.isEnabled ? 'POPUP AKTIF' : 'NONAKTIF'}
+                        </button>
+                        <div>
+                           <label className="block text-[10px] font-black uppercase text-gray-400 mb-1">Judul Penawaran</label>
+                           <input type="text" value={config.newsletterPopup?.title} onChange={(e) => setConfig({...config, newsletterPopup: {...config.newsletterPopup, title: e.target.value}})} className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm font-bold" />
+                        </div>
+                        <div>
+                           <label className="block text-[10px] font-black uppercase text-gray-400 mb-1">Kode Diskon (Teks Reveal)</label>
+                           <input type="text" value={config.newsletterPopup?.promoCode} onChange={(e) => setConfig({...config, newsletterPopup: {...config.newsletterPopup, promoCode: e.target.value}})} className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm font-mono text-purple-600" />
+                        </div>
+                     </div>
+                     <div>
+                        <label className="block text-[10px] font-black uppercase text-gray-400 mb-1">Deskripsi & Instruksi</label>
+                        <textarea value={config.newsletterPopup?.description} onChange={(e) => setConfig({...config, newsletterPopup: {...config.newsletterPopup, description: e.target.value}})} className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs h-32 resize-none" />
+                     </div>
+                  </div>
+               </div>
+
+               <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
                   <h2 className="text-xl font-bold mb-4 flex items-center justify-between">
                      <span>📦 Kategori Produk</span>
                      <button 

@@ -7,6 +7,7 @@ import { calculateDiscountBadge } from '../components/ui/utils';
 import { SEO } from '../components/SEO';
 import { supabase } from '../../lib/supabase';
 import { useStore } from '../context/StoreContext';
+import { ProductModal } from '../components/ProductModal';
 
 // Helper icon mapping if lucide-center is not correct (it should be lucide-react)
 import { Heart as HeartIcon, ShoppingBag as ShoppingBagIcon } from 'lucide-react';
@@ -17,6 +18,8 @@ export function ShopPage() {
   const [isLoading, setIsLoading] = useState(true);
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const { config } = useStore();
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     async function fetchProducts() {
@@ -98,25 +101,29 @@ export function ShopPage() {
                       <HeartIcon className={`w-5 h-5 ${isInWishlist(product.id) ? 'fill-red-500 text-red-500' : 'text-gray-700'}`} />
                     </button>
                   </div>
-                  <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <a 
-                      href={product.linktreeUrl || "#"}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full bg-white text-gray-900 py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors shadow-lg"
-                      onClick={(e) => { e.stopPropagation(); }}
-                    >
-                      <ShoppingBagIcon className="w-5 h-5" />
-                      <span className="font-medium">Beli di Marketplace</span>
-                    </a>
-                  </div>
+                      <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <button 
+                          onClick={(e) => { 
+                            e.stopPropagation(); 
+                            setSelectedProduct(product);
+                            setIsModalOpen(true);
+                          }}
+                          className="w-full bg-white text-gray-900 py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors shadow-lg"
+                        >
+                          <ShoppingBagIcon className="w-5 h-5" />
+                          <span className="font-medium">Lihat Detail</span>
+                        </button>
+                      </div>
                 </div>
               </div>
             </div>
             {/* Product Info */}
             <div 
               className="space-y-1 mt-4 cursor-pointer"
-              onClick={() => window.open(product.linktreeUrl || "#", "_blank")}
+              onClick={() => {
+                setSelectedProduct(product);
+                setIsModalOpen(true);
+              }}
             >
               <h3 className="text-[var(--text-primary)] font-semibold hover:text-[var(--accent)] transition-colors line-clamp-2">{product.name}</h3>
               <div className="flex items-center gap-2">
@@ -135,6 +142,12 @@ export function ShopPage() {
           </div>
         )}
       </div>
+
+      <ProductModal 
+        product={selectedProduct} 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </div>
   );
 }
