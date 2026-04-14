@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { 
   Package, Save, Plus, Trash, Settings, 
-  Image as ImageIcon, Link as LinkIcon, Edit3, 
-  LogOut, User, ShoppingBag, Zap, Clock, ShieldCheck 
+  Image as ImageIcon, Edit3, 
+  LogOut, User, ShoppingBag, Zap, Clock, ShieldCheck, 
+  Eye, X, Phone, MapPin, CheckCircle 
 } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { supabase } from '../../lib/supabase';
@@ -16,6 +17,7 @@ export function AdminDashboard() {
   const [resellers, setResellers] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
   const [coupons, setCoupons] = useState<any[]>([]);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [config, setConfig] = useState<any>({
     announcement: { isEnabled: true, text: '' },
     flashSale: { isEnabled: false, text: '', endTime: '' },
@@ -33,6 +35,25 @@ export function AdminDashboard() {
   useEffect(() => {
     checkUser();
     fetchData();
+
+    // REAL-TIME NOTIFICATION SYSTEM
+    const orderSubscription = supabase
+      .channel('orders-realtime')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload) => {
+        const newOrder = payload.new;
+        setOrders(current => [newOrder, ...current]);
+        toast.info(`🔔 PESANAN BARU! Dari ${newOrder.customer_name}`, {
+          description: `Total: Rp ${newOrder.total.toLocaleString()}`,
+          duration: 10000,
+        });
+        // Play notification sound
+        new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play().catch(() => {});
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(orderSubscription);
+    };
   }, []);
 
   const checkUser = async () => {
@@ -43,10 +64,7 @@ export function AdminDashboard() {
 
   const refreshCoupons = async () => {
     const { data, error } = await supabase.from('coupons').select('*');
-    if (error) {
-       console.error("Error coupons:", error);
-       return;
-    }
+    if (error) return;
     setCoupons(data || []);
   };
 
@@ -75,6 +93,17 @@ export function AdminDashboard() {
     setIsSyncing(false);
   };
 
+  const handleUpdateOrderStatus = async (orderId: any, newStatus: string) => {
+    const { error } = await supabase.from('orders').update({ status: newStatus }).eq('id', orderId);
+    if (!error) {
+       setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+       if (selectedOrder?.id === orderId) {
+          setSelectedOrder({ ...selectedOrder, status: newStatus });
+       }
+       toast.success(`Status diperbarui ke: ${newStatus}`);
+    }
+  };
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate('/admin/login');
@@ -82,17 +111,10 @@ export function AdminDashboard() {
 
   const saveConfig = async () => {
     setIsLoading(true);
-    const tid = toast.loading("Menyimpan konfigurasi...");
+    const tid = toast.loading("Menyimpan...");
     try {
-        const { error: cError } = await supabase.from('store_config').upsert({ id: 'main', config_data: config });
-        if (cError) throw cError;
-        
-        if (infoPages.length > 0) {
-           const { error: iError } = await supabase.from('info_pages').upsert(infoPages);
-           if (iError) throw iError;
-        }
-
-        toast.success("Konfigurasi berhasil disimpan!", { id: tid });
+        await supabase.from('store_config').upsert({ id: 'main', config_data: config });
+        toast.success("Berhasil!", { id: tid });
     } catch (e: any) {
         toast.error(e.message, { id: tid });
     } finally {
@@ -105,66 +127,32 @@ export function AdminDashboard() {
   };
 
   const handleUploadImage = async (file: File, callback: (url: string) => void) => {
-    const tid = toast.loading("Mengunggah gambar...");
+    const tid = toast.loading("Upload...");
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage.from('products').upload(fileName, file);
-      if (uploadError) throw uploadError;
+      const fileName = `${Math.random()}.${file.name.split('.').pop()}`;
+      await supabase.storage.from('products').upload(fileName, file);
       const { data } = supabase.storage.from('products').getPublicUrl(fileName);
       callback(data.publicUrl);
-      toast.success("Berhasil diunggah!", { id: tid });
+      toast.success("Done", { id: tid });
     } catch (e: any) {
       toast.error(e.message, { id: tid });
     }
   };
 
   const handleDelete = async (id: any) => {
-    if (!confirm('Hapus produk ini?')) return;
-    const { error } = await supabase.from('products').delete().eq('id', id);
-    if (!error) {
-       setProducts(products.filter(p => p.id !== id));
-       toast.success("Produk dihapus");
-    }
-  };
-
-  const handleAddProduct = () => {
-    const defaultCategory = config?.productCategories?.[0]?.id || 'born';
-    const newProduct = {
-      id: Date.now(),
-      name: "Produk Baru",
-      price: "Rp 0",
-      image: "https://via.placeholder.com/300",
-      linktreeUrl: "https://linktr.ee/",
-      categories: [defaultCategory],
-      sizes: ["S", "M", "L", "XL"],
-      inventory: {},
-      seoTitle: "",
-      seoDescription: ""
-    };
-    setProducts([newProduct, ...products]);
+    if (!confirm('Hapus?')) return;
+    await supabase.from('products').delete().eq('id', id);
+    setProducts(products.filter(p => p.id !== id));
   };
 
   const handlePushAllToCloud = async () => {
     setIsLoading(true);
-    const loadingToast = toast.loading("Menyinkronkan koleksi produk...");
+    const tid = toast.loading("Syncing...");
     try {
-      const formattedProducts = products.map(p => ({
-        ...p,
-        sizes: Array.isArray(p.sizes) ? p.sizes : [],
-        inventory: p.inventory || {},
-        categories: Array.isArray(p.categories) ? p.categories : []
-      }));
-
-      const { error: productsError } = await supabase.from('products').upsert(formattedProducts, { onConflict: 'id' });
-      if (productsError) throw productsError;
-
-      const { error: configError } = await supabase.from('store_config').upsert({ id: 'main', config_data: config });
-      if (configError) throw configError;
-
-      toast.success("Berhasil! Semua data di Cloud kini ter-update.", { id: loadingToast });
-    } catch (error: any) {
-      toast.error("Gagal sinkron: " + error.message, { id: loadingToast });
+      await supabase.from('products').upsert(products);
+      toast.success("Sync Berhasil", { id: tid });
+    } catch (e: any) {
+      toast.error(e.message, { id: tid });
     } finally {
       setIsLoading(false);
     }
@@ -173,279 +161,92 @@ export function AdminDashboard() {
   if (isSyncing) return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center flex-col gap-4">
       <div className="w-16 h-16 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin"></div>
-      <p className="font-bold text-gray-500 animate-pulse uppercase tracking-[0.3em] text-[10px]">Verifikasi Akses Cloud...</p>
+      <p className="font-bold text-gray-500 animate-pulse text-[10px] uppercase tracking-widest">Gakha Cloud Sync...</p>
     </div>
   );
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar Navigation */}
-      <aside className="w-72 bg-gray-900 text-white p-8 hidden md:flex flex-col flex-shrink-0 relative z-20">
+      {/* Sidebar */}
+      <aside className="w-72 bg-gray-900 text-white p-8 hidden md:flex flex-col flex-shrink-0">
         <div className="mb-12">
-          <h2 className="text-2xl font-black mb-2 flex items-center gap-2">
-            Gakha <span className="text-[var(--accent)]">Admin</span>
-          </h2>
-          <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-blue-500/20 text-blue-400 text-[10px] font-black uppercase tracking-widest border border-blue-500/30">
-            <ShieldCheck className="w-3 h-3" /> Cloud Protection Active
+          <h2 className="text-2xl font-black mb-2">Gakha <span className="text-[var(--accent)]">Admin</span></h2>
+          <div className="inline-flex items-center gap-1 px-2 py-1 rounded bg-green-500/20 text-green-400 text-[9px] font-black uppercase tracking-widest">
+            <ShieldCheck className="w-3 h-3" /> Live Control
           </div>
         </div>
-
-        <nav className="space-y-4 flex-1">
+        <nav className="space-y-3 flex-1">
           {[
-            { id: 'analytics', label: 'Dashboard & Analytics', icon: <Package className="w-5 h-5" /> },
-            { id: 'products', label: 'Kelola Produk', icon: <Package className="w-5 h-5" /> },
-            { id: 'orders', label: 'Pesanan Masuk', icon: <ShoppingBag className="w-5 h-5" /> },
-            { id: 'coupons', label: 'Kupon & Promo', icon: <Zap className="w-5 h-5" /> },
-            { id: 'resellers', label: 'Database Reseller', icon: <User className="w-5 h-5" /> },
-            { id: 'settings', label: 'Pengaturan Toko', icon: <Settings className="w-5 h-5" /> },
+            { id: 'analytics', label: 'Performa', icon: <Clock className="w-5 h-5" /> },
+            { id: 'products', label: 'Produk', icon: <Package className="w-5 h-5" /> },
+            { id: 'orders', label: 'Pesanan', icon: <ShoppingBag className="w-5 h-5" /> },
+            { id: 'coupons', label: 'Kupon', icon: <Zap className="w-5 h-5" /> },
+            { id: 'resellers', label: 'Reseller', icon: <User className="w-5 h-5" /> },
+            { id: 'settings', label: 'Pengaturan', icon: <Settings className="w-5 h-5" /> },
           ].map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`w-full flex items-center gap-3 text-left p-4 rounded-xl transition-all ${activeTab === tab.id ? 'bg-[var(--accent)] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/10'}`}>
               {tab.icon} <span className="font-bold text-sm">{tab.label}</span>
             </button>
           ))}
         </nav>
-
-        <div className="mt-auto pt-8 border-t border-white/10">
-          <div className="flex items-center gap-3 mb-6 px-2">
-             <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                <User className="w-5 h-5 text-gray-400" />
-             </div>
-             <div className="overflow-hidden">
-                <p className="text-xs font-bold truncate">{user?.email}</p>
-                <p className="text-[10px] text-gray-400 uppercase tracking-widest">Administrator</p>
-             </div>
-          </div>
-          <button onClick={handleLogout} className="w-full flex items-center gap-3 text-left p-4 rounded-xl text-red-400 hover:bg-red-400/10 transition-colors">
-            <LogOut className="w-5 h-5" /> <span className="font-bold">Keluar</span>
-          </button>
-        </div>
+        <button onClick={handleLogout} className="mt-auto flex items-center gap-3 p-4 rounded-xl text-red-400 hover:bg-red-400/10 transition-colors font-bold">
+          <LogOut className="w-5 h-5" /> Keluar
+        </button>
       </aside>
 
-      {/* Main Content Area */}
-      <main className="flex-1 p-8 h-screen overflow-y-auto w-full">
+      {/* Main Content */}
+      <main className="flex-1 p-8 h-screen overflow-y-auto">
         <AnimatePresence mode="wait">
-          {activeTab === 'products' && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} key="products" className="max-w-[1400px]">
-              <div className="flex justify-between items-center mb-8">
-                <div>
-                  <h1 className="text-3xl font-black text-gray-900 tracking-tight">Database Produk</h1>
-                  <p className="text-gray-500 mt-1">Status: <span className="text-green-600 font-bold uppercase text-[10px] tracking-widest">Live On Cloud</span></p>
-                </div>
-                <div className="flex gap-4">
-                  <button onClick={handleAddProduct} className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 font-bold text-sm shadow-sm transition-all active:scale-95"><Plus className="w-5 h-5" /> Tambah</button>
-                  <button onClick={handlePushAllToCloud} disabled={isLoading} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg active:scale-95 transition-all">🚀 Push ke Cloud</button>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
-                <table className="w-full text-left border-collapse min-w-[1200px]">
-                  <thead>
-                    <tr className="bg-gray-50/50 border-b border-gray-100 text-gray-400 font-black text-[10px] uppercase tracking-[0.2em]">
-                      <th className="p-6">Foto</th>
-                      <th className="p-6">Nama Produk</th>
-                      <th className="p-6">Harga</th>
-                      <th className="p-6">Ukuran & Stok</th>
-                      <th className="p-6">SEO Metadata</th>
-                      <th className="p-6 text-right">Aksi</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50">
-                    {products.map((p) => (
-                      <tr key={p.id} className="hover:bg-gray-50/40 transition-colors">
-                        <td className="p-6">
-                           <div className="relative group w-14 h-14">
-                              <img src={p.image} className="w-full h-full object-cover rounded-xl shadow-sm" />
-                              <label className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer rounded-xl transition-opacity">
-                                 <Plus className="w-4 h-4 text-white" />
-                                 <input type="file" className="hidden" accept="image/*" onChange={(e) => e.target.files && handleUploadImage(e.target.files[0], (url) => handleUpdateProduct(p.id, 'image', url))} />
-                              </label>
-                           </div>
-                        </td>
-                        <td className="p-6">
-                          <input type="text" value={p.name} onChange={(e) => handleUpdateProduct(p.id, 'name', e.target.value)} className="w-full font-bold text-sm bg-transparent outline-none border-b border-transparent focus:border-[var(--accent)]" />
-                          <p className="text-[10px] text-gray-400 mt-1 uppercase font-black">ID: {p.id}</p>
-                        </td>
-                        <td className="p-6">
-                          <input type="text" value={p.price} onChange={(e) => handleUpdateProduct(p.id, 'price', e.target.value)} className="font-bold text-blue-600 text-sm bg-transparent outline-none border-b border-transparent focus:border-[var(--accent)]" />
-                        </td>
-                        <td className="p-6">
-                          <div className="flex flex-wrap gap-3 max-w-[300px]">
-                             {(p.sizes || []).map((s: string) => (
-                               <div key={s} className="bg-gray-50 p-2 rounded-lg border border-gray-100 flex flex-col items-center">
-                                  <span className="text-[8px] font-black text-gray-400 mb-1">{s}</span>
-                                  <input 
-                                    type="number" 
-                                    value={p.inventory?.[s] || 0}
-                                    onChange={(e) => {
-                                       const inv = { ...(p.inventory || {}), [s]: parseInt(e.target.value) || 0 };
-                                       handleUpdateProduct(p.id, 'inventory', inv);
-                                    }}
-                                    className="w-10 bg-white border border-gray-200 rounded text-center font-bold text-[10px]"
-                                  />
-                               </div>
-                             ))}
-                          </div>
-                        </td>
-                        <td className="p-6 space-y-2">
-                           <input placeholder="SEO Title" value={p.seoTitle || ''} onChange={(e) => handleUpdateProduct(p.id, 'seoTitle', e.target.value)} className="w-full text-[10px] bg-gray-50 border border-gray-100 rounded p-1.5" />
-                           <textarea placeholder="SEO Description" value={p.seoDescription || ''} onChange={(e) => handleUpdateProduct(p.id, 'seoDescription', e.target.value)} className="w-full text-[10px] bg-gray-50 border border-gray-100 rounded p-1.5 h-10 resize-none" />
-                        </td>
-                        <td className="p-6 text-right">
-                          <button onClick={() => handleDelete(p.id)} className="p-3 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"><Trash className="w-5 h-5" /></button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </motion.div>
-          )}
-
           {activeTab === 'analytics' && (
-             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="analytics" className="max-w-[1200px]">
-                <div className="mb-10">
-                  <h1 className="text-4xl font-black text-gray-900 italic tracking-tighter uppercase leading-none mb-3">Shop Performance</h1>
-                  <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px]">Real-time Insight Gakha Kids</p>
-                </div>
+             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="analytics">
+                <h1 className="text-3xl font-black mb-10">DASHBOARD ANALYTICS</h1>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                    {[
-                     { label: "Omzet (Pendapatan)", val: `Rp ${orders.reduce((acc, o) => acc + (o.total || 0), 0).toLocaleString()}`, icon: <Package className="w-5 h-5 text-green-500" /> },
-                     { label: "Jumlah Pesanan", val: orders.length.toString(), icon: <ShoppingBag className="w-5 h-5 text-blue-500" /> },
-                     { label: "Produk Terdaftar", val: products.length.toString(), icon: <Zap className="w-5 h-5 text-yellow-500" /> },
-                     { label: "Kupon Aktif", val: coupons.length.toString(), icon: <Edit3 className="w-5 h-5 text-purple-500" /> },
+                     { label: "Omset", val: `Rp ${orders.reduce((acc, o) => acc + (o.total || 0), 0).toLocaleString()}`, icon: <Package className="text-green-500" /> },
+                     { label: "Pesanan", val: orders.length, icon: <ShoppingBag className="text-blue-500" /> },
+                     { label: "Produk", val: products.length, icon: <Zap className="text-yellow-500" /> },
+                     { label: "Voucher", val: coupons.length, icon: <Edit3 className="text-purple-500" /> },
                    ].map((stat, i) => (
-                     <div key={i} className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all">
-                        <div className="bg-gray-50 w-12 h-12 rounded-2xl flex items-center justify-center mb-6">{stat.icon}</div>
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{stat.label}</p>
-                        <h3 className="text-3xl font-black text-gray-900 tracking-tight">{stat.val}</h3>
+                     <div key={i} className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+                        <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center mb-4">{stat.icon}</div>
+                        <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest">{stat.label}</p>
+                        <h3 className="text-2xl font-black">{stat.val}</h3>
                      </div>
                    ))}
                 </div>
              </motion.div>
           )}
 
-          {activeTab === 'settings' && (
-             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} key="settings" className="max-w-[1000px] pb-32">
-                <div className="flex justify-between items-center mb-10">
-                  <h1 className="text-3xl font-black text-gray-900 tracking-tight">Pengaturan Toko</h1>
-                  <button onClick={saveConfig} disabled={isLoading} className="bg-gray-900 text-white px-8 py-3 rounded-xl font-bold shadow-xl flex items-center gap-2 hover:bg-black transition-all">
-                     <Save className="w-5 h-5" /> {isLoading ? 'Menyimpan...' : 'Simpan Perubahan'}
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 gap-8">
-                   <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-                      <h2 className="text-xl font-bold mb-6 flex items-center gap-3">📢 Top Announcement Bar</h2>
-                      <div className="flex items-center gap-4">
-                         <button onClick={() => setConfig({...config, announcement: {...config.announcement, isEnabled: !config.announcement.isEnabled}})} className={`px-4 py-2 rounded-lg font-black text-[10px] uppercase border ${config.announcement?.isEnabled ? 'bg-green-100 text-green-700 border-green-200' : 'bg-gray-100 text-gray-500'}`}>
-                            {config.announcement?.isEnabled ? 'Aktif' : 'Non-Aktif'}
-                         </button>
-                         <input type="text" value={config.announcement?.text || ''} onChange={(e) => setConfig({...config, announcement: {...config.announcement, text: e.target.value}})} className="flex-1 bg-gray-50 p-3 rounded-xl border border-gray-200 outline-none focus:border-[var(--accent)]" placeholder="Contoh: Gratis Ongkir Seluruh Indonesia!" />
-                      </div>
-                   </div>
-
-                   <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-                      <h2 className="text-xl font-bold mb-6 flex items-center gap-3"><ImageIcon className="w-5 h-5 text-purple-500" /> Hero Section Banner</h2>
-                      <div className="space-y-6">
-                         <div className="grid grid-cols-2 gap-4">
-                            <input placeholder="Heading Line 1" value={config.hero?.headingLine1 || ''} onChange={(e) => setConfig({...config, hero: {...config.hero, headingLine1: e.target.value}})} className="bg-gray-50 p-3 rounded-xl border border-gray-200" />
-                            <input placeholder="Heading Line 2 (Aksen)" value={config.hero?.headingLine2 || ''} onChange={(e) => setConfig({...config, hero: {...config.hero, headingLine2: e.target.value}})} className="bg-gray-50 p-3 rounded-xl border border-gray-200 text-[var(--accent)] font-bold" />
-                         </div>
-                         <textarea placeholder="Deskripsi Hero" value={config.hero?.description || ''} onChange={(e) => setConfig({...config, hero: {...config.hero, description: e.target.value}})} className="w-full bg-gray-50 p-4 rounded-xl border border-gray-200 h-24 resize-none" />
-                         <div className="flex gap-4">
-                            <input placeholder="URL Background Image" value={config.hero?.backgroundImage || ''} onChange={(e) => setConfig({...config, hero: {...config.hero, backgroundImage: e.target.value}})} className="flex-1 bg-gray-50 p-3 rounded-xl border border-gray-200 font-mono text-xs" />
-                            <label className="bg-white border-2 border-dashed border-gray-200 px-6 py-2 rounded-xl text-xs font-bold cursor-pointer hover:border-[var(--accent)] flex items-center">
-                               Pilih Foto
-                               <input type="file" className="hidden" onChange={(e) => e.target.files && handleUploadImage(e.target.files[0], (url) => setConfig({...config, hero: {...config.hero, backgroundImage: url}}))} />
-                            </label>
-                         </div>
-                      </div>
-                   </div>
-
-                   <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-                      <h2 className="text-xl font-bold mb-6">📱 Media Sosial & Kontak</h2>
-                      <div className="grid grid-cols-2 gap-6">
-                         {['instagram', 'tiktok', 'resellerWhatsApp', 'facebook'].map(plat => (
-                            <div key={plat}>
-                               <label className="block text-[10px] font-black text-gray-400 uppercase mb-2">{plat}</label>
-                               <input type="text" value={config.socialMedia?.[plat] || ''} onChange={(e) => setConfig({...config, socialMedia: {...config.socialMedia, [plat]: e.target.value}})} className="w-full bg-gray-50 p-3 rounded-xl border border-gray-200 font-mono text-xs" />
-                            </div>
-                         ))}
-                      </div>
-                   </div>
-
-                   <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-                      <h2 className="text-xl font-bold mb-6">📝 Halaman Informasi (About/FAQ)</h2>
-                      <div className="space-y-6">
-                         {infoPages.map((page, idx) => (
-                           <div key={page.id} className="pt-6 border-t border-gray-50 first:border-0 first:pt-0">
-                             <div className="font-black text-[10px] text-gray-300 mb-2">PAGE: {page.id}</div>
-                             <input value={page.title || ''} onChange={(e) => {
-                               const newPages = [...infoPages];
-                               newPages[idx].title = e.target.value;
-                               setInfoPages(newPages);
-                             }} className="w-full bg-gray-50 p-3 rounded-xl border border-gray-200 font-bold mb-3" />
-                             <textarea value={page.content || ''} onChange={(e) => {
-                               const newPages = [...infoPages];
-                               newPages[idx].content = e.target.value;
-                               setInfoPages(newPages);
-                             }} className="w-full bg-gray-50 p-4 rounded-xl border border-gray-200 h-32 text-sm" />
-                           </div>
-                         ))}
-                      </div>
-                   </div>
-                </div>
-             </motion.div>
-          )}
-
-          {activeTab === 'resellers' && (
-             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="resellers" className="max-w-[1200px]">
-                <div className="flex justify-between items-center mb-8">
-                   <h1 className="text-3xl font-black text-gray-900 tracking-tighter">DATABASE RESELLER</h1>
-                   <button onClick={async () => {
-                     const name = prompt('Nama Partner:');
-                     if (name) {
-                        const newRes = { name, city: '', whatsapp: '', status: 'Active' };
-                        const { data, error } = await supabase.from('resellers').insert([newRes]).select();
-                        if (data) setResellers([data[0], ...resellers]);
-                     }
-                   }} className="bg-[var(--accent)] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-xl hover:scale-105 transition-all"><Plus className="w-5 h-5" /> Tambah Partner</button>
-                </div>
+          {activeTab === 'orders' && (
+             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="orders">
+                <h1 className="text-3xl font-black mb-8">ORDER REGISTRY</h1>
                 <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
                    <table className="w-full text-left">
-                      <thead className="bg-gray-50/50">
-                         <tr>
-                            <th className="p-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">Partner</th>
-                            <th className="p-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">Lokasi</th>
-                            <th className="p-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">WhatsApp</th>
-                            <th className="p-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">Status</th>
-                            <th className="p-6"></th>
+                      <thead className="bg-gray-50">
+                         <tr className="text-[10px] font-black uppercase text-gray-400 tracking-widest">
+                            <th className="p-6">ID</th>
+                            <th className="p-6">Pelanggan</th>
+                            <th className="p-6">Total</th>
+                            <th className="p-6">Status</th>
+                            <th className="p-6">Aksi</th>
                          </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-50">
-                         {resellers.map((res, idx) => (
-                            <tr key={res.id}>
-                               <td className="p-6 font-bold">{res.name}</td>
-                               <td className="p-6"><input value={res.city || ''} onChange={(e) => {
-                                 const updated = [...resellers];
-                                 updated[idx].city = e.target.value;
-                                 setResellers(updated);
-                               }} className="bg-transparent outline-none border-b border-gray-100 focus:border-[var(--accent)]" /></td>
-                               <td className="p-6 font-mono text-sm">{res.whatsapp}</td>
+                         {orders.map(o => (
+                            <tr key={o.id} className="hover:bg-gray-50/50">
+                               <td className="p-6 font-mono font-bold text-blue-600">ORD-{o.id.toString().slice(-6)}</td>
+                               <td className="p-6 font-bold">{o.customer_name}</td>
+                               <td className="p-6 font-black">Rp {o.total.toLocaleString()}</td>
                                <td className="p-6">
-                                  <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-[10px] font-black">{res.status}</span>
+                                  <span className={`px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                                    o.status === 'Pending' ? 'bg-amber-100 text-amber-700' : 
+                                    o.status === 'Processed' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
+                                  }`}>{o.status}</span>
                                </td>
-                               <td className="p-6 text-right space-x-2">
-                                  <button onClick={async () => {
-                                     await supabase.from('resellers').upsert(res);
-                                     toast.success("Tersimpan");
-                                  }} className="p-2 text-green-500 hover:bg-green-50 rounded-lg"><Save className="w-4 h-4" /></button>
-                                  <button onClick={async () => {
-                                     if(confirm('Hapus?')){
-                                        await supabase.from('resellers').delete().eq('id', res.id);
-                                        setResellers(resellers.filter(r => r.id !== res.id));
-                                     }
-                                  }} className="p-2 text-red-300 hover:text-red-500"><Trash className="w-4 h-4" /></button>
+                               <td className="p-6">
+                                  <button onClick={() => setSelectedOrder(o)} className="p-2 bg-gray-900 text-white rounded-lg hover:bg-black transition-all flex items-center gap-2 text-[10px] font-black uppercase px-4">
+                                     <Eye className="w-4 h-4" /> Detail
+                                  </button>
                                </td>
                             </tr>
                          ))}
@@ -455,126 +256,121 @@ export function AdminDashboard() {
              </motion.div>
           )}
 
-          {activeTab === 'coupons' && (
-             <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} key="coupons" className="max-w-[1200px]">
-                <div className="flex justify-between items-center mb-10">
-                   <div>
-                      <h1 className="text-3xl font-black text-gray-900 tracking-tighter uppercase">Promotion Engine</h1>
-                      <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mt-1">Kelola voucher diskon pelanggan</p>
-                   </div>
-                   <div className="flex gap-4">
-                      <button 
-                        onClick={() => {
-                           const tid = toast.loading("Sinkronisasi kupon...");
-                           refreshCoupons().then(() => toast.success("Data terbaru ditarik!", { id: tid }));
-                        }}
-                        className="bg-white border border-gray-200 text-gray-600 px-6 py-4 rounded-2xl font-black text-xs uppercase shadow-sm hover:bg-gray-50 transition-all flex items-center gap-2"
-                      >
-                         <Clock className="w-4 h-4" /> Sync Data
-                      </button>
-                      <button 
-                        onClick={async () => {
-                           const code = prompt('Masukkan Kode Voucher:');
-                           if (!code) return;
-                           
-                           const valueStr = prompt('Berapa persen diskonnya? (1-100):');
-                           const value = parseInt(valueStr || '10');
-                           
-                           if (isNaN(value)) {
-                              toast.error("Diskon harus angka!");
-                              return;
-                           }
-
-                           const tid = toast.loading("Memproses...");
-                           try {
-                              const newC = { 
-                                 id: Date.now(),
-                                 code: code.toUpperCase().trim(), 
-                                 discount_type: 'Percentage', 
-                                 value: value, 
-                                 status: 'Active' 
-                              };
-                              
-                              const { error } = await supabase.from('coupons').insert([newC]);
-                              
-                              if (error) throw error;
-                              
-                              await refreshCoupons();
-                              toast.success(`Kupon ${newC.code} aktif!`, { id: tid });
-                           } catch (err: any) {
-                              toast.error("Gagal: " + err.message, { id: tid });
-                           }
-                        }} 
-                        className="bg-gray-900 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase shadow-xl hover:scale-105 transition-all flex items-center gap-2"
-                      >
-                         <Plus className="w-5 h-5 text-[var(--accent)]" /> Buat Kupon Baru
-                      </button>
-                   </div>
+          {activeTab === 'products' && (
+             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="products">
+                <div className="flex justify-between items-center mb-8">
+                   <h1 className="text-3xl font-black">KELOLA PRODUK</h1>
+                   <button onClick={handlePushAllToCloud} className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg">Save Changes</button>
                 </div>
-
-                {coupons.length === 0 ? (
-                   <div className="bg-white border-4 border-dashed border-gray-100 rounded-[3rem] py-32 flex flex-col items-center justify-center text-center">
-                      <Zap className="w-16 h-16 text-gray-200 mb-4" />
-                      <p className="text-gray-400 font-black uppercase tracking-widest text-sm">Belum ada kupon aktif</p>
-                   </div>
-                ) : (
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {coupons.map(c => (
-                         <div key={c.id} className="bg-white p-8 rounded-[2.5rem] border-2 border-dashed border-gray-100 flex items-center justify-between hover:border-[var(--accent)] transition-all group">
-                            <div>
-                               <div className="bg-gray-900 text-white px-5 py-2 rounded-xl font-mono font-bold text-xl mb-3 tracking-tighter inline-block shadow-lg">
-                                  {c.code}
-                               </div>
-                               <div className="flex items-center gap-2">
-                                  <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[9px] font-black uppercase">Diskon {c.value}%</span>
-                                  <span className="text-gray-400 text-[9px] font-bold uppercase tracking-widest">Status: {c.status}</span>
-                               </div>
-                            </div>
-                            <button 
-                              onClick={async () => {
-                                 if(!confirm(`Hapus kupon ${c.code}?`)) return;
-                                 const tid = toast.loading("Menghapus...");
-                                 const { error } = await supabase.from('coupons').delete().eq('id', c.id);
-                                 if (!error) {
-                                    setCoupons(coupons.filter(cp => cp.id !== c.id));
-                                    toast.success("Kupon dihapus", { id: tid });
-                                 } else {
-                                    toast.error("Gagal hapus", { id: tid });
-                                 }
-                              }} 
-                              className="p-4 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all opacity-0 group-hover:opacity-100"
-                            >
-                               <Trash className="w-6 h-6" />
-                            </button>
+                <div className="grid grid-cols-1 gap-4">
+                   {products.map(p => (
+                      <div key={p.id} className="bg-white p-6 rounded-2xl border border-gray-100 flex items-center gap-6">
+                         <img src={p.image} className="w-16 h-16 rounded-xl object-cover" />
+                         <div className="flex-1">
+                            <input value={p.name} onChange={(e) => handleUpdateProduct(p.id, 'name', e.target.value)} className="font-bold text-gray-900 outline-none w-full" />
+                            <input value={p.price} onChange={(e) => handleUpdateProduct(p.id, 'price', e.target.value)} className="text-gray-400 text-sm outline-none w-full" />
                          </div>
-                      ))}
-                   </div>
-                )}
+                         <div className="flex gap-2">
+                            {p.sizes?.map((s: string) => (
+                               <div key={s} className="bg-gray-50 p-2 rounded-lg border border-gray-100 min-w-[50px] text-center">
+                                  <p className="text-[8px] font-black text-gray-400">{s}</p>
+                                  <input type="number" value={p.inventory?.[s] || 0} onChange={(e) => {
+                                     const inv = { ...(p.inventory || {}), [s]: parseInt(e.target.value) || 0 };
+                                     handleUpdateProduct(p.id, 'inventory', inv);
+                                  }} className="w-full bg-transparent text-center font-bold text-xs" />
+                               </div>
+                            ))}
+                         </div>
+                         <button onClick={() => handleDelete(p.id)} className="p-3 text-red-300 hover:text-red-500"><Trash className="w-5 h-5" /></button>
+                      </div>
+                   ))}
+                </div>
              </motion.div>
           )}
 
-          {activeTab === 'orders' && (
-             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="orders" className="max-w-[1200px]">
-                <h1 className="text-3xl font-black text-gray-900 tracking-tighter mb-10">ORDER REGISTRY</h1>
-                <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
+          {activeTab === 'settings' && (
+             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="settings" className="max-w-2xl pb-40">
+                <div className="flex justify-between items-center mb-8">
+                   <h1 className="text-3xl font-black">PENGATURAN</h1>
+                   <button onClick={saveConfig} className="bg-gray-900 text-white px-8 py-3 rounded-xl font-bold shadow-xl">Simpan</button>
+                </div>
+                <div className="space-y-6">
+                   <div className="bg-white p-6 rounded-2xl border border-gray-100">
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Announcement Bar</label>
+                      <input value={config.announcement?.text} onChange={(e) => setConfig({...config, announcement: {...config.announcement, text: e.target.value}})} className="w-full bg-gray-50 p-3 rounded-xl outline-none" />
+                   </div>
+                   <div className="bg-white p-6 rounded-2xl border border-gray-100">
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Social - WhatsApp Reseller</label>
+                      <input value={config.socialMedia?.resellerWhatsApp} onChange={(e) => setConfig({...config, socialMedia: {...config.socialMedia, resellerWhatsApp: e.target.value}})} className="w-full bg-gray-50 p-3 rounded-xl outline-none" />
+                   </div>
+                </div>
+             </motion.div>
+          )}
+
+          {activeTab === 'coupons' && (
+             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="coupons" className="pb-40">
+                <div className="flex justify-between items-center mb-10">
+                   <h1 className="text-4xl font-black">PROMO ENGINE</h1>
+                   <div className="flex gap-4">
+                      <button onClick={refreshCoupons} className="p-4 bg-white border border-gray-100 rounded-2xl shadow-sm"><Clock className="w-5 h-5" /></button>
+                      <button onClick={async () => {
+                         const code = prompt('Kode:');
+                         if(!code) return;
+                         const vStr = prompt('Diskon (%):');
+                         const newC = { id: Date.now(), code: code.toUpperCase(), discount_type: 'Percentage', value: parseInt(vStr || '10'), status: 'Active' };
+                         await supabase.from('coupons').insert([newC]);
+                         await refreshCoupons();
+                         toast.success("Kupon Aktif!");
+                      }} className="bg-gray-900 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase shadow-xl hover:scale-105 transition-all">Buat Kupon</button>
+                   </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                   {coupons.map(c => (
+                      <div key={c.id} className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm flex items-center justify-between group">
+                         <div>
+                            <div className="bg-gray-900 text-white px-4 py-1 rounded-lg font-mono font-bold text-lg mb-2">{c.code}</div>
+                            <p className="text-[10px] uppercase font-black text-green-500">Diskon {c.value}%</p>
+                         </div>
+                         <button onClick={async () => {
+                            await supabase.from('coupons').delete().eq('id', c.id);
+                            setCoupons(coupons.filter(cp => cp.id !== c.id));
+                         }} className="p-3 text-red-300 group-hover:text-red-500 transition-colors"><Trash className="w-6 h-6" /></button>
+                      </div>
+                   ))}
+                </div>
+             </motion.div>
+          )}
+
+          {activeTab === 'resellers' && (
+             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="resellers">
+                <div className="flex justify-between items-center mb-8">
+                   <h1 className="text-3xl font-black">RESELLER DATABASE</h1>
+                   <button onClick={async () => {
+                      const name = prompt('Nama:');
+                      if(name) {
+                         const n = { name, city: '', whatsapp: '', status: 'Active' };
+                         const { data } = await supabase.from('resellers').insert([n]).select();
+                         if(data) setResellers([data[0], ...resellers]);
+                      }
+                   }} className="bg-[var(--accent)] text-white px-8 py-3 rounded-xl font-bold">Add Partner</button>
+                </div>
+                <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
                    <table className="w-full text-left">
-                      <thead className="bg-gray-50">
-                         <tr>
-                            <th className="p-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">Order ID</th>
-                            <th className="p-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">Nama Pelanggan</th>
-                            <th className="p-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">Total Bayar</th>
-                            <th className="p-6 text-[10px] font-black uppercase text-gray-400 tracking-widest">Status</th>
+                      <thead>
+                         <tr className="bg-gray-50 text-[10px] font-black uppercase text-gray-400 tracking-widest">
+                            <th className="p-6">Nama</th>
+                            <th className="p-6">Kota</th>
+                            <th className="p-6">WhatsApp</th>
+                            <th className="p-6">Status</th>
                          </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-50">
-                         {orders.map(ord => (
-                            <tr key={ord.id} className="hover:bg-gray-50/50 transition-colors">
-                               <td className="p-6 font-mono font-bold text-blue-600">ORD-{ord.id}</td>
-                               <td className="p-6 font-bold">{ord.customer_name}</td>
-                               <td className="p-6 font-black">Rp {(ord.total || 0).toLocaleString()}</td>
-                               <td className="p-6">
-                                  <span className="bg-amber-50 text-amber-600 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">{ord.status}</span>
-                               </td>
+                         {resellers.map(r => (
+                            <tr key={r.id}>
+                               <td className="p-6 font-bold">{r.name}</td>
+                               <td className="p-6">{r.city}</td>
+                               <td className="p-6 font-mono text-xs">{r.whatsapp}</td>
+                               <td className="p-6"><span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-[9px] font-black italic">Active Part</span></td>
                             </tr>
                          ))}
                       </tbody>
@@ -584,6 +380,91 @@ export function AdminDashboard() {
           )}
         </AnimatePresence>
       </main>
+
+      {/* ORDER DETAIL MODAL */}
+      <AnimatePresence>
+        {selectedOrder && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/60 backdrop-blur-md">
+             <motion.div 
+               initial={{ opacity: 0, scale: 0.9, y: 30 }}
+               animate={{ opacity: 1, scale: 1, y: 0 }}
+               exit={{ opacity: 0, scale: 0.9, y: 30 }}
+               className="bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden relative"
+             >
+                <button onClick={() => setSelectedOrder(null)} className="absolute top-8 right-8 p-3 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors"><X className="w-5 h-5 text-gray-400" /></button>
+                
+                <div className="p-10 pb-0">
+                   <div className="flex items-center gap-4 mb-2">
+                       <span className="bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Order Detail</span>
+                       <span className="text-gray-300 font-bold text-xs tracking-tighter">ID: ORD-{selectedOrder.id}</span>
+                   </div>
+                   <h2 className="text-3xl font-black text-gray-900 mb-8">{selectedOrder.customer_name}</h2>
+                </div>
+
+                <div className="p-10 pt-0 grid grid-cols-1 md:grid-cols-2 gap-8">
+                   <div className="space-y-6">
+                      <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100">
+                         <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-4 flex items-center gap-2">
+                            <Phone className="w-3 h-3" /> Kontak Pelanggan
+                         </h4>
+                         <p className="font-bold text-gray-900 text-lg mb-1">{selectedOrder.whatsapp}</p>
+                         <a href={`https://wa.me/${selectedOrder.whatsapp}`} target="_blank" className="inline-flex items-center gap-2 text-[10px] font-black text-green-600 uppercase tracking-widest hover:underline">Chat via WhatsApp <ArrowRight className="w-3 h-3" /></a>
+                      </div>
+
+                      <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100">
+                         <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-4 flex items-center gap-2">
+                            <MapPin className="w-3 h-3" /> Alamat Pengiriman
+                         </h4>
+                         <p className="text-sm font-bold text-gray-900 leading-relaxed mb-2">{selectedOrder.city}</p>
+                         <p className="text-xs text-gray-500 leading-relaxed">{selectedOrder.address}</p>
+                         {selectedOrder.notes && (
+                            <div className="mt-4 p-3 bg-white/50 border border-gray-200 rounded-xl text-[10px] italic text-gray-400">
+                               Note: "{selectedOrder.notes}"
+                            </div>
+                         )}
+                      </div>
+                   </div>
+
+                   <div className="bg-gray-900 text-white p-8 rounded-[2.5rem] shadow-xl flex flex-col h-full">
+                      <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-6">Barang Dipesan</h4>
+                      <div className="space-y-4 flex-1 overflow-y-auto max-h-[250px] pr-2 custom-scrollbar">
+                         {selectedOrder.items?.map((item: any, i: number) => (
+                            <div key={i} className="flex gap-4 items-center border-b border-white/5 pb-4 last:border-0">
+                               <img src={item.image} className="w-12 h-12 rounded-xl object-cover" />
+                               <div className="flex-1">
+                                  <p className="text-[11px] font-bold line-clamp-1">{item.name}</p>
+                                  <p className="text-[9px] text-gray-400 uppercase font-black">{item.size} × {item.quantity}</p>
+                               </div>
+                               <p className="text-xs font-black">Rp {item.price.toLocaleString()}</p>
+                            </div>
+                         ))}
+                      </div>
+                      <div className="mt-6 pt-6 border-t border-white/10 space-y-4">
+                         <div className="flex justify-between items-end">
+                            <span className="text-[10px] font-black uppercase text-gray-400">Total Pembayaran</span>
+                            <span className="text-2xl font-black text-[var(--accent)]">Rp {selectedOrder.total.toLocaleString()}</span>
+                         </div>
+                         <div className="grid grid-cols-2 gap-2">
+                            <button 
+                              onClick={() => handleUpdateOrderStatus(selectedOrder.id, 'Processed')}
+                              className={`flex items-center justify-center p-3 rounded-xl transition-all ${selectedOrder.status === 'Processed' ? 'bg-green-600 text-white' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                            >
+                               <CheckCircle className="w-5 h-5" />
+                            </button>
+                            <button 
+                              onClick={() => handleUpdateOrderStatus(selectedOrder.id, 'Canceled')}
+                              className="bg-white/10 text-red-400 p-3 rounded-xl hover:bg-red-400/20 transition-all font-bold text-[10px] uppercase"
+                            >
+                               Hapus/Batal
+                            </button>
+                         </div>
+                      </div>
+                   </div>
+                </div>
+             </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
