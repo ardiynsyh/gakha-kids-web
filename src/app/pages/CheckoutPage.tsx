@@ -8,21 +8,62 @@ import { SEO } from '../components/SEO';
 import { useMidtrans } from '../hooks/useMidtrans';
 
 export function CheckoutPage() {
-  const { cart, removeFromCart, updateQuantity, subtotal, clearCart } = useCart();
-  const [couponCode, setCouponCode] = useState('');
-  const [discount, setDiscount] = useState(0);
-  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-  useMidtrans(); // Load Snap.js dynamically from VITE_MIDTRANS_CLIENT_KEY env var
+  useMidtrans();
+
+  const [cities, setCities] = useState<any[]>([]);
+  const [selectedCityId, setSelectedCityId] = useState('');
+  const [shippingOptions, setShippingOptions] = useState<any[]>([]);
+  const [selectedShipping, setSelectedShipping] = useState<any>(null);
+  const [isFetchingShipping, setIsFetchingShipping] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
     whatsapp: '',
     address: '',
-    city: '',
+    cityId: '',
+    cityName: '',
     notes: ''
   });
+
+  // Calculate Total Weight
+  const totalWeight = cart.reduce((acc, item) => acc + ( (item as any).weight || 200 ) * item.quantity, 0);
+
+  // Fetch Cities on Mount
+  useEffect(() => {
+    fetch('/api/shipping?type=cities')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setCities(data);
+      })
+      .catch(err => console.error("Error fetching cities:", err));
+  }, []);
+
+  // Fetch Shipping Costs when City/Weight changes
+  useEffect(() => {
+    if (selectedCityId && totalWeight > 0) {
+      setIsFetchingShipping(true);
+      fetch('/api/shipping', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          origin: '152', // Jakarta Pusat
+          destination: selectedCityId,
+          weight: totalWeight,
+          courier: 'jne'
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setShippingOptions(data);
+          if (data.length > 0) setSelectedShipping(data[0]); 
+        }
+      })
+      .catch(err => console.error("Error fetching shipping:", err))
+      .finally(() => setIsFetchingShipping(false));
+    }
+  }, [selectedCityId, totalWeight]);
 
   const handleApplyCoupon = async () => {
     if (!couponCode) return;
@@ -59,7 +100,8 @@ export function CheckoutPage() {
 
     const orderId = Date.now();
     const roundedDiscount = Math.round(discount);
-    const finalTotal = subtotal - roundedDiscount + 0; // Flat 0 shipping for now (testing)
+    const shippingFee = selectedShipping?.cost[0].value || 0;
+    const finalTotal = subtotal - roundedDiscount + shippingFee;
 
     const finalizeOrder = async (status: string) => {
       try {
@@ -68,8 +110,7 @@ export function CheckoutPage() {
           customer_name: formData.name,
           whatsapp: formData.whatsapp,
           address: formData.address,
-          city: formData.city,
-          notes: formData.notes,
+          city: formData.cityName,
           items: cart,
           total: finalTotal,
           status: status
@@ -110,9 +151,9 @@ export function CheckoutPage() {
         // Ongkos kirim
         {
           id: 'SHIPPING',
-          price: 0,
+          price: shippingFee,
           quantity: 1,
-          name: 'Ongkos Kirim'
+          name: `Ongkir JNE (${selectedShipping?.service || 'Reguler'})`
         }
       ];
 
@@ -135,7 +176,7 @@ export function CheckoutPage() {
           customer_details: {
             first_name: formData.name,
             phone: formData.whatsapp,
-            shipping_address: { address: formData.address, city: formData.city }
+            shipping_address: { address: formData.address, city: formData.cityName }
           },
           item_details: midtransItems
         })
@@ -154,8 +195,14 @@ export function CheckoutPage() {
       // 2. Tampilkan Pop-up Snap Midtrans
       if (typeof window !== 'undefined' && (window as any).snap) {
         (window as any).snap.pay(midtransData.token, {
-          onSuccess: async function() { await finalizeOrder('Completed'); },
-          onPending: async function() { await finalizeOrder('Pending'); },
+          onSuccess: async function() { 
+            await finalizeOrder('Completed'); 
+          },
+          onPending: function() { 
+            toast.info('Menunggu pembayaran... Silakan selesaikan pembayaran Anda.');
+            setIsSubmitting(false);
+            // Tidak menginput ke monitor data (supabase) sesuai permintaan user
+          },
           onError: function() {
               toast.error('Pembayaran Gagal. Silakan coba metode lain.');
               setIsSubmitting(false);
@@ -167,6 +214,7 @@ export function CheckoutPage() {
           }
         });
       } else {
+        // Fallback jika snap tidak ada
         await finalizeOrder('Pending');
       }
       
@@ -251,10 +299,53 @@ export function CheckoutPage() {
                     <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Nomor WhatsApp</label>
                     <input required type="tel" value={formData.whatsapp} onChange={(e) => setFormData({...formData, whatsapp: e.target.value})} className="w-full bg-gray-50 border border-transparent focus:border-[var(--accent)] p-4 rounded-2xl outline-none font-bold text-sm" placeholder="628123..." />
                  </div>
-                 <div className="md:col-span-2 space-y-2">
-                    <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Kota / Kecamatan</label>
-                    <input required value={formData.city} onChange={(e) => setFormData({...formData, city: e.target.value})} className="w-full bg-gray-50 border border-transparent focus:border-[var(--accent)] p-4 rounded-2xl outline-none font-bold text-sm" placeholder="Kota Anda" />
-                 </div>
+                  <div className="md:col-span-2 space-y-2">
+                    <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Pilih Kota Tujuan</label>
+                    <select 
+                      required 
+                      value={selectedCityId} 
+                      onChange={(e) => {
+                        const city = cities.find(c => c.city_id === e.target.value);
+                        setSelectedCityId(e.target.value);
+                        setFormData({...formData, cityId: e.target.value, cityName: city ? `${city.type} ${city.city_name}` : ''});
+                      }} 
+                      className="w-full bg-gray-50 border border-transparent focus:border-[var(--accent)] p-4 rounded-2xl outline-none font-bold text-sm"
+                    >
+                      <option value="">-- Pilih Kota --</option>
+                      {cities.map(c => (
+                        <option key={c.city_id} value={c.city_id}>{c.type} {c.city_name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {shippingOptions.length > 0 && (
+                    <div className="md:col-span-2 space-y-2 bg-blue-50/50 p-6 rounded-3xl border border-blue-100">
+                      <label className="text-[10px] font-black uppercase text-blue-500 tracking-widest ml-1 flex items-center gap-2">
+                        <Truck className="w-4 h-4" /> Pilih Layanan Pengiriman (JNE)
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+                        {shippingOptions.map((opt, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => setSelectedShipping(opt)}
+                            className={`p-4 rounded-2xl border transition-all text-left ${selectedShipping === opt ? 'bg-white border-blue-500 shadow-md ring-2 ring-blue-100' : 'bg-white border-transparent hover:border-blue-200'}`}
+                          >
+                            <p className="font-black text-xs text-gray-900 uppercase">{opt.service}</p>
+                            <p className="text-[10px] text-gray-500 font-bold">{opt.description}</p>
+                            <p className="text-sm font-black text-blue-600 mt-2">Rp {opt.cost[0].value.toLocaleString()}</p>
+                            <p className="text-[9px] text-gray-400 font-medium">Estimasi: {opt.cost[0].etd} Hari</p>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {isFetchingShipping && (
+                    <div className="md:col-span-2 text-center py-4 text-blue-400 font-bold text-xs animate-pulse">
+                      Menghitung Ongkos Kirim...
+                    </div>
+                  )}
                  <div className="md:col-span-2 space-y-2">
                     <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Alamat Lengkap</label>
                     <textarea required value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} className="w-full bg-gray-50 border border-transparent focus:border-[var(--accent)] p-4 rounded-2xl outline-none font-bold text-sm h-24 resize-none" placeholder="Alamat detail..." />
@@ -286,14 +377,14 @@ export function CheckoutPage() {
                        <span className="font-bold text-gray-900">Rp {subtotal.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                       <span className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Ongkos Kirim (Flat)</span>
-                       <span className="font-bold text-gray-900">+Rp 0</span>
+                       <span className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Ongkos Kirim JNE ({totalWeight}g)</span>
+                       <span className="font-bold text-gray-900">+Rp {selectedShipping ? selectedShipping.cost[0].value.toLocaleString() : '0'}</span>
                     </div>
                     {discount > 0 && (
                       <>
                         <div className="flex justify-between text-[11px] pt-3 border-t border-gray-50">
                            <span className="text-gray-400 font-bold uppercase tracking-widest">Total Sebelum Diskon</span>
-                           <span className="text-gray-400 line-through">Rp {(subtotal + 0).toLocaleString()}</span>
+                           <span className="text-gray-400 line-through">Rp {(subtotal + (selectedShipping?.cost[0].value || 0)).toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between text-sm text-green-600 bg-green-50/50 p-2 rounded-lg border border-green-100/50">
                           <span className="font-black uppercase tracking-widest text-[10px] flex items-center gap-1"><Zap className="w-3 h-3" /> Potongan Kupon</span>
@@ -306,7 +397,7 @@ export function CheckoutPage() {
                           <span className="text-gray-900 font-bold uppercase tracking-tight text-[10px] block opacity-50">Total Pembayaran</span>
                           <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-md font-black italic">Midtrans Secure</span>
                        </div>
-                       <span className="text-3xl font-black text-[var(--accent)] tracking-tighter">Rp {(subtotal + 0 - discount).toLocaleString()}</span>
+                       <span className="text-3xl font-black text-[var(--accent)] tracking-tighter">Rp {(subtotal + (selectedShipping?.cost[0].value || 0) - roundedDiscount).toLocaleString()}</span>
                     </div>
                  </div>
                  <button type="submit" form="order-form" disabled={isSubmitting} className="w-full bg-[var(--text-primary)] hover:bg-[var(--accent)] text-white py-6 rounded-3xl font-black text-xs uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3 shadow-2xl disabled:opacity-50">
