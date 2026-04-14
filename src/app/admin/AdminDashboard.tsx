@@ -3,7 +3,7 @@ import {
   Package, Save, Plus, Trash, Settings, 
   Image as ImageIcon, Edit3, 
   LogOut, User, ShoppingBag, Zap, Clock, ShieldCheck, 
-  Eye, X, Phone, MapPin, CheckCircle 
+  Eye, X, Phone, MapPin, CheckCircle, ArrowRight 
 } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { supabase } from '../../lib/supabase';
