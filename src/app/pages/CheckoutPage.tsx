@@ -58,7 +58,8 @@ export function CheckoutPage() {
     setIsSubmitting(true);
 
     const orderId = Date.now();
-    const finalTotal = subtotal - discount + 0; // Flat 0 shipping for now (testing)
+    const roundedDiscount = Math.round(discount);
+    const finalTotal = subtotal - roundedDiscount + 0; // Flat 0 shipping for now (testing)
 
     const finalizeOrder = async (status: string) => {
       try {
@@ -116,10 +117,10 @@ export function CheckoutPage() {
       ];
 
       // Tambahkan baris diskon jika ada (harga negatif)
-      if (discount > 0) {
+      if (roundedDiscount > 0) {
         midtransItems.push({
           id: 'DISCOUNT',
-          price: -Math.round(discount),
+          price: -roundedDiscount,
           quantity: 1,
           name: 'Diskon Kupon'
         });
