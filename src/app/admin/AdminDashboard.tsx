@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { 
-  Package, Save, Plus, Trash, Settings, 
-  Image as ImageIcon, Edit3, 
-  LogOut, User, ShoppingBag, Zap, Clock, ShieldCheck, 
-  Eye, X, Phone, MapPin, CheckCircle, ArrowRight, Bell, Camera, 
-  Layout, Sparkles, Percent, Tag, RefreshCw, Printer, Calendar, TrendingUp, BarChart3, ChevronRight, MessageSquare, Filter, Ruler
+  Package, Plus, Trash, Settings, 
+  Image as ImageIcon, LogOut, ShoppingBag, Zap, 
+  Eye, X, Phone, MapPin, Camera, 
+  Sparkles, Tag, RefreshCw, Printer, TrendingUp, BarChart3, MessageSquare, Filter
 } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { supabase } from '../../lib/supabase';
@@ -13,7 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export function AdminDashboard() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'products' | 'settings' | 'orders' | 'coupons' | 'analytics'>('analytics');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'products' | 'orders' | 'coupons' | 'settings'>('analytics');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [products, setProducts] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
@@ -21,18 +20,18 @@ export function AdminDashboard() {
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [isAddingSize, setIsAddingSize] = useState<any>(null);
   const [isAddingCoupon, setIsAddingCoupon] = useState(false);
+  
   const [config, setConfig] = useState<any>({
     announcement: { isEnabled: true, text: '' },
-    flashSale: { isEnabled: false, text: '', endTime: '' },
     productCategories: [
-      { id: 'all', name: 'SEMUA' },
+      { id: 'all', name: 'SEMUA KATEGORI' },
       { id: 'born', name: 'NEW BORN' },
       { id: '0-6', name: '0-6 BULAN' },
       { id: '6-12', name: '6-12 BULAN' },
       { id: '1-5', name: '1-5 TAHUN' },
       { id: '5-12', name: '5-12 TAHUN' },
-      { id: 'boys', name: 'LAKI-LAKI' },
-      { id: 'girls', name: 'PEREMPUAN' },
+      { id: 'boys', name: 'ANAK LAKI-LAKI' },
+      { id: 'girls', name: 'ANAK PEREMPUAN' },
       { id: 'baby', name: 'BAYI' },
       { id: 'toddler', name: 'TODDLER' }
     ],
@@ -45,6 +44,17 @@ export function AdminDashboard() {
   useEffect(() => {
     checkUser();
     fetchData();
+
+    const orderSubscription = supabase
+      .channel('orders-realtime')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload) => {
+        setOrders(current => [payload.new, ...current]);
+        toast.info(`🔔 PESANAN BARU! Dari ${payload.new.customer_name}`, { duration: 10000 });
+        new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play().catch(() => {});
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(orderSubscription); };
   }, []);
 
   const checkUser = async () => {
@@ -58,25 +68,35 @@ export function AdminDashboard() {
       const { data: pData } = await supabase.from('products').select('*').order('id', { ascending: false });
       if (pData) setProducts(pData);
       const { data: cData } = await supabase.from('store_config').select('*').eq('id', 'main').maybeSingle();
-      if (cData?.config_data) setConfig({ ...cData.config_data });
+      if (cData?.config_data) {
+        // Gabungkan kategori secara aman
+        setConfig((prev: any) => ({
+          ...prev,
+          ...cData.config_data,
+          productCategories: prev.productCategories // Kunci ke list terbaru
+        }));
+      }
       const { data: ordData } = await supabase.from('orders').select('*').order('id', { ascending: false });
       if (ordData) setOrders(ordData);
       const { data: coupData } = await supabase.from('coupons').select('*');
       if (coupData) setCoupons(coupData);
-    } catch (e) { console.error(e); }
-    setIsSyncing(false);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   const handlePushAllToCloud = async () => {
     setIsLoading(true);
-    const tid = toast.loading("Sinkronisasi Global...");
+    const tid = toast.loading("Sinkronisasi Cloud...");
     try {
       for (const product of products) {
         await supabase.from('products').upsert(product, { onConflict: 'id' });
       }
       await supabase.from('store_config').upsert({ id: 'main', config_data: config });
-      toast.success("Tersimpan ke Cloud!", { id: tid });
-    } catch (e: any) { toast.error(e.message, { id: tid }); }
+      toast.success("Database Tersimpan Rapi!", { id: tid });
+    } catch (e: any) { toast.error(`Error: ${e.message}`, { id: tid }); }
     setIsLoading(false);
   };
 
@@ -88,159 +108,304 @@ export function AdminDashboard() {
     const newProduct = {
       id: Math.floor(Math.random() * 900000000) + 100000000,
       name: "Produk Baru",
-      price: "Rp 150000",
+      price: "150000",
       originalPrice: "",
       image: "https://images.unsplash.com/photo-1540855513560-112df639c947?auto=format&fit=crop&q=80&w=300",
       categories: [selectedCategory === 'all' ? 'born' : selectedCategory],
-      sizes: ["S", "M"],
-      inventory: { "S": 10, "M": 10 }
+      sizes: ["S", "M", "L"],
+      inventory: { "S": 10, "M": 10, "L": 10 }
     };
     setProducts([newProduct, ...products]);
   };
 
-  const handlePrintLabel = (order: any) => {
-    const w = window.open('', '_blank');
-    if(w) {
-      w.document.write(`<html><body style="font-family:sans-serif;padding:40px;border:5px solid black;border-radius:30px;max-width:500px">
-        <h1 style="border-bottom:3px solid #eee;padding-bottom:10px">GAKHA KIDS - LABEL</h1>
-        <p><strong>KEPADA:</strong> ${order.customer_name}</p>
-        <p><strong>WA:</strong> ${order.whatsapp}</p>
-        <p><strong>ALAMAT:</strong> ${order.address}, ${order.city}</p>
-        <hr/>
-        <p><strong>ISI PAKET:</strong><br/>${order.items?.map((it:any)=>`• ${it.name} (${it.size}) x${it.quantity}`).join('<br/>')}</p>
-        <h2 style="margin-top:20px">TAGIHAN: Rp ${order.total.toLocaleString()}</h2>
-        <script>window.print()</script>
-      </body></html>`);
-      w.document.close();
+  const handleUploadImage = async (file: File, callback: (url: string) => void) => {
+    const tid = toast.loading("Mengunggah Gambar...");
+    try {
+      const fileName = `gakha-${Date.now()}.${file.name.split('.').pop()}`;
+      await supabase.storage.from('products').upload(fileName, file);
+      const { data } = supabase.storage.from('products').getPublicUrl(fileName);
+      callback(data.publicUrl);
+      toast.success("Gambar Terpasang!", { id: tid });
+    } catch (e: any) { toast.error(e.message, { id: tid }); }
+  };
+
+  const handlePrintInvoice = (order: any) => {
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Invoice Label - Gakha Kids</title>
+            <style>
+              body { font-family: monospace; padding: 20px; color: #000; }
+              .label { border: 3px solid #000; padding: 20px; border-radius: 12px; max-width: 400px; margin: 0 auto; }
+              .header { font-size: 24px; font-weight: bold; border-bottom: 2px solid #000; margin-bottom: 15px; padding-bottom: 10px; text-align: center; }
+              .section { margin-bottom: 15px; border-bottom: 1px dotted #ccc; padding-bottom: 10px; }
+              .title { font-size: 12px; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; color: #666; }
+              .value { font-size: 16px; font-weight: bold; }
+              .address { font-size: 14px; margin-top: 5px; white-space: pre-wrap; }
+              .items { background: #f5f5f5; padding: 10px; border-radius: 8px; margin-top: 15px; }
+              .item-line { margin-bottom: 5px; font-size: 14px; }
+            </style>
+          </head>
+          <body>
+            <div class="label">
+              <div class="header">GAKHA KIDS<br/><span style="font-size: 12px; font-weight: normal;">SHIPPING LABEL</span></div>
+               <div style="font-size: 10px; text-align: right; margin-bottom: 10px;">ID: #${order.id.toString().slice(-8)}</div>
+              <div class="section">
+                <div class="title">PENERIMA</div>
+                <div class="value">${order.customer_name}</div>
+                <div class="value">${order.whatsapp}</div>
+              </div>
+              <div class="section">
+                <div class="title">ALAMAT PENGIRIMAN</div>
+                <div class="value">${order.city}</div>
+                <div class="address">${order.address}</div>
+              </div>
+              <div class="items">
+                <div class="title" style="margin-bottom: 8px;">DETAIL PESANAN</div>
+                ${order.items?.map((it: any) => `<div class="item-line">• ${it.name} [Size: ${it.size}] x${it.quantity}</div>`).join('')}
+              </div>
+              <div style="text-align: right; margin-top: 15px; font-size: 16px; font-weight: bold;">TOTAL: Rp ${order.total.toLocaleString()}</div>
+            </div>
+            <script>window.print();</script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
     }
   };
 
-  // Analytics
+  const handleUpdateOrderStatus = async (orderId: any, newStatus: string) => {
+    const { error } = await supabase.from('orders').update({ status: newStatus }).eq('id', orderId);
+    if (!error) {
+       setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+       if (selectedOrder?.id === orderId) setSelectedOrder({ ...selectedOrder, status: newStatus });
+       toast.success(`Pesanan ditandai ${newStatus}`);
+    }
+  };
+
+  // Derived Data
+  const filteredProducts = products.filter(p => selectedCategory === 'all' || p.categories?.includes(selectedCategory));
   const dailyRecap = orders.filter(o => new Date(o.created_at).toDateString() === new Date().toDateString()).reduce((acc, o) => acc + (o.total || 0), 0);
   const monthlyRecap = orders.filter(o => new Date(o.created_at).getMonth() === new Date().getMonth()).reduce((acc, o) => acc + (o.total || 0), 0);
   const bestSellers = [...products].sort((a,b) => (b.sold||0)-(a.sold||0)).slice(0,3);
-  const filteredProducts = products.filter(p => selectedCategory === 'all' || p.categories?.includes(selectedCategory));
 
-  if (isSyncing) return <div className="min-h-screen bg-gray-950 flex items-center justify-center"><div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin"></div></div>;
+  if (isSyncing) return (
+    <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center">
+       <div className="w-12 h-12 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin"></div>
+       <p className="text-[10px] text-[var(--accent)] uppercase font-black tracking-widest mt-4">INITIALIZING SYSTEM</p>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
+    <div className="min-h-screen bg-gray-100 flex font-sans">
       {/* SIDEBAR */}
-      <aside className="w-24 lg:w-80 bg-gray-950 text-white p-6 lg:p-10 flex flex-col flex-shrink-0 transition-all">
+      <aside className="w-24 lg:w-72 bg-gray-950 text-white p-6 lg:p-8 flex flex-col flex-shrink-0 transition-all z-10 shadow-2xl">
         <div className="flex items-center gap-3 mb-16 justify-center lg:justify-start">
-           <div className="w-12 h-12 bg-[var(--accent)] rounded-2xl flex items-center justify-center text-3xl font-black">G</div>
+           <div className="w-12 h-12 bg-gradient-to-br from-[var(--accent)] to-pink-600 rounded-2xl flex items-center justify-center text-3xl font-black shadow-lg shadow-pink-500/30">G</div>
            <h2 className="text-2xl font-black italic tracking-tighter hidden lg:block">Gakha<span className="text-[var(--accent)]">Admin</span></h2>
         </div>
-        <nav className="space-y-4 flex-1">
+        <nav className="space-y-3 flex-1">
           {[
-            { id: 'analytics', label: 'Monitor', icon: <BarChart3 className="w-6 h-6" /> },
-            { id: 'products', label: 'Produk', icon: <Package className="w-6 h-6" /> },
-            { id: 'orders', label: 'Penjualan', icon: <ShoppingBag className="w-6 h-6" /> },
-            { id: 'coupons', label: 'Kupon', icon: <Zap className="w-6 h-6" /> },
-            { id: 'settings', label: 'Konfigurasi', icon: <Settings className="w-6 h-6" /> },
+            { id: 'analytics', label: 'Monitor Data', icon: <BarChart3 className="w-5 h-5" /> },
+            { id: 'products', label: 'Produk & Stok', icon: <Package className="w-5 h-5" /> },
+            { id: 'orders', label: 'Penjualan', icon: <ShoppingBag className="w-5 h-5" /> },
+            { id: 'coupons', label: 'Kode Kupon', icon: <Zap className="w-5 h-5" /> },
+            { id: 'settings', label: 'Seting Toko', icon: <Settings className="w-5 h-5" /> },
           ].map(tab => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`w-full flex items-center gap-4 p-4 lg:p-5 rounded-[1.5rem] transition-all relative ${activeTab === tab.id ? 'bg-[var(--accent)] text-white shadow-xl' : 'text-gray-500 hover:text-white'}`}>
-              {tab.icon} <span className="font-black text-[11px] uppercase tracking-widest hidden lg:block">{tab.label}</span>
+            <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all relative group ${activeTab === tab.id ? 'bg-[var(--accent)] text-white shadow-lg shadow-pink-500/20' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}>
+              {tab.icon} <span className="font-bold text-[11px] uppercase tracking-widest hidden lg:block">{tab.label}</span>
+              {activeTab === tab.id && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-8 bg-white rounded-r-full hidden lg:block" />}
             </button>
           ))}
         </nav>
+        <button onClick={() => { supabase.auth.signOut(); navigate('/admin/login'); }} className="p-4 flex items-center gap-3 text-red-400 font-bold text-[11px] uppercase hover:bg-red-400/10 rounded-2xl transition-all">
+          <LogOut className="w-5 h-5" /> <span className="hidden lg:block">Logout</span>
+        </button>
       </aside>
 
-      <main className="flex-1 overflow-y-auto h-screen custom-scrollbar">
+      {/* MAIN CONTENT AREA */}
+      <main className="flex-1 overflow-y-auto h-screen custom-scrollbar relative">
         <AnimatePresence mode="wait">
+
+          {/* TAB: MONITOR */}
           {activeTab === 'analytics' && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="analytics" className="p-8 lg:p-16">
-               <h1 className="text-5xl font-black tracking-tighter uppercase italic mb-12">Performance Monitor</h1>
-               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                  <div className="bg-white p-12 rounded-[4rem] shadow-sm border border-gray-100">
-                     <p className="text-[10px] font-black text-gray-400 uppercase mb-2">HARI INI</p>
-                     <p className="text-4xl font-black text-green-600">Rp {dailyRecap.toLocaleString()}</p>
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key="analytics" className="p-8 lg:p-12">
+               <div className="flex justify-between items-end mb-12">
+                  <div>
+                    <h1 className="text-4xl font-black tracking-tighter uppercase italic leading-none">Monitor Dashboard</h1>
+                    <p className="text-gray-400 font-bold mb-0 mt-2 uppercase text-[10px] tracking-widest">Pantauan Data Real-Time</p>
                   </div>
-                   <div className="bg-white p-12 rounded-[4rem] shadow-sm border border-gray-100">
-                     <p className="text-[10px] font-black text-gray-400 uppercase mb-2">BULAN INI</p>
-                     <p className="text-4xl font-black text-blue-600">Rp {monthlyRecap.toLocaleString()}</p>
+               </div>
+
+               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                  <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col justify-between">
+                     <p className="text-[10px] font-black text-gray-400 uppercase mb-4 tracking-widest font-mono">REKAP HARI INI</p>
+                     <h3 className="text-3xl font-black text-green-600 tracking-tighter">Rp {dailyRecap.toLocaleString()}</h3>
                   </div>
-                  <div className="bg-gray-900 text-white p-12 rounded-[4rem] shadow-2xl">
-                     <p className="text-[10px] font-black text-gray-500 uppercase mb-4 tracking-widest italic">BEST SELLERS</p>
-                     <div className="flex gap-4">
-                        {bestSellers.map(p => <img key={p.id} src={p.image} className="w-12 h-12 rounded-xl object-cover border border-white/10" title={p.name} />)}
+                  <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col justify-between">
+                     <p className="text-[10px] font-black text-gray-400 uppercase mb-4 tracking-widest font-mono">REKAP BULAN INI</p>
+                     <h3 className="text-3xl font-black text-blue-600 tracking-tighter">Rp {monthlyRecap.toLocaleString()}</h3>
+                  </div>
+                  <div className="bg-gray-950 text-white p-8 rounded-[2rem] shadow-xl relative overflow-hidden flex flex-col justify-between">
+                     <div className="relative z-10">
+                        <p className="text-[10px] font-black text-gray-500 uppercase mb-2 tracking-widest font-mono">TOTAL PESANAN</p>
+                        <h3 className="text-5xl font-black italic">{orders.length}</h3>
                      </div>
+                     <TrendingUp className="absolute -bottom-6 -right-6 w-32 h-32 opacity-10 text-[var(--accent)]" />
+                  </div>
+               </div>
+
+               <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm">
+                  <h4 className="text-[11px] font-black uppercase text-gray-400 mb-6 tracking-[0.3em] flex items-center gap-2"><Sparkles className="w-4 h-4 text-[var(--accent)]" /> Best Seller Products</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                     {bestSellers.map(p => (
+                       <div key={p.id} className="flex gap-4 items-center bg-gray-50 p-4 rounded-[1.5rem]">
+                          <img src={p.image} className="w-16 h-16 rounded-xl object-cover shadow-sm" />
+                          <div className="overflow-hidden">
+                             <p className="text-xs font-black truncate">{p.name}</p>
+                             <p className="text-[10px] uppercase font-bold text-[var(--accent)] mt-1">{p.sold || 0} Terjual</p>
+                          </div>
+                       </div>
+                     ))}
                   </div>
                </div>
             </motion.div>
           )}
 
+          {/* TAB: PRODUCTS */}
           {activeTab === 'products' && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="products">
-               <div className="sticky top-0 z-20 bg-gray-100 p-8 lg:px-16 pb-4 border-b border-gray-200 shadow-sm">
-                  <div className="flex flex-col xl:flex-row justify-between items-center gap-6">
-                    <div className="flex flex-wrap gap-2 justify-center">
-                       {config.productCategories.map((c: any) => (
-                         <button key={c.id} onClick={() => setSelectedCategory(c.id)} className={`px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${selectedCategory === c.id ? 'bg-gray-950 text-white shadow-xl' : 'bg-white text-gray-400 hover:text-gray-900'}`}>{c.name}</button>
-                       ))}
-                    </div>
-                    <div className="flex gap-3">
-                      <button onClick={handleAddProduct} className="bg-white px-8 py-3 rounded-2xl font-black text-[10px] uppercase border border-blue-100 text-blue-600 hover:bg-blue-50">Add Item</button>
-                      <button onClick={handlePushAllToCloud} className="bg-[var(--accent)] text-white px-10 py-3 rounded-2xl font-black text-[10px] uppercase shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
-                         <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} /> Sync Cloud
-                      </button>
-                    </div>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="products" className="flex flex-col h-full bg-gray-50/50">
+               {/* Fixed Sticky Header for Products */}
+               <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl p-6 lg:px-12 border-b border-gray-200 shadow-sm">
+                  <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
+                     <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
+                        {config.productCategories.map((c: any) => (
+                          <button 
+                             key={c.id} 
+                             onClick={() => setSelectedCategory(c.id)}
+                             className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${selectedCategory === c.id ? 'bg-gray-950 text-[var(--accent)] shadow-md' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
+                          >
+                             {c.name}
+                          </button>
+                        ))}
+                     </div>
+                     <div className="flex gap-3">
+                        <button onClick={handleAddProduct} className="bg-white border border-gray-200 px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-gray-50 transition-all text-gray-800"><Plus className="w-4 h-4 text-[var(--accent)]" /> Tambah Produk</button>
+                        <button onClick={handlePushAllToCloud} className="bg-[var(--accent)] text-white px-8 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-pink-500/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 border border-pink-500">
+                           <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} /> Sync Semua
+                        </button>
+                     </div>
                   </div>
                </div>
-               <div className="p-8 lg:p-16 space-y-4">
+
+               <div className="p-6 lg:p-12 space-y-6 flex-1">
+                  {filteredProducts.length === 0 && (
+                     <div className="text-center py-20 opacity-50">
+                        <Package className="w-16 h-16 mx-auto mb-4" />
+                        <p className="font-bold uppercase tracking-widest text-xs">Belum ada produk di kategori ini</p>
+                     </div>
+                  )}
+
                   {filteredProducts.map(p => {
+                    // Logic Diskon Stempel
                     const priceNum = parseInt(p.price?.replace(/[^0-9]/g, '')) || 0;
                     const origNum = parseInt(p.originalPrice?.replace(/[^0-9]/g, '') || '0');
-                    const disc = origNum > priceNum ? Math.round(((origNum-priceNum)/origNum)*100) : 0;
+                    const disc = origNum > priceNum ? Math.round(((origNum - priceNum) / origNum) * 100) : 0;
+
                     return (
-                    <div key={p.id} className="bg-white p-6 lg:p-8 rounded-[3rem] border border-gray-100 shadow-sm flex flex-col lg:flex-row items-center gap-8 group">
-                       <div className="relative w-28 h-28 flex-shrink-0">
-                          <img src={p.image} className="w-full h-full rounded-[2rem] object-cover shadow-lg" />
-                          <label className="absolute inset-0 bg-black/50 rounded-[2rem] flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer">
-                             <input type="file" className="hidden" onChange={(e) => { if(e.target.files?.[0]) { const f = e.target.files[0]; const tid = toast.loading("Uploading..."); const fName = `gakha-${Date.now()}.${f.name.split('.').pop()}`; supabase.storage.from('products').upload(fName, f).then(() => { const { data } = supabase.storage.from('products').getPublicUrl(fName); handleUpdateProduct(p.id, 'image', data.publicUrl); toast.success("Updated!", { id: tid }); }); } }} />
+                    <div key={p.id} className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col xl:flex-row items-center gap-8 relative group">
+                       
+                       {/* Gambar Produk */}
+                       <div className="relative w-32 h-32 flex-shrink-0 group/img">
+                          <img src={p.image} className="w-full h-full rounded-[1.8rem] object-cover shadow-inner bg-gray-50" />
+                          <label className="absolute inset-0 bg-black/60 rounded-[1.8rem] flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity cursor-pointer backdrop-blur-sm">
+                             <input type="file" className="hidden" accept="image/*" onChange={(e) => {
+                               if(e.target.files?.[0]) handleUploadImage(e.target.files[0], (url) => handleUpdateProduct(p.id, 'image', url));
+                             }} />
                              <Camera className="w-8 h-8 text-white" />
                           </label>
-                          {disc > 0 && <div className="absolute -top-2 -right-2 bg-red-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-black text-[10px] shadow-lg">-{disc}%</div>}
+                          {disc > 0 && <div className="absolute -top-3 -right-3 bg-red-500 text-white w-12 h-12 rounded-full flex items-center justify-center font-black text-[11px] shadow-lg border-[3px] border-white rotate-12">-{disc}%</div>}
                        </div>
-                       <div className="flex-1 space-y-3 w-full">
-                          <input value={p.name} onChange={(e) => handleUpdateProduct(p.id, 'name', e.target.value)} className="w-full font-black text-xl outline-none bg-gray-50/20 p-2 px-4 rounded-xl" />
-                          <div className="flex gap-3">
-                             <div className="flex-1"><label className="text-[8px] font-black text-gray-400 uppercase px-2">Harga Jual</label><input value={p.price} onChange={(e) => handleUpdateProduct(p.id, 'price', e.target.value)} className="w-full text-blue-600 font-bold bg-gray-50/50 p-2 px-4 rounded-xl outline-none" placeholder="Price" /></div>
-                             <div className="flex-1"><label className="text-[8px] font-black text-gray-400 uppercase px-2">Harga Coret</label><input value={p.originalPrice} onChange={(e) => handleUpdateProduct(p.id, 'originalPrice', e.target.value)} className="w-full text-red-300 font-bold bg-red-50/20 p-2 px-4 rounded-xl outline-none" placeholder="Original" /></div>
-                             <div className="flex-1"><label className="text-[8px] font-black text-gray-400 uppercase px-2">Kategori</label><select value={p.categories?.[0] || 'all'} onChange={(e)=>handleUpdateProduct(p.id, 'categories', [e.target.value])} className="w-full text-[9px] font-black p-2 rounded-xl bg-pink-50 text-[var(--accent)] outline-none border-none cursor-pointer">{config.productCategories.map((c:any) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
+
+                       {/* Input Info Produk (Rapi/Compact) */}
+                       <div className="flex-1 space-y-4 w-full">
+                          <input value={p.name} onChange={(e) => handleUpdateProduct(p.id, 'name', e.target.value)} className="w-full font-black text-xl outline-none bg-transparent hover:bg-gray-50 focus:bg-gray-50 p-2 rounded-xl transition-colors border border-transparent focus:border-gray-200" placeholder="Nama Produk" />
+                          
+                          <div className="flex flex-col md:flex-row gap-4">
+                             <div className="flex-1 bg-gray-50 p-3 rounded-2xl border border-gray-100">
+                                <label className="text-[9px] font-black text-gray-400 uppercase block mb-1">Harga Jual</label>
+                                <input value={p.price} onChange={(e) => handleUpdateProduct(p.id, 'price', e.target.value)} className="w-full text-blue-600 font-bold text-sm bg-transparent outline-none" placeholder="Rp 150000" />
+                             </div>
+                             <div className="flex-1 bg-red-50/50 p-3 rounded-2xl border border-red-50/50">
+                                <label className="text-[9px] font-black text-red-300 uppercase block mb-1">Harga Coret</label>
+                                <input value={p.originalPrice} onChange={(e) => handleUpdateProduct(p.id, 'originalPrice', e.target.value)} className="w-full text-red-400 font-bold text-sm bg-transparent outline-none line-through" placeholder="(Opsional)" />
+                             </div>
+                             <div className="flex-1 bg-pink-50 p-3 rounded-2xl border border-pink-100">
+                                <label className="text-[9px] font-black text-[var(--accent)]/50 uppercase block mb-1 flex items-center gap-1"><Tag className="w-3 h-3"/> Kategori</label>
+                                <select value={p.categories?.[0] || 'all'} onChange={(e)=>handleUpdateProduct(p.id, 'categories', [e.target.value])} className="w-full text-[10px] font-black uppercase text-[var(--accent)] bg-transparent outline-none cursor-pointer">
+                                   {config.productCategories.map((c:any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                </select>
+                             </div>
                           </div>
                        </div>
-                       <div className="flex-shrink-0 flex items-center gap-2">
+
+                       {/* Ukuran & Stok Horizontal */}
+                       <div className="flex-shrink-0 flex items-center gap-2 overflow-x-auto custom-scrollbar pb-2 max-w-[300px]">
                           {p.sizes?.map((s: string) => (
-                            <div key={s} className="bg-gray-950 text-white rounded-2xl p-2.5 min-w-[65px] text-center relative">
-                               <p className="text-[8px] font-black text-gray-500 mb-1 uppercase">{s}</p>
-                               <input type="number" value={p.inventory?.[s] || 0} onChange={(e) => { const inv = { ...(p.inventory || {}), [s]: parseInt(e.target.value) || 0 }; handleUpdateProduct(p.id, 'inventory', inv); }} className="w-full bg-transparent text-center font-black text-sm outline-none text-[var(--accent)]" />
-                               <button onClick={() => { const ns = p.sizes.filter((sz: string) => sz !== s); const ni = { ...p.inventory }; delete ni[s]; handleUpdateProduct(p.id, 'sizes', ns); handleUpdateProduct(p.id, 'inventory', ni); }} className="absolute -top-1 -right-1 bg-red-500 w-4 h-4 rounded-full flex items-center justify-center text-[8px] opacity-0 hover:opacity-100 transition-opacity">X</button>
+                            <div key={s} className="bg-gray-950 text-white rounded-[1.5rem] p-3 text-center relative shadow-md group/sz w-[65px] flex-shrink-0 border border-gray-800">
+                               <button onClick={() => {
+                                  if(!confirm('Hapus ukuran ini?')) return;
+                                  const ns = p.sizes.filter((sz: string) => sz !== s);
+                                  const ni = { ...p.inventory }; delete ni[s];
+                                  handleUpdateProduct(p.id, 'sizes', ns);
+                                  handleUpdateProduct(p.id, 'inventory', ni);
+                               }} className="absolute -top-1 -right-1 bg-red-500 w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover/sz:opacity-100 transition-opacity z-10"><X className="w-3 h-3 text-white" /></button>
+                               <p className="text-[9px] font-black text-gray-400 mb-1 uppercase tracking-widest">{s}</p>
+                               <input type="number" value={p.inventory?.[s] || 0} onChange={(e) => {
+                                 const inv = { ...(p.inventory || {}), [s]: parseInt(e.target.value) || 0 };
+                                 handleUpdateProduct(p.id, 'inventory', inv);
+                               }} className="w-full bg-transparent text-center font-black text-sm outline-none text-[var(--accent)]" />
                             </div>
                           ))}
-                          <button onClick={() => setIsAddingSize(p.id)} className="w-10 h-10 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center text-gray-300 hover:border-[var(--accent)] hover:text-[var(--accent)]"><Plus className="w-5 h-5" /></button>
+                          <button onClick={() => setIsAddingSize(p.id)} className="w-[65px] h-[72px] border-2 border-dashed border-gray-300 rounded-[1.5rem] flex items-center justify-center text-gray-400 hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-pink-50 transition-all flex-shrink-0"><Plus className="w-6 h-6" /></button>
                        </div>
-                       <button onClick={() => { if(confirm('Hapus?')) { supabase.from('products').delete().eq('id', p.id).then(()=>fetchData()); } }} className="p-4 bg-red-50 text-red-400 hover:bg-red-500 hover:text-white rounded-2xl transition-all"><Trash className="w-5 h-5" /></button>
+
+                       <div className="flex-shrink-0">
+                          <button onClick={() => { if(confirm('Hapus Produk Permanen?')) { supabase.from('products').delete().eq('id', p.id).then(()=>fetchData()); } }} className="w-12 h-12 flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-2xl transition-all shadow-sm active:scale-95"><Trash className="w-5 h-5" /></button>
+                       </div>
                     </div>
                   )})}
                </div>
             </motion.div>
           )}
 
+          {/* TAB: PENJUALAN */}
           {activeTab === 'orders' && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="orders" className="p-8 lg:p-16">
-               <h1 className="text-5xl font-black mb-12 tracking-tighter uppercase italic">Sales Registry</h1>
-               <div className="bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden text-sm">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="orders" className="p-8 lg:p-12">
+               <h1 className="text-4xl font-black mb-12 tracking-tighter uppercase italic leading-none">Daftar Penjualan</h1>
+               <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden text-sm">
                   <table className="w-full text-left">
-                     <thead className="bg-gray-50 text-[9px] uppercase font-black tracking-[0.4em] text-gray-400"><tr className="border-b border-gray-100"><th className="p-10">ID</th><th className="p-10">Customer</th><th className="p-10">Amount</th><th className="p-10">Status</th><th className="p-10">Actions</th></tr></thead>
+                     <thead className="bg-gray-50 text-[10px] uppercase font-black tracking-[0.2em] text-gray-400">
+                        <tr className="border-b border-gray-100">
+                           <th className="p-6 pl-8">ID Pesanan</th>
+                           <th className="p-6">Pembeli</th>
+                           <th className="p-6">Nominal</th>
+                           <th className="p-6">No. Resi (AWB)</th>
+                           <th className="p-6">Status</th>
+                           <th className="p-6">Aksi</th>
+                        </tr>
+                     </thead>
                      <tbody>
                         {orders.map(o => (
                           <tr key={o.id} className="hover:bg-gray-50/50 transition-all border-b border-gray-50">
-                             <td className="p-10 font-mono font-bold text-gray-400 text-xs">#{o.id.toString().slice(-6)}</td>
-                             <td className="p-10 font-black text-gray-950 uppercase text-xs">{o.customer_name}</td>
-                             <td className="p-10 font-black text-lg">Rp {o.total.toLocaleString()}</td>
-                             <td className="p-10"><span className={`px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest ${o.status === 'Pending' ? 'bg-amber-100 text-amber-600' : 'bg-green-100 text-green-600'}`}>{o.status}</span></td>
-                             <td className="p-10"><button onClick={() => setSelectedOrder(o)} className="bg-gray-950 text-white px-8 py-3 rounded-xl text-[9px] font-black uppercase flex items-center gap-2 hover:scale-105 transition-all shadow-xl"><Eye className="w-3 h-3 text-[var(--accent)]" /> Manage</button></td>
+                             <td className="p-6 pl-8 font-mono font-bold text-gray-400">#{o.id.toString().slice(-6)}</td>
+                             <td className="p-6 font-black text-gray-900 uppercase">{o.customer_name}</td>
+                             <td className="p-6 font-black text-[var(--accent)]">Rp {o.total.toLocaleString()}</td>
+                             <td className="p-6 font-bold text-gray-400">{o.tracking_number || '-'}</td>
+                             <td className="p-6"><span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest ${o.status === 'Pending' ? 'bg-amber-100 text-amber-600' : 'bg-green-100 text-green-600'}`}>{o.status}</span></td>
+                             <td className="p-6"><button onClick={() => setSelectedOrder(o)} className="bg-gray-950 text-white px-6 py-2.5 rounded-xl text-[10px] font-black uppercase flex items-center gap-2 hover:scale-105 transition-all"><Eye className="w-4 h-4 text-pink-400" /> Kelola</button></td>
                           </tr>
                         ))}
                      </tbody>
@@ -249,122 +414,201 @@ export function AdminDashboard() {
             </motion.div>
           )}
 
+          {/* TAB: KUPON */}
           {activeTab === 'coupons' && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="coupons" className="p-8 lg:p-16">
-               <div className="flex justify-between items-center mb-16">
-                  <h1 className="text-5xl font-black tracking-tighter uppercase italic">Voucher Engine</h1>
-                  <button onClick={() => setIsAddingCoupon(true)} className="bg-gray-950 text-white px-10 py-4 rounded-[2rem] font-black text-[12px] uppercase shadow-2xl hover:scale-105 transition-all flex items-center gap-3"><Plus className="w-5 h-5 text-[var(--accent)]" /> New Voucher</button>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="coupons" className="p-8 lg:p-12">
+               <div className="flex justify-between items-center mb-12">
+                  <h1 className="text-4xl font-black tracking-tighter uppercase italic leading-none">Manajemen Kupon</h1>
+                  <button onClick={() => setIsAddingCoupon(true)} className="bg-gray-950 text-white px-8 py-3 rounded-2xl font-black text-[11px] uppercase shadow-xl hover:scale-105 transition-all flex items-center gap-2"><Plus className="w-4 h-4 text-[var(--accent)]" /> Buat Kupon</button>
                </div>
                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   {coupons.map(c => {
                     const isExp = c.expiry_date && new Date(c.expiry_date) < new Date();
-                    if(isExp) return null;
+                    if(isExp) return null; // Sembunyikan otomatis jika kadaluarsa
                     return (
-                    <div key={c.id} className="bg-white p-12 rounded-[4rem] border border-gray-100 shadow-sm flex flex-col items-center text-center group relative">
-                       <p className="absolute top-8 right-8 text-[8px] font-black uppercase text-gray-400">{c.expiry_date || 'NO EXPIRY'}</p>
-                       <div className="bg-gray-950 text-[var(--accent)] px-8 py-3 rounded-2xl font-mono font-black text-2xl mb-4 group-hover:scale-110 transition-transform">{c.code}</div>
-                       <p className="text-3xl font-black mb-2">{c.value}% OFF</p>
-                       <button onClick={async () => { await supabase.from('coupons').delete().eq('id', c.id); fetchData(); }} className="mt-4 text-red-500 font-black text-[9px] uppercase underline">Delete</button>
+                    <div key={c.id} className="bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm flex flex-col items-center text-center relative group overflow-hidden">
+                       <span className="absolute top-6 right-6 bg-red-50 text-red-500 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">Valid: {c.expiry_date || 'Permanen'}</span>
+                       <div className="bg-gray-900 text-[var(--accent)] px-8 py-3 rounded-2xl font-mono font-black text-2xl mb-4 mt-4 tracking-tight shadow-md border border-gray-800">{c.code}</div>
+                       <p className="text-4xl font-black mb-1">{c.value}% <span className="text-sm text-gray-400 uppercase tracking-widest">OFF</span></p>
+                       <button onClick={async () => { if(confirm('Hapus Coupon?')){ await supabase.from('coupons').delete().eq('id', c.id); fetchData(); } }} className="mt-6 text-red-400 font-black text-[10px] uppercase underline hover:text-red-600">Hapus Kupon</button>
                     </div>
                   )})}
                </div>
             </motion.div>
           )}
 
+          {/* TAB: PENGATURAN TOKO */}
           {activeTab === 'settings' && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="settings" className="p-8 lg:p-16 max-w-4xl space-y-10">
-               <div className="bg-gray-950 text-white p-12 rounded-[4rem] shadow-2xl flex justify-between items-center relative overflow-hidden">
-                  <h1 className="text-4xl font-black italic uppercase tracking-tighter relative z-10">Global Config</h1>
-                  <button onClick={handlePushAllToCloud} className="bg-[var(--accent)] text-white px-10 py-5 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl relative z-10">Save Changes</button>
-                  <Settings className="absolute -bottom-10 -right-10 w-48 h-48 opacity-10 rotate-12" />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="settings" className="p-8 lg:p-12 max-w-4xl space-y-8">
+               <div className="bg-gray-950 text-white p-10 rounded-[3rem] shadow-xl flex justify-between items-center relative overflow-hidden">
+                  <div className="relative z-10">
+                     <h1 className="text-3xl font-black italic uppercase tracking-tighter mb-1">Konfigurasi Toko</h1>
+                     <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest">Atur Tampilan Halaman Utama</p>
+                  </div>
+                  <button onClick={handlePushAllToCloud} className="bg-[var(--accent)] text-white px-8 py-4 rounded-xl font-black text-[11px] uppercase tracking-widest shadow-lg relative z-10 hover:scale-105 transition-all">Simpan Pengaturan</button>
+                  <Settings className="absolute -bottom-10 -right-4 w-40 h-40 opacity-5 rotate-12" />
                </div>
+               
                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="bg-white p-10 rounded-[3rem] border border-gray-100 space-y-4">
-                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest italic">🖼️ Hero Display</p>
-                     <input value={config.hero?.headingLine1} onChange={(e) => setConfig({...config, hero: {...config.hero, headingLine1: e.target.value}})} className="w-full bg-gray-50 p-4 rounded-xl outline-none font-bold" placeholder="Line 1" />
-                     <input value={config.hero?.headingLine2} onChange={(e) => setConfig({...config, hero: {...config.hero, headingLine2: e.target.value}})} className="w-full bg-gray-50 p-4 rounded-xl font-black text-[var(--accent)]" placeholder="Line 2" />
+                  <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 space-y-5 shadow-sm">
+                     <p className="text-[11px] font-black text-gray-900 uppercase tracking-widest italic flex items-center gap-2"><Layout className="w-4 h-4 text-blue-500" /> Teks Hero Display</p>
+                     <input value={config.hero?.headingLine1} onChange={(e) => setConfig({...config, hero: {...config.hero, headingLine1: e.target.value}})} className="w-full bg-gray-50/50 border border-gray-200 p-4 rounded-xl outline-none font-bold" placeholder="Teks Baris 1" />
+                     <input value={config.hero?.headingLine2} onChange={(e) => setConfig({...config, hero: {...config.hero, headingLine2: e.target.value}})} className="w-full bg-pink-50/50 border border-pink-100 p-4 rounded-xl font-black text-[var(--accent)] outline-none" placeholder="Teks Aksen" />
                   </div>
-                  <div className="bg-white p-10 rounded-[3rem] border border-gray-100 space-y-4">
-                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest italic">📱 Social & WA</p>
-                     <input value={config.socialMedia?.instagram} onChange={(e) => setConfig({...config, socialMedia: {...config.socialMedia, instagram: e.target.value}})} className="w-full bg-gray-50 p-4 rounded-xl outline-none font-bold" placeholder="Instagram" />
-                     <input value={config.socialMedia?.resellerWhatsApp} onChange={(e) => setConfig({...config, socialMedia: {...config.socialMedia, resellerWhatsApp: e.target.value}})} className="w-full bg-green-50/50 p-4 rounded-xl outline-none font-black text-green-600" placeholder="WhatsApp" />
+                  <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 space-y-5 shadow-sm">
+                     <p className="text-[11px] font-black text-gray-900 uppercase tracking-widest italic flex items-center gap-2"><Phone className="w-4 h-4 text-green-500" /> Link Social & CS</p>
+                     <input value={config.socialMedia?.instagram} onChange={(e) => setConfig({...config, socialMedia: {...config.socialMedia, instagram: e.target.value}})} className="w-full bg-gray-50/50 border border-gray-200 p-4 rounded-xl outline-none font-bold text-sm" placeholder="URL Instagram" />
+                     <input value={config.socialMedia?.resellerWhatsApp} onChange={(e) => setConfig({...config, socialMedia: {...config.socialMedia, resellerWhatsApp: e.target.value}})} className="w-full bg-green-50/50 border border-green-100 p-4 rounded-xl outline-none font-black text-green-600 text-sm" placeholder="Nomor WA (Mulai dari 628...)" />
                   </div>
                </div>
-               <div className="bg-white p-10 rounded-[3rem] border border-gray-100 space-y-4">
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest italic text-center">📢 Announcement Bar</p>
-                  <input value={config.announcement?.text} onChange={(e) => setConfig({...config, announcement: {...config.announcement, text: e.target.value}})} className="w-full bg-orange-50/50 p-5 rounded-2xl font-bold text-orange-600 text-center" />
+               <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 space-y-5 shadow-sm text-center">
+                  <p className="text-[11px] font-black text-gray-900 uppercase tracking-widest italic flex items-center justify-center gap-2"><Bell className="w-4 h-4 text-orange-400" /> Teks Bar Pengumuman Atas</p>
+                  <input value={config.announcement?.text} onChange={(e) => setConfig({...config, announcement: {...config.announcement, text: e.target.value}})} className="w-full max-w-2xl mx-auto bg-orange-50/50 border border-orange-200 p-5 rounded-2xl font-black text-orange-600 text-center outline-none" placeholder="Contoh: PROMO FREE ONGKIR" />
                </div>
             </motion.div>
           )}
+
         </AnimatePresence>
       </main>
 
-      {/* POPUPS (Restored V2) */}
+      {/* POPUPS SECTION */}
+
+      {/* 1. Popup Add Size */}
       <AnimatePresence>
          {isAddingSize && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-gray-950/80 backdrop-blur-md">
-               <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className="bg-white p-12 rounded-[3.5rem] shadow-2xl w-full max-w-xs text-center relative">
-                  <h3 className="text-2xl font-black mb-8 uppercase italic">New Size</h3>
-                  <input id="sz" className="w-full bg-gray-50 p-4 rounded-2xl outline-none font-black text-2xl text-center mb-8" placeholder="EX: 4Y" autoFocus />
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-gray-950/70 backdrop-blur-sm">
+               <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white p-10 rounded-[3rem] shadow-2xl w-full max-w-sm text-center">
+                  <h3 className="text-2xl font-black mb-6 uppercase italic tracking-tighter">Tambah Ukuran</h3>
+                  <input id="szInput" className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl outline-none font-black text-2xl text-center mb-6 uppercase" placeholder="MISAL: XL / 4Y" autoFocus />
                   <div className="flex gap-4">
-                     <button onClick={()=>setIsAddingSize(null)} className="flex-1 font-black text-[10px] text-gray-400 uppercase">Abort</button>
-                     <button onClick={()=>{ const v = (document.getElementById('sz') as HTMLInputElement).value; if(v){ setProducts(prev => prev.map(p=>p.id===isAddingSize?{...p, sizes:[...(p.sizes||[]), v.toUpperCase()], inventory:{...(p.inventory||{}), [v.toUpperCase()]:0} }:p)); setIsAddingSize(null); } }} className="flex-1 bg-gray-900 text-white py-4 rounded-2xl font-black text-[10px] uppercase shadow-lg">Add Size</button>
+                     <button onClick={() => setIsAddingSize(null)} className="flex-1 py-3 font-black uppercase text-[10px] text-gray-400 hover:bg-gray-50 rounded-xl">Batal</button>
+                     <button onClick={() => {
+                        const v = (document.getElementById('szInput') as HTMLInputElement).value;
+                        if(v) {
+                          setProducts(prev => prev.map(p => p.id === isAddingSize ? { ...p, sizes: [...(p.sizes||[]), v.toUpperCase()], inventory: { ...(p.inventory||{}), [v.toUpperCase()]: 0 } } : p));
+                          setIsAddingSize(null);
+                        }
+                     }} className="flex-1 bg-[var(--accent)] text-white py-3 rounded-xl font-black uppercase text-[10px] shadow-lg hover:scale-105 transition-all">Tambahkan</button>
                   </div>
                </motion.div>
             </div>
          )}
+      </AnimatePresence>
+
+      {/* 2. Popup Add Coupon */}
+      <AnimatePresence>
          {isAddingCoupon && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-gray-950/80 backdrop-blur-md">
-               <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="bg-white p-16 rounded-[4.5rem] shadow-2xl w-full max-w-2xl relative">
-                  <h3 className="text-4xl font-black mb-12 uppercase italic text-center leading-none">New Voucher</h3>
-                  <div className="space-y-6 mb-12">
-                     <input id="ccode" className="w-full bg-gray-50 p-5 rounded-2xl font-black text-2xl uppercase tracking-widest outline-none" placeholder="CODE: GAKHA50" />
-                     <div className="flex gap-6">
-                        <input id="cval" type="number" className="flex-1 bg-gray-50 p-5 rounded-2xl font-black text-2xl outline-none" placeholder="Discount %" />
-                        <input id="cexp" type="date" className="flex-1 bg-gray-50 p-5 rounded-2xl font-black outline-none" />
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-gray-950/70 backdrop-blur-sm">
+               <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white p-12 rounded-[3.5rem] shadow-2xl w-full max-w-xl">
+                  <h3 className="text-3xl font-black mb-8 uppercase italic text-center tracking-tighter">Buat Kode Kupon</h3>
+                  <div className="space-y-5 mb-8">
+                     <div>
+                        <label className="text-[10px] font-black text-gray-400 uppercase block mb-1">Kode Unik:</label>
+                        <input id="ccode" className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl font-black text-2xl uppercase tracking-widest outline-none" placeholder="GAKHA50" />
+                     </div>
+                     <div className="flex gap-5">
+                        <div className="flex-1">
+                           <label className="text-[10px] font-black text-gray-400 uppercase block mb-1">Potongan (%):</label>
+                           <input id="cval" type="number" className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl font-black text-xl outline-none" placeholder="50" />
+                        </div>
+                        <div className="flex-1">
+                           <label className="text-[10px] font-black text-gray-400 uppercase block mb-1">Berlaku Sampai (Opsional):</label>
+                           <input id="cexp" type="date" className="w-full bg-gray-50 border border-gray-200 p-4 rounded-xl font-black text-sm outline-none" />
+                        </div>
                      </div>
                   </div>
                   <div className="flex gap-4">
-                     <button onClick={()=>setIsAddingCoupon(false)} className="flex-1 py-6 font-black uppercase text-gray-400">Abort</button>
-                     <button onClick={()=>{ const c=(document.getElementById('ccode') as HTMLInputElement).value; const v=(document.getElementById('cval') as HTMLInputElement).value; const e=(document.getElementById('cexp') as HTMLInputElement).value; if(c && v){ supabase.from('coupons').insert([{id:Date.now(), code:c.toUpperCase(), value:parseInt(v), expiry_date:e||null}]).then(()=>{fetchData(); setIsAddingCoupon(false);}); } }} className="flex-1 bg-[var(--accent)] text-white py-6 rounded-[2rem] font-black uppercase shadow-2xl">Create</button>
+                     <button onClick={()=>setIsAddingCoupon(false)} className="flex-1 py-4 font-black uppercase text-[10px] text-gray-400 hover:bg-gray-50 rounded-xl">Batal</button>
+                     <button onClick={()=>{
+                        const c=(document.getElementById('ccode') as HTMLInputElement).value;
+                        const v=(document.getElementById('cval') as HTMLInputElement).value;
+                        const e=(document.getElementById('cexp') as HTMLInputElement).value;
+                        if(c && v){
+                           supabase.from('coupons').insert([{id:Date.now(), code:c.toUpperCase(), value:parseInt(v), expiry_date:e||null}]).then(()=>{fetchData(); setIsAddingCoupon(false); toast.success("Kupon Dibuat!");});
+                        }
+                     }} className="flex-1 bg-[var(--accent)] text-white py-4 rounded-xl font-black uppercase tracking-widest text-[11px] shadow-lg border border-pink-500 hover:scale-105 transition-all">Simpan Kupon</button>
                   </div>
                </motion.div>
             </div>
          )}
+      </AnimatePresence>
+
+      {/* 3. Popup Order Detail (Sangat Rapih) */}
+      <AnimatePresence>
          {selectedOrder && (
-            <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-gray-950/80 backdrop-blur-3xl">
-               <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="bg-white w-full max-w-6xl rounded-[4rem] shadow-2xl overflow-hidden relative">
-                  <button onClick={()=>setSelectedOrder(null)} className="absolute top-8 right-8 p-5 bg-gray-100 rounded-3xl text-gray-400"><X className="w-6 h-6"/></button>
-                  <div className="flex flex-col lg:flex-row min-h-[650px]">
-                     <div className="flex-1 p-16 lg:p-24 overflow-y-auto custom-scrollbar">
-                        <span className="bg-blue-50 text-blue-600 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest mb-10 inline-block font-mono">Registry Details</span>
-                        <h2 className="text-6xl font-black mb-16 tracking-tighter uppercase italic leading-none">{selectedOrder.customer_name}</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-16">
-                           <div className="p-10 bg-gray-50 rounded-[3rem] border border-gray-100 flex gap-6">
-                              <MapPin className="text-blue-600 w-8 h-8" /><div className="text-sm"><p className="font-black text-xl mb-2">{selectedOrder.city}</p><p className="text-gray-400">{selectedOrder.address}</p></div>
-                           </div>
-                           <div className="p-10 bg-gray-50 rounded-[3rem] border border-gray-100 flex gap-6">
-                              <Phone className="text-green-500 w-8 h-8" /><div className="flex-1"><p className="font-black text-xl mb-4">{selectedOrder.whatsapp}</p><a href={`https://wa.me/${selectedOrder.whatsapp}`} target="_blank" className="bg-green-500 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase shadow-lg inline-block">WhatsApp Chat</a></div>
+            <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 lg:p-10 bg-gray-950/80 backdrop-blur-md">
+               <motion.div initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 30, opacity: 0 }} className="bg-white w-full max-w-5xl rounded-[3rem] shadow-2xl overflow-hidden relative flex flex-col md:flex-row max-h-full">
+                  <button onClick={()=>setSelectedOrder(null)} className="absolute top-6 right-6 lg:top-8 lg:right-8 p-3 bg-gray-100 rounded-full text-gray-500 hover:bg-gray-200 z-10 transition-all"><X className="w-5 h-5"/></button>
+                  
+                  {/* Bagian Kiri: Info Pembeli & Resi */}
+                  <div className="flex-1 p-8 lg:p-14 overflow-y-auto custom-scrollbar">
+                     <span className="bg-blue-50/50 border border-blue-100 text-blue-600 px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest mb-6 inline-block">Detail Pesanan</span>
+                     <h2 className="text-4xl lg:text-5xl font-black mb-10 tracking-tighter uppercase italic text-gray-900">{selectedOrder.customer_name}</h2>
+                     
+                     <div className="space-y-4 mb-10">
+                        {/* Info Alamat Lengkap */}
+                        <div className="p-6 bg-gray-50 border border-gray-100 rounded-[2rem] flex gap-5 items-start">
+                           <div className="bg-white p-3 rounded-2xl shadow-sm border border-gray-50 text-blue-500"><MapPin className="w-6 h-6" /></div>
+                           <div className="text-sm pt-1 w-full">
+                             <p className="font-black text-lg mb-1">{selectedOrder.city}</p>
+                             <p className="text-gray-500 font-medium leading-relaxed bg-white p-3 rounded-xl border border-gray-100 mt-2">{selectedOrder.address}</p>
                            </div>
                         </div>
-                        <div className="flex gap-4">
-                           <input id="awb" value={selectedOrder.tracking_number} onChange={(e)=>setSelectedOrder({...selectedOrder, tracking_number:e.target.value})} className="flex-1 bg-gray-50 p-6 rounded-[2rem] outline-none font-black text-2xl shadow-inner" placeholder="AWB / NO RESI" />
-                           <button onClick={()=>{ const a=(document.getElementById('awb') as HTMLInputElement).value; if(a){ supabase.from('orders').update({tracking_number:a, status:'Shipped'}).eq('id',selectedOrder.id).then(()=>{ handlePrintLabel(selectedOrder); fetchData(); setSelectedOrder(null); window.open(`https://wa.me/${selectedOrder.whatsapp}?text=${encodeURIComponent(`Halo ${selectedOrder.customer_name}, Paket Anda sedang dikirim dengan Resi: *${a}*.`)}`); }); } }} className="bg-blue-600 text-white px-10 rounded-[2rem] font-black uppercase text-xs shadow-2xl transition-all">Save & Notify WA</button>
+                        {/* Info Kontak */}
+                        <div className="p-6 bg-gray-50 border border-gray-100 rounded-[2rem] flex items-center gap-5">
+                           <div className="bg-white p-3 rounded-2xl shadow-sm border border-gray-50 text-green-500"><Phone className="w-6 h-6" /></div>
+                           <div className="flex-1">
+                             <p className="font-black text-xl">{selectedOrder.whatsapp}</p>
+                           </div>
                         </div>
                      </div>
-                     <div className="w-full lg:w-[450px] bg-gray-950 text-white p-16 flex flex-col pt-24">
-                        <h4 className="text-[10px] font-black uppercase text-gray-500 mb-10 tracking-[0.4em] italic leading-none">Cart Items</h4>
-                        <div className="flex-1 space-y-8 overflow-y-auto pr-4 custom-scrollbar">
+
+                     {/* Input AWB & Notifikasi WA */}
+                     <div className="bg-blue-50/30 border border-blue-100 p-6 rounded-[2rem]">
+                        <p className="text-[10px] font-black uppercase text-blue-500 mb-3 tracking-widest flex items-center gap-2"><Package className="w-4 h-4"/> Input Nomor Resi Pengiriman</p>
+                        <div className="flex flex-col sm:flex-row gap-3">
+                           <input id="awb" value={selectedOrder.tracking_number} onChange={(e)=>setSelectedOrder({...selectedOrder, tracking_number:e.target.value})} className="flex-1 bg-white p-4 rounded-xl outline-none font-black text-lg border border-blue-200 shadow-inner" placeholder="Contoh: JNEXXX123" />
+                           <button onClick={()=>{
+                              const a=(document.getElementById('awb') as HTMLInputElement).value;
+                              if(a){
+                                supabase.from('orders').update({tracking_number:a, status:'Shipped'}).eq('id',selectedOrder.id).then(()=>{
+                                   fetchData(); setSelectedOrder(null); toast.success("AWB Disimpan!");
+                                   // Otomatis WA
+                                   const msg = `Halo Kak ${selectedOrder.customer_name},\n\nTerima kasih sudah belanja di Gakha Kids. Pesanan Kakak sedang dalam pengiriman.\n\nKurir: *Cek Status Resi*\nNo Resi (AWB): *${a}*\n\nDitunggu kedatangan paketnya ya!`;
+                                   window.open(`https://wa.me/${selectedOrder.whatsapp}?text=${encodeURIComponent(msg)}`);
+                                });
+                              }
+                           }} className="bg-blue-600 text-white px-6 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg hover:bg-blue-700 transition-all whitespace-nowrap flex items-center justify-center gap-2"><MessageSquare className="w-4 h-4"/> Simpan & WA</button>
+                        </div>
+                     </div>
+                  </div>
+
+                  {/* Bagian Kanan: Barang Belanjaan & Action */}
+                  <div className="w-full md:w-[400px] bg-gray-950 text-white p-8 lg:p-12 flex flex-col justify-between">
+                     <div>
+                        <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
+                           <h4 className="text-[11px] font-black uppercase text-gray-400 tracking-[0.2em] italic">Daftar Belanja</h4>
+                        </div>
+                        <div className="space-y-5 overflow-y-auto max-h-[300px] custom-scrollbar pr-2">
                            {selectedOrder.items?.map((it:any, i:number) => (
-                             <div key={i} className="flex gap-6 items-center">
-                                <img src={it.image} className="w-16 h-16 rounded-2xl object-cover shadow-2xl border border-white/5" />
-                                <div><p className="text-xs font-black italic mb-2">{it.name}</p><p className="text-[9px] font-black uppercase text-[var(--accent)]">{it.size} x{it.quantity}</p></div>
+                             <div key={i} className="flex gap-4 items-center bg-white/5 p-3 rounded-2xl border border-white/5">
+                                <img src={it.image} className="w-14 h-14 rounded-xl object-cover" />
+                                <div>
+                                   <p className="text-sm font-bold leading-tight mb-1">{it.name}</p>
+                                   <p className="text-[10px] font-black uppercase text-[var(--accent)] bg-[var(--accent)]/10 px-2 py-0.5 rounded-full inline-block">Size: {it.size} &nbsp;&bull;&nbsp; Qty: {it.quantity}</p>
+                                </div>
                              </div>
                            ))}
                         </div>
-                        <div className="pt-12 border-t border-white/10 mt-12">
-                           <div className="flex justify-between items-end mb-10"><span className="text-[10px] font-black uppercase text-gray-500">Value</span><span className="text-4xl font-black text-[var(--accent)] tracking-tighter">Rp {selectedOrder.total.toLocaleString()}</span></div>
-                           <button onClick={()=>{ supabase.from('orders').update({status:'Completed'}).eq('id',selectedOrder.id).then(()=>{fetchData(); setSelectedOrder(null);}); }} className="w-full bg-[var(--accent)] py-6 rounded-[2rem] font-black uppercase text-xs shadow-2xl active:scale-95 transition-all">Selesaikan Pesanan</button>
+                     </div>
+                     <div className="pt-8 border-t border-white/10 mt-8">
+                        <div className="flex justify-between items-center mb-6">
+                           <span className="text-[11px] font-black uppercase text-gray-400">Total Harga</span>
+                           <span className="text-3xl font-black text-[var(--accent)]">Rp {selectedOrder.total.toLocaleString()}</span>
+                        </div>
+                        <div className="flex flex-col gap-3">
+                           <button onClick={()=>handlePrintInvoice(selectedOrder)} className="w-full border-2 border-white/20 text-white py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all flex justify-center items-center gap-2"><Printer className="w-4 h-4"/> Print Label Alamat</button>
+                           <button onClick={()=>{ supabase.from('orders').update({status:'Completed'}).eq('id',selectedOrder.id).then(()=>{fetchData(); setSelectedOrder(null);}); }} className="w-full bg-green-500 text-white py-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg hover:bg-green-600 transition-all flex justify-center items-center gap-2"><CheckCircle className="w-4 h-4"/> Selesaikan Pesanan</button>
                         </div>
                      </div>
                   </div>
@@ -374,9 +618,9 @@ export function AdminDashboard() {
       </AnimatePresence>
 
       <style>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
       `}</style>
     </div>
   );
