@@ -153,7 +153,7 @@ export function CheckoutPage() {
           id: 'SHIPPING',
           price: shippingFee,
           quantity: 1,
-          name: `Ongkir JNE (${selectedShipping?.service || 'Reguler'})`
+          name: `Ongkir ${selectedShipping?.courier_name} (${selectedShipping?.service || 'Reguler'})`
         }
       ];
 
@@ -321,20 +321,29 @@ export function CheckoutPage() {
                   {shippingOptions.length > 0 && (
                     <div className="md:col-span-2 space-y-2 bg-blue-50/50 p-6 rounded-3xl border border-blue-100">
                       <label className="text-[10px] font-black uppercase text-blue-500 tracking-widest ml-1 flex items-center gap-2">
-                        <Truck className="w-4 h-4" /> Pilih Layanan Pengiriman (JNE)
+                        <Truck className="w-4 h-4" /> Pilih Layanan Pengiriman
                       </label>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
                         {shippingOptions.map((opt, idx) => (
                           <button
                             key={idx}
                             type="button"
                             onClick={() => setSelectedShipping(opt)}
-                            className={`p-4 rounded-2xl border transition-all text-left ${selectedShipping === opt ? 'bg-white border-blue-500 shadow-md ring-2 ring-blue-100' : 'bg-white border-transparent hover:border-blue-200'}`}
+                            className={`p-4 rounded-2xl border transition-all text-left flex flex-col justify-between h-full ${selectedShipping === opt ? 'bg-white border-blue-500 shadow-md ring-2 ring-blue-100' : 'bg-white border-transparent hover:border-blue-200'}`}
                           >
-                            <p className="font-black text-xs text-gray-900 uppercase">{opt.service}</p>
-                            <p className="text-[10px] text-gray-500 font-bold">{opt.description}</p>
-                            <p className="text-sm font-black text-blue-600 mt-2">Rp {opt.cost[0].value.toLocaleString()}</p>
-                            <p className="text-[9px] text-gray-400 font-medium">Estimasi: {opt.cost[0].etd} Hari</p>
+                            <div>
+                              <div className="flex justify-between items-start mb-2">
+                                <span className={`text-[8px] font-black px-2 py-0.5 rounded-full uppercase ${opt.courier_code === 'jne' ? 'bg-red-50 text-red-500' : opt.courier_code === 'pos' ? 'bg-orange-50 text-orange-500' : 'bg-blue-50 text-blue-500'}`}>
+                                  {opt.courier_name}
+                                </span>
+                                <span className="font-black text-[10px] text-gray-900 uppercase">{opt.service}</span>
+                              </div>
+                              <p className="text-[9px] text-gray-400 font-bold leading-tight">{opt.description}</p>
+                            </div>
+                            <div className="mt-4">
+                              <p className="text-sm font-black text-blue-600">Rp {opt.cost[0].value.toLocaleString()}</p>
+                              <p className="text-[9px] text-gray-400 font-medium">Estimasi: {opt.cost[0].etd} Hari</p>
+                            </div>
                           </button>
                         ))}
                       </div>
@@ -377,7 +386,7 @@ export function CheckoutPage() {
                        <span className="font-bold text-gray-900">Rp {subtotal.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                       <span className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Ongkos Kirim JNE ({totalWeight}g)</span>
+                       <span className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Ongkos Kirim ({totalWeight}g)</span>
                        <span className="font-bold text-gray-900">+Rp {selectedShipping ? selectedShipping.cost[0].value.toLocaleString() : '0'}</span>
                     </div>
                     {discount > 0 && (

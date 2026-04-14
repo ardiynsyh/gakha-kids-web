@@ -1,7 +1,6 @@
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 export default async function handler(req, res) {
-  // CORS Headers
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -14,13 +13,12 @@ export default async function handler(req, res) {
 
   const apiKey = process.env.RAJAONGKIR_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: 'RAJAONGKIR_API_KEY is not set in environment variables.' });
+    return res.status(500).json({ error: 'RAJAONGKIR_API_KEY is not set.' });
   }
 
   try {
     const { type } = req.query;
 
-    // 1. Ambil DAFTAR KOTA
     if (req.method === 'GET' && type === 'cities') {
       const response = await fetch('https://api.rajaongkir.com/starter/city', {
         headers: { 'key': apiKey }
@@ -29,41 +27,47 @@ export default async function handler(req, res) {
       return res.status(200).json(data.rajaongkir.results);
     }
 
-    // 2. Hitung ONGKOS KIRIM
     if (req.method === 'POST') {
-      const { origin, destination, weight, courier } = req.body;
+      const { origin, destination, weight } = req.body;
 
-      if (!origin || !destination || !weight || !courier) {
-        return res.status(400).json({ error: 'Missing parameters (origin, destination, weight, courier)' });
+      if (!origin || !destination || !weight) {
+        return res.status(400).json({ error: 'Missing parameters' });
       }
 
-      const response = await fetch('https://api.rajaongkir.com/starter/cost', {
-        method: 'POST',
-        headers: { 
-          'key': apiKey,
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({
-          origin,
-          destination,
-          weight,
-          courier
-        })
+      // Ambil harga dari 3 kurir sekaligus (Starter Plan: JNE, POS, TIKI)
+      const couriers = ['jne', 'pos', 'tiki'];
+      
+      const fetchCosts = couriers.map(async (courier) => {
+        const response = await fetch('https://api.rajaongkir.com/starter/cost', {
+          method: 'POST',
+          headers: { 
+            'key': apiKey,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: new URLSearchParams({ origin, destination, weight, courier })
+        });
+        const data = await response.json();
+        
+        if (data.rajaongkir.status.code === 200) {
+          // Gabungkan nama kurir ke setiap hasil biaya
+          return data.rajaongkir.results[0].costs.map(c => ({
+            ...c,
+            courier_name: data.rajaongkir.results[0].name,
+            courier_code: data.rajaongkir.results[0].code
+          }));
+        }
+        return [];
       });
 
-      const data = await response.json();
-      
-      if (data.rajaongkir.status.code !== 200) {
-        return res.status(400).json({ error: data.rajaongkir.status.description });
-      }
+      const allResults = await Promise.all(fetchCosts);
+      const combinedCosts = allResults.flat();
 
-      return res.status(200).json(data.rajaongkir.results[0].costs);
+      return res.status(200).json(combinedCosts);
     }
 
     return res.status(405).json({ error: 'Method not allowed' });
 
   } catch (error) {
-    console.error('Shipping API Error:', error);
     return res.status(500).json({ error: error.message });
   }
 }
