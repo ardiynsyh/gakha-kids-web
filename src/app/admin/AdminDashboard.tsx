@@ -3,7 +3,7 @@ import {
   Package, Plus, Trash, Settings, 
   Image as ImageIcon, LogOut, ShoppingBag, Zap, 
   Eye, X, Phone, MapPin, Camera, 
-  Sparkles, Tag, RefreshCw, Printer, TrendingUp, BarChart3, MessageSquare, Filter
+  Sparkles, Tag, RefreshCw, Printer, TrendingUp, BarChart3, MessageSquare, Filter, Layout, Bell, CheckCircle
 } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { supabase } from '../../lib/supabase';
