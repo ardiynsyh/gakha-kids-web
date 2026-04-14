@@ -117,7 +117,8 @@ export function CheckoutPage() {
       
       // Fallback Dev Mode (Jika API Error atau env key belum di setup di Vercel)
       if (!res.ok || !midtransData.token) {
-        console.warn('Midtrans token timeout, mem-bypass payment gateway ke sistem manual.');
+        console.warn('Midtrans Error Data:', midtransData);
+        toast.error(`Sistem Pembayaran Belum Siap: ${midtransData.error || 'API Key Invalid / Localhost'}`);
         await finalizeOrder('Pending');
         return;
       }
