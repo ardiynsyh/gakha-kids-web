@@ -168,4 +168,20 @@ export default defineConfig({
 
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
   assetsInclude: ['**/*.svg', '**/*.csv'],
+
+  build: {
+    // Suppress warning at 1000kb — actual chunks should be well below this after splitting
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        // Split large vendor libraries into separate cacheable chunks
+        manualChunks: {
+          'vendor-react':      ['react', 'react-dom', 'react-router'],
+          'vendor-motion':     ['framer-motion'],
+          'vendor-supabase':   ['@supabase/supabase-js'],
+          'vendor-ui':         ['lucide-react', 'sonner'],
+        }
+      }
+    }
+  }
 })
