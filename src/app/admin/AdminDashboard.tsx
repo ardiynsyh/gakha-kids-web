@@ -294,8 +294,29 @@ export function AdminDashboard() {
                         </div>
                      </div>
                   </div>
+
+                  <div className="bg-white p-10 rounded-[3.5rem] border border-gray-100 italic font-black space-y-6">
+                     <h4 className="text-[10px] uppercase tracking-widest text-gray-400">Social Media & WhatsApp</h4>
+                     <div className="space-y-4">
+                        <div>
+                           <label className="text-[9px] uppercase mb-2 block">Instagram Link</label>
+                           <input value={config.socialMedia?.instagram} onChange={(e) => setConfig({...config, socialMedia: {...config.socialMedia, instagram: e.target.value}})} className="w-full bg-gray-50 p-3 rounded-xl not-italic font-mono text-xs" placeholder="https://instagram.com/..." />
+                        </div>
+                        <div>
+                           <label className="text-[9px] uppercase mb-2 block">WA Reseller / CS</label>
+                           <input value={config.socialMedia?.resellerWhatsApp} onChange={(e) => setConfig({...config, socialMedia: {...config.socialMedia, resellerWhatsApp: e.target.value}})} className="w-full bg-gray-50 p-3 rounded-xl not-italic font-mono text-xs" placeholder="628123..." />
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="bg-white p-10 rounded-[3.5rem] border border-gray-100 space-y-6">
-                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2"><Percent className="w-4 h-4 text-orange-500" /> Flash Sale Engine</p>
+                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2 italic">📢 Announcement Bar</p>
+                     <input value={config.announcement?.text} onChange={(e) => setConfig({...config, announcement: {...config.announcement, text: e.target.value}})} className="w-full bg-gray-50 p-4 rounded-2xl outline-none text-sm font-bold" placeholder="Teks Promo Atas" />
+                  </div>
+                  <div className="bg-white p-10 rounded-[3.5rem] border border-gray-100 space-y-6">
+                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2 italic"><Percent className="w-4 h-4 text-orange-500" /> Flash Sale Engine</p>
                      <div className="flex items-center gap-4 mb-4">
                         <button onClick={() => setConfig({...config, flashSale: {...config.flashSale, isEnabled: !config.flashSale.isEnabled}})} className={`w-12 h-6 rounded-full relative transition-colors ${config.flashSale.isEnabled ? 'bg-green-500' : 'bg-gray-300'}`}>
                            <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${config.flashSale.isEnabled ? 'left-7' : 'left-1'}`} />
