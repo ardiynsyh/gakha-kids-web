@@ -5,7 +5,9 @@ import { supabase } from '../../lib/supabase';
 import { useWishlist } from '../context/WishlistContext';
 import { calculateDiscountBadge } from './ui/utils';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { useCart } from '../context/CartContext';
 import { SEO } from './SEO';
+import { toast } from 'sonner';
 
 interface ProductModalProps {
   product: any;
@@ -17,6 +19,8 @@ export function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
   const [bundleProducts, setBundleProducts] = useState<any[]>([]);
   const [isPlayingVideo, setIsPlayingVideo] = useState(false);
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+  const { addToCart } = useCart();
+  const [selectedSize, setSelectedSize] = useState<string>('');
 
   useEffect(() => {
     if (isOpen && product?.bundleIds?.length > 0) {
@@ -147,22 +151,48 @@ export function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
                   <div>
                      <h4 className="text-[10px] font-black uppercase tracking-widest text-[var(--text-secondary)] mb-4">Pilih Ukuran Tersedia</h4>
                      <div className="flex flex-wrap gap-2">
-                        {product.sizes?.map((size: string) => (
-                           <button key={size} className="w-12 h-12 flex items-center justify-center border-2 border-[var(--border-color)] rounded-xl font-bold hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all">
-                              {size}
-                           </button>
-                        ))}
+                         {product.sizes?.map((size: string) => {
+                            const stock = product.inventory?.[size] ?? 0;
+                            const isOut = stock === 0;
+                            return (
+                               <button 
+                                  key={size} 
+                                  disabled={isOut}
+                                  onClick={() => setSelectedSize(size)}
+                                  className={`w-12 h-12 flex flex-col items-center justify-center border-2 rounded-xl font-bold transition-all relative ${
+                                    selectedSize === size ? 'border-[var(--accent)] text-[var(--accent)] bg-[var(--accent)]/5' : 
+                                    isOut ? 'opacity-30 cursor-not-allowed border-gray-100' : 'border-[var(--border-color)] hover:border-[var(--accent)]'
+                                  }`}
+                               >
+                                  <span className="text-sm">{size}</span>
+                                  <span className="text-[8px] font-black absolute -bottom-1 bg-white px-1">{stock}</span>
+                               </button>
+                            );
+                         })}
                      </div>
                   </div>
 
-                  <div className="flex gap-4">
-                     <a 
-                       href={product.linktreeUrl || "#"} 
-                       target="_blank"
-                       className="flex-1 bg-[var(--text-primary)] hover:bg-[var(--accent)] text-white py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-xl active:scale-95"
-                     >
-                        <ShoppingBag className="w-5 h-5" /> Beli di Marketplace
-                     </a>
+                   <div className="flex gap-4">
+                      <button 
+                        onClick={() => {
+                          if (!selectedSize) {
+                            toast.error('Silakan pilih ukuran terlebih dahulu');
+                            return;
+                          }
+                          addToCart(product, selectedSize);
+                        }}
+                        className="flex-1 bg-[var(--text-primary)] hover:bg-[var(--accent)] text-white py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-xl active:scale-95 group"
+                      >
+                         <ShoppingBag className="w-5 h-5 group-hover:animate-bounce" /> Tambah ke Keranjang
+                      </button>
+                      <a 
+                        href={product.linktreeUrl || "#"} 
+                        target="_blank"
+                        className="w-16 h-16 flex items-center justify-center rounded-2xl border-2 border-[var(--border-color)] text-gray-400 hover:text-[var(--accent)] hover:border-[var(--accent)] transition-all"
+                        title="Beli di Marketplace"
+                      >
+                         <Share2 className="w-5 h-5" />
+                      </a>
                      <button 
                        onClick={() => isInWishlist(product.id) ? removeFromWishlist(product.id) : addToWishlist(product)}
                        className={`w-16 h-16 flex items-center justify-center rounded-2xl border-2 transition-all ${isInWishlist(product.id) ? 'bg-red-50 border-red-100 text-red-500' : 'bg-gray-50 border-transparent text-gray-400'}`}

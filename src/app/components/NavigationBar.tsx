@@ -4,6 +4,7 @@ import { useStore } from '../context/StoreContext';
 import { Link, useNavigate } from 'react-router';
 import { useWishlist } from '../context/WishlistContext';
 import { useTheme } from '../context/ThemeContext';
+import { useCart } from '../context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AnnouncementBar } from './AnnouncementBar';
 import { FlashSaleTimer } from './FlashSaleTimer';
@@ -13,6 +14,7 @@ export function NavigationBar() {
   const navigate = useNavigate();
   const { wishlist } = useWishlist();
   const { theme, toggleTheme } = useTheme();
+  const { totalItems } = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isMobileCategoryOpen, setIsMobileCategoryOpen] = useState(false);
@@ -67,10 +69,10 @@ export function NavigationBar() {
                 <Heart className="w-5 h-5" />
                 {wishlist.length > 0 && <span className="absolute -top-1 -right-1 bg-[var(--accent)] text-white text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold">{wishlist.length}</span>}
               </Link>
-              <div className="relative">
+               <Link to="/checkout" className="relative">
                 <ShoppingBag className="w-5 h-5" />
-                <span className="absolute -top-1 -right-1 bg-[var(--accent)] text-white text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold">0</span>
-              </div>
+                {totalItems > 0 && <span className="absolute -top-1 -right-1 bg-[var(--accent)] text-white text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold tracking-tighter">{totalItems}</span>}
+              </Link>
               <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
                 {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -146,19 +148,21 @@ export function NavigationBar() {
                )}
              </Link>
 
-             <div className="flex items-center text-[var(--text-primary)] cursor-pointer group">
-                <div className="flex items-center gap-3">
-                   <div className="relative hover:text-[var(--accent)] transition-colors">
-                      <ShoppingBag className="w-5 h-5 stroke-[1.5]" />
-                      <span className="absolute -top-1.5 -right-2 bg-[var(--accent)] text-white text-[9px] w-[18px] h-[18px] rounded-full flex items-center justify-center font-bold shadow-md">
-                        0
-                      </span>
-                   </div>
-                   <div className="hidden sm:flex flex-col">
-                      <span className="text-[11px] font-bold">Tas (0)</span>
-                   </div>
-                </div>
-             </div>
+              <Link to="/checkout" className="flex items-center text-[var(--text-primary)] cursor-pointer group">
+                 <div className="flex items-center gap-3">
+                    <div className="relative hover:text-[var(--accent)] transition-colors">
+                       <ShoppingBag className="w-5 h-5 stroke-[1.5]" />
+                       {totalItems > 0 && (
+                        <span className="absolute -top-1.5 -right-2 bg-[var(--accent)] text-white text-[9px] w-[18px] h-[18px] rounded-full flex items-center justify-center font-bold shadow-md">
+                          {totalItems}
+                        </span>
+                       )}
+                    </div>
+                    <div className="hidden sm:flex flex-col">
+                       <span className="text-[11px] font-bold">Tas ({totalItems})</span>
+                    </div>
+                 </div>
+              </Link>
 
              <button 
                className="lg:hidden p-1.5 hover:bg-[var(--bg-secondary)] rounded-lg transition-colors ml-2 text-[var(--text-primary)]"
