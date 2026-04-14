@@ -69,8 +69,6 @@ export function ShopPage() {
     }
   };
 
-  if (isLoading) return <div className="py-20 text-center opacity-50 font-bold uppercase tracking-widest text-xs">Menjelajahi Katalog...</div>;
-
   return (
     <div className="max-w-[1800px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-12 min-h-[60vh]">
       <SEO 
@@ -80,8 +78,12 @@ export function ShopPage() {
       <h1 className="text-[clamp(1.8rem,4vw,2.5rem)] font-extrabold text-[var(--text-primary)] mb-8 tracking-tight border-b border-[var(--border-color)] pb-4">{getTitle()}</h1>
       
       {/* Products Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-        {products.length > 0 ? (
+      <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 transition-opacity duration-300 ${isLoading ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
+        {!isLoading && products.length === 0 ? (
+           <div className="col-span-full py-20 text-center opacity-50 font-bold uppercase tracking-widest text-xs">
+              Belum ada produk di kategori ini.
+           </div>
+        ) : products.length > 0 ? (
           products.map((product) => {
             const dynamicTag = calculateDiscountBadge(product.price, product.originalPrice);
             const tag = dynamicTag || product.tag;
