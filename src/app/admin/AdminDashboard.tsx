@@ -26,8 +26,9 @@ const ShieldCheck = ({className}: {className?: string}) => (
 
 export function AdminDashboard() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'products' | 'settings'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'settings' | 'resellers'>('products');
   const [products, setProducts] = useState<any[]>([]);
+  const [resellers, setResellers] = useState<any[]>([]);
   const [config, setConfig] = useState<any>(null);
   const [infoPages, setInfoPages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -62,8 +63,11 @@ export function AdminDashboard() {
       const { data: pData } = await supabase.from('products').select('*').order('id', { ascending: false });
       if (pData) setProducts(pData);
 
-      const { data: cData } = await supabase.from('store_config').select('*').eq('id', 'main').single();
-      if (cData) setConfig(cData.config_data);
+      const { data: configData } = await supabase.from('store_config').select('*').eq('id', 'main').single();
+      if (configData) setConfig(configData.config_data);
+
+      const { data: resData } = await supabase.from('resellers').select('*').order('created_at', { ascending: false });
+      if (resData) setResellers(resData);
 
       const { data: iData } = await supabase.from('info_pages').select('*');
       if (iData) setInfoPages(iData);
@@ -170,17 +174,15 @@ export function AdminDashboard() {
     const loadingToast = toast.loading("Menyinkronkan koleksi produk...");
 
     try {
-      // Upsert all products to Supabase
       const { error: productsError } = await supabase
         .from('products')
         .upsert(products, { onConflict: 'id' });
 
       if (productsError) throw productsError;
 
-      // Upsert store config
       const { error: configError } = await supabase
         .from('store_config')
-        .upsert({ id: 'main', ...config });
+        .upsert({ id: 'main', config_data: config });
 
       if (configError) throw configError;
 
@@ -202,7 +204,6 @@ export function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
       <aside className="w-72 bg-gray-900 text-white p-8 hidden md:flex flex-col flex-shrink-0 relative z-20">
         <div className="mb-12">
             <h2 className="text-2xl font-black mb-2 text-white flex items-center gap-2">
@@ -222,6 +223,13 @@ export function AdminDashboard() {
             <span className="font-bold">Kelola Produk</span>
           </button>
           <button 
+              onClick={() => setActiveTab('resellers')}
+              className={`w-full flex items-center gap-3 text-left p-4 rounded-xl transition-all ${activeTab === 'resellers' ? 'bg-[var(--accent)] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/10'}`}
+            >
+              <User className="w-5 h-5" />
+              <span className="font-bold">Database Reseller</span>
+            </button>
+          <button 
             onClick={() => setActiveTab('settings')}
             className={`w-full flex items-center gap-3 text-left p-4 rounded-xl transition-all ${activeTab === 'settings' ? 'bg-[var(--accent)] text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-white/10'}`}
           >
@@ -230,7 +238,6 @@ export function AdminDashboard() {
           </button>
         </nav>
 
-        {/* User Info & Logout */}
         <div className="mt-auto pt-8 border-t border-white/10">
            <div className="flex items-center gap-3 mb-6 px-2">
               <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
@@ -251,7 +258,6 @@ export function AdminDashboard() {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 p-8 h-screen overflow-y-auto w-full max-w-full">
         {activeTab === 'products' && (
           <div className="max-w-[1400px] mb-20">
@@ -497,6 +503,26 @@ export function AdminDashboard() {
                                  placeholder="ID1, ID2..."
                                />
                             </div>
+                            <div className="pt-2 border-t border-gray-100">
+                                <label className="text-[9px] font-black text-blue-500 uppercase flex items-center gap-1">
+                                  <LinkIcon className="w-2 h-2" /> SEO Metadata (Google)
+                                </label>
+                                <div className="space-y-2 mt-1">
+                                  <input 
+                                    type="text" 
+                                    value={p.seoTitle || ''} 
+                                    onChange={(e) => handleUpdateProduct(p.id, 'seoTitle', e.target.value)}
+                                    placeholder="Meta Title..."
+                                    className="w-full bg-blue-50/50 border border-blue-100 rounded p-1.5 text-[9px] outline-none" 
+                                  />
+                                  <textarea 
+                                    value={p.seoDescription || ''} 
+                                    onChange={(e) => handleUpdateProduct(p.id, 'seoDescription', e.target.value)}
+                                    placeholder="Meta Description..."
+                                    className="w-full bg-blue-50/50 border border-blue-100 rounded p-1.5 text-[9px] h-12 resize-none outline-none" 
+                                  />
+                                </div>
+                             </div>
                          </div>
                       </td>
                       <td className="p-6 text-right">
@@ -797,6 +823,112 @@ export function AdminDashboard() {
                   </div>
                </div>
             </div>
+          </div>
+        )}
+
+        {/* Tab Resellers */}
+        {activeTab === 'resellers' && (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+             <div className="flex justify-between items-center mb-8">
+                <div>
+                  <h1 className="text-3xl font-black text-gray-900 italic tracking-tighter">DATABASE RESELLER</h1>
+                  <p className="text-gray-500 text-sm font-medium">Kelola hubungan dan data partner bisnis Gakha Kids.</p>
+                </div>
+                <button 
+                  onClick={async () => {
+                    const name = prompt('Nama Reseller:');
+                    if (name) {
+                      const newRes = { id: Date.now(), name, city: '', whatsapp: '', status: 'Active' };
+                      setResellers([newRes, ...resellers]);
+                      await supabase.from('resellers').insert([newRes]);
+                    }
+                  }}
+                  className="bg-[var(--accent)] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-xl hover:scale-105 transition-transform flex items-center gap-2"
+                >
+                  <Plus className="w-5 h-5" /> Tambah Partner
+                </button>
+             </div>
+
+             <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+                <table className="w-full text-left">
+                  <thead className="bg-gray-50/50 border-b border-gray-100">
+                    <tr>
+                      <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Partner</th>
+                      <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Lokasi / Kota</th>
+                      <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">WhatsApp</th>
+                      <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Status</th>
+                      <th className="p-6"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {resellers.map((res) => (
+                      <tr key={res.id} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="p-6 font-bold text-gray-900">{res.name}</td>
+                        <td className="p-6">
+                          <input 
+                            value={res.city} 
+                            onChange={(e) => {
+                              const updated = resellers.map(r => r.id === res.id ? {...r, city: e.target.value} : r);
+                              setResellers(updated);
+                            }}
+                            placeholder="Contoh: Jakarta"
+                            className="bg-transparent border-b border-transparent focus:border-[var(--accent)] outline-none text-sm font-medium"
+                          />
+                        </td>
+                        <td className="p-6">
+                          <input 
+                            value={res.whatsapp} 
+                            onChange={(e) => {
+                              const updated = resellers.map(r => r.id === res.id ? {...r, whatsapp: e.target.value} : r);
+                              setResellers(updated);
+                            }}
+                            placeholder="628..."
+                            className="bg-transparent border-b border-transparent focus:border-[var(--accent)] outline-none text-sm font-mono"
+                          />
+                        </td>
+                        <td className="p-6">
+                           <select 
+                            value={res.status}
+                            onChange={(e) => {
+                              const updated = resellers.map(r => r.id === res.id ? {...r, status: e.target.value} : r);
+                              setResellers(updated);
+                            }}
+                            className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold border-none outline-none"
+                           >
+                             <option>Active</option>
+                             <option>Pending</option>
+                             <option>Inactive</option>
+                           </select>
+                        </td>
+                        <td className="p-6 text-right">
+                           <div className="flex justify-end gap-2">
+                              <button 
+                                onClick={async () => {
+                                   const { error } = await supabase.from('resellers').upsert(res);
+                                   if (!error) toast.success('Data Partner Tersimpan');
+                                }}
+                                className="p-2 text-green-500 hover:bg-green-50 rounded-lg transition-colors" title="Save"
+                              >
+                                <Save className="w-5 h-5" />
+                              </button>
+                              <button 
+                                onClick={async () => {
+                                  if (confirm('Hapus partner ini?')) {
+                                    await supabase.from('resellers').delete().eq('id', res.id);
+                                    setResellers(resellers.filter(r => r.id !== res.id));
+                                  }
+                                }}
+                                className="p-2 text-red-400 hover:bg-red-50 rounded-lg transition-colors"
+                              >
+                                <Trash className="w-5 h-5" />
+                              </button>
+                           </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+             </div>
           </div>
         )}
       </main>

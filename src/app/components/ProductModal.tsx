@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabase';
 import { useWishlist } from '../context/WishlistContext';
 import { calculateDiscountBadge } from './ui/utils';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { SEO } from './SEO';
 
 interface ProductModalProps {
   product: any;
@@ -40,6 +41,11 @@ export function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <SEO 
+            title={product.seoTitle || product.name}
+            description={product.seoDescription || `Beli ${product.name} di Gakha Kids. Fashion bayi premium, lembut, dan modern.`}
+            image={product.image}
+          />
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
