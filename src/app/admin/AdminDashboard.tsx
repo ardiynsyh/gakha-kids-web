@@ -254,7 +254,7 @@ export function AdminDashboard() {
                           <button onClick={() => { if(confirm('Hapus?')) { supabase.from('products').delete().eq('id', p.id).then(()=>fetchData()); } }} className="p-4 bg-red-50 text-red-400 hover:bg-red-500 hover:text-white rounded-2xl transition-all"><Trash className="w-5 h-5" /></button>
                        </div>
                     </div>
-                  ))}
+                  )})}
                </div>
             </motion.div>
           )}
