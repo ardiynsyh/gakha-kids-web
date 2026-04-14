@@ -130,7 +130,7 @@ export function AdminDashboard() {
   };
 
   const handleUpdateProduct = (id: any, field: string, value: any) => {
-    setProducts(products.map(p => p.id === id ? { ...p, [field]: value } : p));
+    setProducts(prev => prev.map(p => p.id === id ? { ...p, [field]: value } : p));
   };
 
   const handleUpdateOrderStatus = async (orderId: any, newStatus: string) => {
@@ -248,8 +248,12 @@ export function AdminDashboard() {
                             onClick={() => {
                                const newSizeName = prompt("Nama ukuran baru (contoh: XXL, 6Thn, dll):");
                                if (newSizeName && !p.sizes.includes(newSizeName)) {
-                                  handleUpdateProduct(p.id, 'sizes', [...p.sizes, newSizeName]);
-                                  handleUpdateProduct(p.id, 'inventory', { ...(p.inventory || {}), [newSizeName]: 0 });
+                                  setProducts(prev => prev.map(prod => prod.id === p.id ? {
+                                     ...prod,
+                                     sizes: [...prod.sizes, newSizeName],
+                                     inventory: { ...(prod.inventory || {}), [newSizeName]: 0 }
+                                  } : prod));
+                                  toast.success(`Ukuran ${newSizeName} ditambahkan`);
                                }
                             }}
                             className="w-12 h-[74px] border-2 border-dashed border-gray-200 rounded-2xl flex items-center justify-center text-gray-300 hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all hover:bg-white"
