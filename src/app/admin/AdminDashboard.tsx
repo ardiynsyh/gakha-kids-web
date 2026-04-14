@@ -152,7 +152,8 @@ export function AdminDashboard() {
       image: "https://images.unsplash.com/photo-1540855513560-112df639c947?auto=format&fit=crop&q=80&w=300",
       categories: [selectedCategory === 'all' ? 'born' : selectedCategory],
       sizes: ["S", "M", "L"],
-      inventory: { "S": 10, "M": 10, "L": 10 }
+      inventory: { "S": 10, "M": 10, "L": 10 },
+      weight: 200
     };
     setProducts([newProduct, ...products]);
   };
@@ -387,6 +388,10 @@ export function AdminDashboard() {
                             <select value={p.categories?.[0] || 'all'} onChange={(e) => handleUpdateProduct(p.id, 'categories', [e.target.value])} className="w-full text-[10px] font-black uppercase text-[var(--accent)] bg-transparent outline-none cursor-pointer">
                               {config.productCategories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
                             </select>
+                          </div>
+                          <div className="flex-1 bg-gray-50 p-3 rounded-2xl border border-gray-100">
+                             <label className="text-[9px] font-black text-gray-400 uppercase block mb-1">Berat (Gram)</label>
+                             <input type="number" value={p.weight || 200} onChange={(e) => handleUpdateProduct(p.id, 'weight', parseInt(e.target.value) || 0)} className="w-full font-bold text-sm bg-transparent outline-none" placeholder="Misal: 200" />
                           </div>
                         </div>
                       </div>
