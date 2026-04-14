@@ -250,28 +250,46 @@ export function CheckoutPage() {
               <div className="bg-white p-8 sm:p-10 rounded-[3rem] border border-gray-100 shadow-xl">
                  <h3 className="text-xl font-black text-gray-900 italic tracking-tight uppercase mb-8">Ringkasan Biaya</h3>
                  
-                 <div className="space-y-4 mb-8">
+                  <div className="space-y-4 mb-8">
                     <div className="flex justify-between text-sm">
                        <span className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Subtotal Produk</span>
                        <span className="font-bold text-gray-900">Rp {subtotal.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                        <span className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Ongkos Kirim (Flat)</span>
-                       <span className="font-bold text-gray-900">Rp 15.000</span>
+                       <span className="font-bold text-gray-900">+Rp 15.000</span>
                     </div>
+                    
                     {discount > 0 && (
-                      <div className="flex justify-between text-sm text-green-600">
-                        <span className="font-bold uppercase tracking-widest text-[10px]">Diskon Kupon</span>
-                        <span className="font-black">-Rp {discount.toLocaleString()}</span>
-                      </div>
+                      <>
+                        <div className="flex justify-between text-[11px] pt-3 border-t border-gray-50">
+                           <span className="text-gray-400 font-bold uppercase tracking-widest">Total Sebelum Diskon</span>
+                           <span className="text-gray-400 line-through">Rp {(subtotal + 15000).toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between text-sm text-green-600 bg-green-50/50 p-2 rounded-lg border border-green-100/50">
+                          <span className="font-black uppercase tracking-widest text-[10px] flex items-center gap-1">
+                             <Zap className="w-3 h-3" /> Potongan Kupon
+                          </span>
+                          <span className="font-black">-Rp {discount.toLocaleString()}</span>
+                        </div>
+                      </>
                     )}
-                    <div className="pt-4 border-t border-gray-100 mt-4">
+
+                    <div className="pt-6 border-t-2 border-dashed border-gray-100 mt-6">
                        <div className="flex justify-between items-end">
-                          <span className="text-gray-900 font-black uppercase tracking-tight text-xs">Total Pembayaran</span>
-                          <span className="text-3xl font-black text-[var(--accent)]">Rp {(subtotal - discount + 15000).toLocaleString()}</span>
+                          <div className="space-y-1">
+                             <span className="text-gray-900 font-bold uppercase tracking-tight text-[10px] block opacity-50">Total Pembayaran</span>
+                             <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-md font-black italic">Midtrans Secure</span>
+                          </div>
+                          <div className="text-right">
+                             <span className="text-3xl font-black text-[var(--accent)] tracking-tighter">
+                                Rp {(subtotal + 15000 - discount).toLocaleString()}
+                             </span>
+                          </div>
                        </div>
                     </div>
-                 </div>
+                  </div>
+              </div>
 
                  <div className="space-y-4">
                     <button 
