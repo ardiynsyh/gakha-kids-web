@@ -58,23 +58,23 @@ export function CheckoutPage() {
     const orderId = Date.now();
     const finalTotal = subtotal - discount + 15000; // Flat 15k shipping for now
 
-    try {
-      const { error: orderError } = await supabase.from('orders').insert([{
-        id: orderId,
-        customer_name: formData.name,
-        whatsapp: formData.whatsapp,
-        address: formData.address,
-        city: formData.city,
-        notes: formData.notes,
-        items: cart,
-        total: finalTotal,
-        status: 'Pending'
-      }]);
-
-      if (orderError) throw orderError;
-
-      // Deduct Stock
+    const finalizeOrder = async (status: string) => {
       try {
+        const { error: orderError } = await supabase.from('orders').insert([{
+          id: orderId,
+          customer_name: formData.name,
+          whatsapp: formData.whatsapp,
+          address: formData.address,
+          city: formData.city,
+          notes: formData.notes,
+          items: cart,
+          total: finalTotal,
+          status: status
+        }]);
+
+        if (orderError) throw orderError;
+
+        // Deduct Stock
         for (const item of cart) {
           const { data: p } = await supabase.from('products').select('inventory').eq('id', item.id).single();
           if (p && p.inventory) {
@@ -82,18 +82,68 @@ export function CheckoutPage() {
             await supabase.from('products').update({ inventory: newInv }).eq('id', item.id);
           }
         }
-      } catch (stockErr) {
-        console.warn("Stock deduction failed:", stockErr);
+
+        toast.success(status === 'Pending' ? 'Menunggu Pembayaran...' : 'Pesanan berhasil dibuat!');
+        clearCart();
+        navigate('/track-order', { state: { orderId } });
+      } catch (err: any) {
+        console.error("Order Creation Error:", err);
+        toast.error(`Gagal menyimpan pesanan: ${err.message || 'Cek koneksi database'}`);
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
+
+    try {
+      // 1. Fetch token ke Serverless API
+      const res = await fetch('/api/midtrans', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          order_id: orderId,
+          gross_amount: finalTotal,
+          customer_details: {
+            first_name: formData.name,
+            phone: formData.whatsapp,
+            shipping_address: { address: formData.address, city: formData.city }
+          },
+          item_details: cart.map(c => ({
+             id: c.id, price: c.price, quantity: c.quantity, name: c.name
+          }))
+        })
+      });
+
+      const midtransData = await res.json();
+      
+      // Fallback Dev Mode (Jika API Error atau env key belum di setup di Vercel)
+      if (!res.ok || !midtransData.token) {
+        console.warn('Midtrans token timeout, mem-bypass payment gateway ke sistem manual.');
+        await finalizeOrder('Pending');
+        return;
       }
 
-      toast.success('Pesanan berhasil dibuat!');
-      clearCart();
-      navigate('/track-order', { state: { orderId } });
+      // 2. Tampilkan Pop-up Snap Midtrans
+      if (typeof window !== 'undefined' && (window as any).snap) {
+        (window as any).snap.pay(midtransData.token, {
+          onSuccess: async function() { await finalizeOrder('Completed'); },
+          onPending: async function() { await finalizeOrder('Pending'); },
+          onError: function() {
+              toast.error('Pembayaran Gagal. Silakan coba metode lain.');
+              setIsSubmitting(false);
+          },
+          onClose: function () {
+              // Jika user tutup popup, jangan save pesanan untuk menghindari spam
+              toast.error('Anda menutup pop-up pembayaran sebelum selesai.');
+              setIsSubmitting(false);
+          }
+        });
+      } else {
+        await finalizeOrder('Pending');
+      }
+      
     } catch (e: any) {
-      console.error("Order Creation Error:", e);
-      toast.error(`Gagal: ${e.message || 'Cek koneksi database'}`);
-    } finally {
-      setIsSubmitting(false);
+      console.error("Network Exception:", e);
+      await finalizeOrder('Pending');
     }
   };
 
