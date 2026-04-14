@@ -450,30 +450,89 @@ export function AdminDashboard() {
           {activeTab === 'coupons' && (
              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} key="coupons" className="max-w-[1200px]">
                 <div className="flex justify-between items-center mb-10">
-                   <h1 className="text-3xl font-black text-gray-900 tracking-tighter uppercase">Promotion Engine</h1>
-                   <button onClick={async () => {
-                      const code = prompt('Kode Voucher:');
-                      if (code) {
-                         const newC = { code: code.toUpperCase(), discount_type: 'Percentage', value: 10, status: 'Active' };
-                         const { data } = await supabase.from('coupons').insert([newC]).select();
-                         if (data) setCoupons([data[0], ...coupons]);
-                      }
-                   }} className="bg-gray-900 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase shadow-xl hover:scale-105 transition-all"><Plus className="w-5 h-5" /> Buat Kupon</button>
+                   <div>
+                      <h1 className="text-3xl font-black text-gray-900 tracking-tighter uppercase">Promotion Engine</h1>
+                      <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mt-1">Kelola voucher diskon pelanggan</p>
+                   </div>
+                   <button 
+                     onClick={async () => {
+                        const code = prompt('Masukkan Kode Voucher (Contoh: HEMAT50):');
+                        if (!code) return;
+                        
+                        const valueStr = prompt('Berapa persen diskonnya? (Masukkan angka saja, 1-100):');
+                        const value = parseInt(valueStr || '10');
+                        
+                        if (isNaN(value)) {
+                           toast.error("Diskon harus berupa angka!");
+                           return;
+                        }
+
+                        const tid = toast.loading("Memproses kupon baru...");
+                        try {
+                           const newC = { 
+                              code: code.toUpperCase().trim(), 
+                              discount_type: 'Percentage', 
+                              value: value, 
+                              status: 'Active' 
+                           };
+                           
+                           const { data, error } = await supabase.from('coupons').insert([newC]).select();
+                           
+                           if (error) throw error;
+                           
+                           if (data) {
+                              setCoupons([data[0], ...coupons]);
+                              toast.success(`Kupon ${newC.code} berhasil aktif!`, { id: tid });
+                           }
+                        } catch (err: any) {
+                           console.error(err);
+                           toast.error("Gagal buat kupon: " + err.message, { id: tid });
+                        }
+                     }} 
+                     className="bg-gray-900 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase shadow-xl hover:scale-105 transition-all flex items-center gap-2"
+                   >
+                      <Plus className="w-5 h-5 text-[var(--accent)]" /> Buat Kupon Baru
+                   </button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                   {coupons.map(c => (
-                      <div key={c.id} className="bg-white p-8 rounded-[2.5rem] border-2 border-dashed border-gray-100 flex items-center justify-between hover:border-[var(--accent)] transition-all">
-                         <div>
-                            <div className="bg-gray-900 text-white px-4 py-1 rounded-lg font-mono font-bold text-lg mb-2">{c.code}</div>
-                            <p className="text-gray-400 text-[10px] font-black uppercase">Voucher Diskon {c.value}%</p>
+
+                {coupons.length === 0 ? (
+                   <div className="bg-white border-4 border-dashed border-gray-100 rounded-[3rem] py-32 flex flex-col items-center justify-center text-center">
+                      <Zap className="w-16 h-16 text-gray-200 mb-4" />
+                      <p className="text-gray-400 font-black uppercase tracking-widest text-sm">Belum ada kupon aktif</p>
+                   </div>
+                ) : (
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {coupons.map(c => (
+                         <div key={c.id} className="bg-white p-8 rounded-[2.5rem] border-2 border-dashed border-gray-100 flex items-center justify-between hover:border-[var(--accent)] transition-all group">
+                            <div>
+                               <div className="bg-gray-900 text-white px-5 py-2 rounded-xl font-mono font-bold text-xl mb-3 tracking-tighter inline-block shadow-lg">
+                                  {c.code}
+                               </div>
+                               <div className="flex items-center gap-2">
+                                  <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[9px] font-black uppercase">Diskon {c.value}%</span>
+                                  <span className="text-gray-400 text-[9px] font-bold uppercase tracking-widest">Status: {c.status}</span>
+                               </div>
+                            </div>
+                            <button 
+                              onClick={async () => {
+                                 if(!confirm(`Hapus kupon ${c.code}?`)) return;
+                                 const tid = toast.loading("Menghapus...");
+                                 const { error } = await supabase.from('coupons').delete().eq('id', c.id);
+                                 if (!error) {
+                                    setCoupons(coupons.filter(cp => cp.id !== c.id));
+                                    toast.success("Kupon dihapus", { id: tid });
+                                 } else {
+                                    toast.error("Gagal hapus", { id: tid });
+                                 }
+                              }} 
+                              className="p-4 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all opacity-0 group-hover:opacity-100"
+                            >
+                               <Trash className="w-6 h-6" />
+                            </button>
                          </div>
-                         <button onClick={async () => {
-                            await supabase.from('coupons').delete().eq('id', c.id);
-                            setCoupons(coupons.filter(cp => cp.id !== c.id));
-                         }} className="p-3 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-xl"><Trash className="w-6 h-6" /></button>
-                      </div>
-                   ))}
-                </div>
+                      ))}
+                   </div>
+                )}
              </motion.div>
           )}
 
