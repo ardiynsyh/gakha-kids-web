@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useCart } from '../context/CartContext';
-import { ShoppingBag, Trash2, Plus, Minus, ArrowRight, CreditCard, Truck, ShieldCheck, Ticket } from 'lucide-react';
+import { ShoppingBag, Trash2, Plus, Minus, ArrowRight, CreditCard, Truck, ShieldCheck, Ticket, Zap } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router';
@@ -73,7 +73,7 @@ export function CheckoutPage() {
 
       if (orderError) throw orderError;
 
-      // Deduct Stock (Wrapped in another try-catch so it doesn't break the order if it fails)
+      // Deduct Stock
       try {
         for (const item of cart) {
           const { data: p } = await supabase.from('products').select('inventory').eq('id', item.id).single();
@@ -83,7 +83,7 @@ export function CheckoutPage() {
           }
         }
       } catch (stockErr) {
-        console.warn("Stock deduction failed (likely RLS), but order is created:", stockErr);
+        console.warn("Stock deduction failed:", stockErr);
       }
 
       toast.success('Pesanan berhasil dibuat!');
@@ -105,10 +105,7 @@ export function CheckoutPage() {
          </div>
          <h1 className="text-3xl font-black text-gray-900 mb-4">Keranjang Anda Kosong</h1>
          <p className="text-gray-500 mb-8 font-medium">Sepertinya Anda belum memilih produk untuk buah hati Anda.</p>
-         <button 
-           onClick={() => navigate('/shop/all')}
-           className="bg-[var(--accent)] text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:scale-105 transition-transform"
-         >
+         <button onClick={() => navigate('/shop/all')} className="bg-[var(--accent)] text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:scale-105 transition-transform">
            Mulai Belanja Sekarang
          </button>
       </div>
@@ -127,12 +124,9 @@ export function CheckoutPage() {
       <div className="flex flex-col lg:flex-row gap-12">
         {/* Left: Products & Forms */}
         <div className="lg:w-2/3 space-y-8">
-           {/* Cart Items */}
            <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
-              <div className="p-8 border-b border-gray-50">
-                 <h2 className="text-lg font-black uppercase tracking-tight flex items-center gap-2">
-                    <ShoppingBag className="w-5 h-5 text-[var(--accent)]" /> Ringkasan Tas Belanja
-                 </h2>
+              <div className="p-8 border-b border-gray-50 text-lg font-black uppercase tracking-tight flex items-center gap-2">
+                <ShoppingBag className="w-5 h-5 text-[var(--accent)]" /> Ringkasan Tas Belanja
               </div>
               <div className="divide-y divide-gray-50">
                  {cart.map((item) => (
@@ -165,7 +159,6 @@ export function CheckoutPage() {
               </div>
            </div>
 
-           {/* Customer Form */}
            <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm p-8 sm:p-12">
               <h2 className="text-lg font-black uppercase tracking-tight flex items-center gap-2 mb-8">
                  <Truck className="w-5 h-5 text-[var(--accent)]" /> Data Pengiriman
@@ -173,53 +166,23 @@ export function CheckoutPage() {
               <form id="order-form" onSubmit={handlePlaceOrder} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                  <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Nama Lengkap</label>
-                    <input 
-                      required
-                      value={formData.name}
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      className="w-full bg-gray-50 border border-transparent focus:border-[var(--accent)] p-4 rounded-2xl outline-none font-bold text-sm transition-all shadow-inner" 
-                      placeholder="Contoh: Budi Santoso"
-                    />
+                    <input required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full bg-gray-50 border border-transparent focus:border-[var(--accent)] p-4 rounded-2xl outline-none font-bold text-sm" placeholder="Nama Anda" />
                  </div>
                  <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Nomor WhatsApp</label>
-                    <input 
-                      required
-                      type="tel"
-                      value={formData.whatsapp}
-                      onChange={(e) => setFormData({...formData, whatsapp: e.target.value})}
-                      className="w-full bg-gray-50 border border-transparent focus:border-[var(--accent)] p-4 rounded-2xl outline-none font-bold text-sm transition-all shadow-inner" 
-                      placeholder="62812345678"
-                    />
+                    <input required type="tel" value={formData.whatsapp} onChange={(e) => setFormData({...formData, whatsapp: e.target.value})} className="w-full bg-gray-50 border border-transparent focus:border-[var(--accent)] p-4 rounded-2xl outline-none font-bold text-sm" placeholder="628123..." />
                  </div>
                  <div className="md:col-span-2 space-y-2">
                     <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Kota / Kecamatan</label>
-                    <input 
-                      required
-                      value={formData.city}
-                      onChange={(e) => setFormData({...formData, city: e.target.value})}
-                      className="w-full bg-gray-50 border border-transparent focus:border-[var(--accent)] p-4 rounded-2xl outline-none font-bold text-sm transition-all shadow-inner" 
-                      placeholder="Contoh: Kebayoran Baru, Jakarta Selatan"
-                    />
+                    <input required value={formData.city} onChange={(e) => setFormData({...formData, city: e.target.value})} className="w-full bg-gray-50 border border-transparent focus:border-[var(--accent)] p-4 rounded-2xl outline-none font-bold text-sm" placeholder="Kota Anda" />
                  </div>
                  <div className="md:col-span-2 space-y-2">
                     <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Alamat Lengkap</label>
-                    <textarea 
-                      required
-                      value={formData.address}
-                      onChange={(e) => setFormData({...formData, address: e.target.value})}
-                      className="w-full bg-gray-50 border border-transparent focus:border-[var(--accent)] p-4 rounded-2xl outline-none font-bold text-sm transition-all shadow-inner h-24 resize-none" 
-                      placeholder="Jalan, No Rumah, RT/RW, Patokan..."
-                    />
+                    <textarea required value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} className="w-full bg-gray-50 border border-transparent focus:border-[var(--accent)] p-4 rounded-2xl outline-none font-bold text-sm h-24 resize-none" placeholder="Alamat detail..." />
                  </div>
                  <div className="md:col-span-2 space-y-2">
                     <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Catatan Tambahan (Opsional)</label>
-                    <input 
-                      value={formData.notes}
-                      onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                      className="w-full bg-gray-50 border border-transparent focus:border-[var(--accent)] p-4 rounded-2xl outline-none font-bold text-sm transition-all shadow-inner" 
-                      placeholder="Titip di pos satpam, bungkus kado, dll."
-                    />
+                    <input value={formData.notes} onChange={(e) => setFormData({...formData, notes: e.target.value})} className="w-full bg-gray-50 border border-transparent focus:border-[var(--accent)] p-4 rounded-2xl outline-none font-bold text-sm" placeholder="Catatan..." />
                  </div>
               </form>
            </div>
@@ -228,33 +191,17 @@ export function CheckoutPage() {
         {/* Right: Summary & Checkout */}
         <div className="lg:w-1/3">
            <div className="sticky top-32 space-y-6">
-              {/* Coupon */}
-              <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
-                 <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-4 flex items-center gap-2">
-                    <Ticket className="w-4 h-4 text-blue-500" /> Punya Kode Kupon?
-                 </h4>
-                 <div className="flex gap-2">
-                    <input 
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value)}
-                      className="flex-1 bg-gray-50 border border-transparent focus:border-blue-300 p-3 rounded-xl outline-none font-bold text-xs transition-all uppercase" 
-                      placeholder="GAKHAxxx"
-                    />
-                    <button 
-                      onClick={handleApplyCoupon}
-                      disabled={isApplyingCoupon}
-                      className="bg-gray-900 text-white px-5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-600 transition-colors disabled:opacity-50"
-                    >
-                      Cek
-                    </button>
+              <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm text-[10px] font-black uppercase tracking-widest">
+                 <Ticket className="w-4 h-4 text-blue-500 mb-4 inline mr-2" /> Punya Kode Kupon?
+                 <div className="flex gap-2 mt-2">
+                    <input value={couponCode} onChange={(e) => setCouponCode(e.target.value)} className="flex-1 bg-gray-50 border border-transparent focus:border-blue-300 p-3 rounded-xl outline-none font-bold text-xs uppercase" placeholder="KODE" />
+                    <button onClick={handleApplyCoupon} disabled={isApplyingCoupon} className="bg-gray-900 text-white px-5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-600">Cek</button>
                  </div>
               </div>
 
-              {/* Final Summary */}
               <div className="bg-white p-8 sm:p-10 rounded-[3rem] border border-gray-100 shadow-xl">
                  <h3 className="text-xl font-black text-gray-900 italic tracking-tight uppercase mb-8">Ringkasan Biaya</h3>
-                 
-                  <div className="space-y-4 mb-8">
+                 <div className="space-y-4 mb-8">
                     <div className="flex justify-between text-sm">
                        <span className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Subtotal Produk</span>
                        <span className="font-bold text-gray-900">Rp {subtotal.toLocaleString()}</span>
@@ -263,7 +210,6 @@ export function CheckoutPage() {
                        <span className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Ongkos Kirim (Flat)</span>
                        <span className="font-bold text-gray-900">+Rp 15.000</span>
                     </div>
-                    
                     {discount > 0 && (
                       <>
                         <div className="flex justify-between text-[11px] pt-3 border-t border-gray-50">
@@ -271,54 +217,25 @@ export function CheckoutPage() {
                            <span className="text-gray-400 line-through">Rp {(subtotal + 15000).toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between text-sm text-green-600 bg-green-50/50 p-2 rounded-lg border border-green-100/50">
-                          <span className="font-black uppercase tracking-widest text-[10px] flex items-center gap-1">
-                             <Zap className="w-3 h-3" /> Potongan Kupon
-                          </span>
+                          <span className="font-black uppercase tracking-widest text-[10px] flex items-center gap-1"><Zap className="w-3 h-3" /> Potongan Kupon</span>
                           <span className="font-black">-Rp {discount.toLocaleString()}</span>
                         </div>
                       </>
                     )}
-
-                    <div className="pt-6 border-t-2 border-dashed border-gray-100 mt-6">
-                       <div className="flex justify-between items-end">
-                          <div className="space-y-1">
-                             <span className="text-gray-900 font-bold uppercase tracking-tight text-[10px] block opacity-50">Total Pembayaran</span>
-                             <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-md font-black italic">Midtrans Secure</span>
-                          </div>
-                          <div className="text-right">
-                             <span className="text-3xl font-black text-[var(--accent)] tracking-tighter">
-                                Rp {(subtotal + 15000 - discount).toLocaleString()}
-                             </span>
-                          </div>
+                    <div className="pt-6 border-t-2 border-dashed border-gray-100 mt-6 flex justify-between items-end">
+                       <div className="space-y-1">
+                          <span className="text-gray-900 font-bold uppercase tracking-tight text-[10px] block opacity-50">Total Pembayaran</span>
+                          <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-md font-black italic">Midtrans Secure</span>
                        </div>
+                       <span className="text-3xl font-black text-[var(--accent)] tracking-tighter">Rp {(subtotal + 15000 - discount).toLocaleString()}</span>
                     </div>
-                  </div>
-              </div>
-
-                 <div className="space-y-4">
-                    <button 
-                      type="submit"
-                      form="order-form"
-                      disabled={isSubmitting}
-                      className="w-full bg-[var(--text-primary)] hover:bg-[var(--accent)] text-white py-6 rounded-3xl font-black text-xs uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3 shadow-2xl disabled:opacity-50 group active:scale-95"
-                    >
-                       {isSubmitting ? 'Memproses...' : (
-                         <>
-                           Bayar Sekarang <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
-                         </>
-                       )}
-                    </button>
-                    
-                    <div className="flex items-center justify-center gap-4 py-4 border-t border-gray-50 mt-6">
-                       <div className="flex items-center gap-1.5 opacity-30">
-                          <CreditCard className="w-4 h-4" />
-                          <span className="text-[10px] font-black uppercase tracking-widest">Midtrans Ready</span>
-                       </div>
-                       <div className="flex items-center gap-1.5 opacity-30">
-                          <ShieldCheck className="w-4 h-4" />
-                          <span className="text-[10px] font-black uppercase tracking-widest">Encrypted</span>
-                       </div>
-                    </div>
+                 </div>
+                 <button type="submit" form="order-form" disabled={isSubmitting} className="w-full bg-[var(--text-primary)] hover:bg-[var(--accent)] text-white py-6 rounded-3xl font-black text-xs uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3 shadow-2xl disabled:opacity-50">
+                    {isSubmitting ? 'Memproses...' : <>Bayar Sekarang <ArrowRight className="w-5 h-5" /></>}
+                 </button>
+                 <div className="flex items-center justify-center gap-4 py-4 border-t border-gray-50 mt-6 opacity-30 text-[10px] font-black uppercase tracking-widest">
+                    <CreditCard className="w-4 h-4" /> Midtrans Ready
+                    <ShieldCheck className="w-4 h-4" /> Encrypted
                  </div>
               </div>
            </div>
