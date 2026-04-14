@@ -58,7 +58,7 @@ export function CheckoutPage() {
     setIsSubmitting(true);
 
     const orderId = Date.now();
-    const finalTotal = subtotal - discount + 15000; // Flat 15k shipping for now
+    const finalTotal = subtotal - discount + 0; // Flat 0 shipping for now (testing)
 
     const finalizeOrder = async (status: string) => {
       try {
@@ -109,7 +109,7 @@ export function CheckoutPage() {
         // Ongkos kirim
         {
           id: 'SHIPPING',
-          price: 15000,
+          price: 0,
           quantity: 1,
           name: 'Ongkos Kirim'
         }
@@ -286,13 +286,13 @@ export function CheckoutPage() {
                     </div>
                     <div className="flex justify-between text-sm">
                        <span className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Ongkos Kirim (Flat)</span>
-                       <span className="font-bold text-gray-900">+Rp 15.000</span>
+                       <span className="font-bold text-gray-900">+Rp 0</span>
                     </div>
                     {discount > 0 && (
                       <>
                         <div className="flex justify-between text-[11px] pt-3 border-t border-gray-50">
                            <span className="text-gray-400 font-bold uppercase tracking-widest">Total Sebelum Diskon</span>
-                           <span className="text-gray-400 line-through">Rp {(subtotal + 15000).toLocaleString()}</span>
+                           <span className="text-gray-400 line-through">Rp {(subtotal + 0).toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between text-sm text-green-600 bg-green-50/50 p-2 rounded-lg border border-green-100/50">
                           <span className="font-black uppercase tracking-widest text-[10px] flex items-center gap-1"><Zap className="w-3 h-3" /> Potongan Kupon</span>
@@ -305,7 +305,7 @@ export function CheckoutPage() {
                           <span className="text-gray-900 font-bold uppercase tracking-tight text-[10px] block opacity-50">Total Pembayaran</span>
                           <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-md font-black italic">Midtrans Secure</span>
                        </div>
-                       <span className="text-3xl font-black text-[var(--accent)] tracking-tighter">Rp {(subtotal + 15000 - discount).toLocaleString()}</span>
+                       <span className="text-3xl font-black text-[var(--accent)] tracking-tighter">Rp {(subtotal + 0 - discount).toLocaleString()}</span>
                     </div>
                  </div>
                  <button type="submit" form="order-form" disabled={isSubmitting} className="w-full bg-[var(--text-primary)] hover:bg-[var(--accent)] text-white py-6 rounded-3xl font-black text-xs uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3 shadow-2xl disabled:opacity-50">
