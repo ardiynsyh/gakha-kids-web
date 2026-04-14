@@ -43,8 +43,9 @@ export function CheckoutPage() {
         if (Array.isArray(data)) {
           setCities(data);
         } else {
-          console.error("API Shipping Error (Not an array):", data);
-          toast.error("Gagal memuat daftar kota. Cek API Key RajaOngkir di Vercel.");
+          console.error("API Shipping Error:", data);
+          const errorMsg = data.description || data.error || "Gagal memuat daftar kota (Cek API Key)";
+          toast.error(errorMsg);
         }
       })
       .catch(err => {
