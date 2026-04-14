@@ -572,7 +572,10 @@ export function AdminDashboard() {
                               const a=(document.getElementById('awb') as HTMLInputElement).value;
                               if(a){
                                 supabase.from('orders').update({tracking_number:a, status:'Shipped'}).eq('id',selectedOrder.id).then(()=>{
-                                   fetchData(); setSelectedOrder(null); toast.success("AWB Disimpan!");
+                                   // Update state immediately without waiting for Supabase reflection
+                                   setOrders(orders.map(o => o.id === selectedOrder.id ? { ...o, tracking_number: a, status: 'Shipped' } : o));
+                                   setSelectedOrder(null); 
+                                   toast.success("AWB Disimpan!");
                                    // Otomatis WA
                                    const msg = `Halo Kak ${selectedOrder.customer_name},\n\nTerima kasih sudah belanja di Gakha Kids. Pesanan Kakak sedang dalam pengiriman.\n\nKurir: *Cek Status Resi*\nNo Resi (AWB): *${a}*\n\nDitunggu kedatangan paketnya ya!`;
                                    window.open(`https://wa.me/${selectedOrder.whatsapp}?text=${encodeURIComponent(msg)}`);
@@ -608,7 +611,7 @@ export function AdminDashboard() {
                         </div>
                         <div className="flex flex-col gap-3">
                            <button onClick={()=>handlePrintInvoice(selectedOrder)} className="w-full border-2 border-white/20 text-white py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all flex justify-center items-center gap-2"><Printer className="w-4 h-4"/> Print Label Alamat</button>
-                           <button onClick={()=>{ supabase.from('orders').update({status:'Completed'}).eq('id',selectedOrder.id).then(()=>{fetchData(); setSelectedOrder(null);}); }} className="w-full bg-green-500 text-white py-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg hover:bg-green-600 transition-all flex justify-center items-center gap-2"><CheckCircle className="w-4 h-4"/> Selesaikan Pesanan</button>
+                           <button onClick={() => { handleUpdateOrderStatus(selectedOrder.id, 'Completed'); setSelectedOrder(null); }} className="w-full bg-green-500 text-white py-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg hover:bg-green-600 transition-all flex justify-center items-center gap-2"><CheckCircle className="w-4 h-4"/> Selesaikan Pesanan</button>
                         </div>
                      </div>
                   </div>
