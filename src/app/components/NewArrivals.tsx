@@ -119,8 +119,8 @@ export function NewArrivals() {
            <h2 className="text-[clamp(1.75rem,5vw,2.5rem)] font-extrabold text-[var(--text-primary)] font-serif italic tracking-wide leading-tight">Koleksi Terbaru</h2>
         </div>
 
-        {/* Grid Cards with Neumorphism / Soft Shadow details */}
-        <div className="lg:w-3/4 grid grid-cols-[repeat(auto-fit,minmax(clamp(160px,25vw,240px),1fr))] gap-[clamp(1rem,3vw,2rem)]">
+        {/* Grid Cards with Premium Aesthetic */}
+        <div className="lg:w-3/4 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
            {products.map((product, idx) => {
               const dynamicTag = calculateDiscountBadge(product.price, product.originalPrice);
               const tag = dynamicTag || product.tag || (idx < 2 ? "Hot" : "New");
@@ -128,36 +128,27 @@ export function NewArrivals() {
               return (
                 <motion.div 
                   key={product.id} 
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  whileHover={{ 
-                    y: -15, 
-                    scale: 1.02,
-                    boxShadow: "0 25px 50px -12px rgba(251, 36, 106, 0.25)"
-                  }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ 
-                    layout: { duration: 0.3 },
-                    y: { type: "spring", stiffness: 300, damping: 20 },
-                    opacity: { duration: 0.5, delay: idx * 0.1 }
-                  }}
-                  className="group cursor-pointer flex flex-col items-center bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-3xl p-3 shadow-sm hover:border-[var(--accent)]/30 transition-all duration-300 relative z-0 hover:z-10"
+                  whileHover={{ y: -8 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.5, delay: idx * 0.1 }}
+                  className="group relative flex flex-col bg-white rounded-[2rem] p-4 border border-gray-50 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] transition-all duration-500"
                 >
-                   {/* 3D Reflection Effect on Hover */}
-                   <motion.div 
-                      className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 rounded-3xl pointer-events-none transition-opacity"
-                   />
-                   {/* Image Box */}
-                   <div className="relative w-full bg-slate-50 dark:bg-slate-900/50 rounded-2xl aspect-[4/5] mb-4 flex justify-center items-center transition-colors group-hover:bg-gray-100 overflow-hidden shadow-inner border border-gray-100 dark:border-gray-800">
-                      <div className={`absolute top-4 left-4 text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-[4px] text-white shadow-sm z-10 ${tag.includes('%') ? 'bg-red-500' : 'bg-[#ffb000]'}`}>
-                         {tag}
-                      </div>
-                      
+                   {/* Image container with soft background */}
+                   <div className="relative aspect-[4/5] rounded-[1.5rem] overflow-hidden bg-[#f9fafb] mb-4">
                       <ImageWithFallback 
                         src={product.image} 
                         alt={product.name}
-                        className="w-full h-full object-contain p-2 mix-blend-multiply dark:mix-blend-normal group-hover:scale-[1.1] transition-transform duration-700 ease-out" 
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" 
                       />
+                      
+                      {/* Tag Overlay */}
+                      {tag && (
+                        <div className={`absolute top-4 left-4 text-[10px] font-black px-3 py-1 rounded-full text-white shadow-lg backdrop-blur-md ${tag.includes('%') ? 'bg-red-500/90' : 'bg-amber-500/90'}`}>
+                           {tag}
+                        </div>
+                      )}
                    </div>
                    
                    {/* Text Info */}
