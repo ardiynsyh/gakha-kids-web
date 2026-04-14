@@ -45,16 +45,40 @@ export function AdminDashboard() {
     checkUser();
     fetchData();
 
+    // 1. Supabase Native Realtime (Jika diaktifkan di Database)
     const orderSubscription = supabase
       .channel('orders-realtime')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload) => {
-        setOrders(current => [payload.new, ...current]);
-        toast.info(`🔔 PESANAN BARU! Dari ${payload.new.customer_name}`, { duration: 10000 });
-        new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play().catch(() => { });
+        setOrders(current => {
+          if (!current.find((o) => o.id === payload.new.id)) {
+            toast.info(`🔔 PESANAN BARU! Dari ${payload.new.customer_name}`, { duration: 10000 });
+            new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play().catch(() => {});
+            return [payload.new, ...current];
+          }
+          return current;
+        });
       })
       .subscribe();
 
-    return () => { supabase.removeChannel(orderSubscription); };
+    // 2. Intelligent Auto-Polling Fallback (Jika Realtime Mati)
+    const pollingInterval = setInterval(async () => {
+       const { data: latestOrders } = await supabase.from('orders').select('*').order('id', { ascending: false });
+       if (latestOrders) {
+          setOrders(prevOrders => {
+             const isNew = latestOrders.length > prevOrders.length;
+             if (isNew && prevOrders.length > 0) {
+                 const newCount = latestOrders.length - prevOrders.length;
+                 toast.success(`Terdapat ${newCount} Pesanan Baru masuk!`);
+             }
+             return latestOrders; // Sinkronisasi penuh
+          });
+       }
+    }, 5000); // Cek setiap 5 Detik
+
+    return () => { 
+      supabase.removeChannel(orderSubscription); 
+      clearInterval(pollingInterval);
+    };
   }, []);
 
   const checkUser = async () => {
