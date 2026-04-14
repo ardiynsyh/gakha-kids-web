@@ -24,23 +24,38 @@ export function ShopPage() {
   useEffect(() => {
     async function fetchProducts() {
       setIsLoading(true);
-      let query = supabase.from('products').select('*');
-      
-      if (categoryId && categoryId !== 'all') {
-        query = query.contains('categories', [categoryId.toLowerCase()]);
+      try {
+        let query = supabase.from('products').select('*');
+        
+        // Smarter filtering: If it's the 'new' slug or if the active category's name contains "Terbaru"
+        const activeCat = config?.productCategories?.find((c: any) => c.id === categoryId);
+        const isLatestSection = categoryId === 'new' || (activeCat && activeCat.name.toLowerCase().includes('terbaru'));
+
+        if (categoryId && categoryId !== 'all') {
+          if (isLatestSection) {
+            // Target products with 'new' tag from the star button
+            query = query.contains('categories', ['new']);
+          } else {
+            query = query.contains('categories', [categoryId.toLowerCase()]);
+          }
+        }
+        
+        const { data, error } = await query;
+        if (error) throw error;
+        if (data) setProducts(data);
+      } catch (e) {
+        console.error("Fetch error:", e);
+      } finally {
+        setIsLoading(false);
       }
-      
-      const { data } = await query;
-      if (data) setProducts(data);
-      setIsLoading(false);
     }
     fetchProducts();
-  }, [categoryId]);
+  }, [categoryId, config?.productCategories]);
 
   const getTitle = () => {
     // Check dynamic categories from config first
     const dynamicCat = config?.productCategories?.find((c: any) => c.id === categoryId);
-    if (dynamicCat) return `Koleksi ${dynamicCat.name.replace(/[^\w\s]/gi, '').trim()}`;
+    if (dynamicCat) return dynamicCat.name;
 
     switch(categoryId) {
       case 'new': return 'Koleksi Terbaru';
