@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
-import { Heart, ShoppingBag } from 'lucide-center';
+import { Heart, ShoppingBag } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { useWishlist } from '../context/WishlistContext';
 import { calculateDiscountBadge } from '../components/ui/utils';
@@ -9,8 +9,7 @@ import { supabase } from '../../lib/supabase';
 import { useStore } from '../context/StoreContext';
 import { ProductModal } from '../components/ProductModal';
 
-// Helper icon mapping if lucide-center is not correct (it should be lucide-react)
-import { Heart as HeartIcon, ShoppingBag as ShoppingBagIcon } from 'lucide-react';
+
 
 export function ShopPage() {
   const { categoryId } = useParams();
@@ -113,7 +112,7 @@ export function ShopPage() {
                         inWish ? removeFromWishlist(product.id) : addToWishlist(product);
                       }}
                       className="bg-white p-2.5 rounded-full hover:scale-110 transition-transform shadow-lg cursor-pointer">
-                      <HeartIcon className={`w-5 h-5 ${isInWishlist(product.id) ? 'fill-red-500 text-red-500' : 'text-gray-700'}`} />
+                      <Heart className={`w-5 h-5 ${isInWishlist(product.id) ? 'fill-red-500 text-red-500' : 'text-gray-700'}`} />
                     </button>
                   </div>
                       <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
