@@ -20,6 +20,7 @@ export function AdminDashboard() {
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [isAddingSize, setIsAddingSize] = useState<any>(null);
   const [isAddingCoupon, setIsAddingCoupon] = useState(false);
+  const [orderStatusFilter, setOrderStatusFilter] = useState<'all' | 'Completed' | 'Pending' | 'Refund Requested'>('all');
 
   const [config, setConfig] = useState<any>({
     announcement: { isEnabled: true, text: '' },
@@ -211,9 +212,9 @@ export function AdminDashboard() {
   };
 
   // Derived Data
-  const filteredProducts = products.filter(p => selectedCategory === 'all' || p.categories?.includes(selectedCategory));
-  const dailyRecap = orders.filter(o => new Date(o.created_at).toDateString() === new Date().toDateString()).reduce((acc, o) => acc + (o.total || 0), 0);
-  const monthlyRecap = orders.filter(o => new Date(o.created_at).getMonth() === new Date().getMonth()).reduce((acc, o) => acc + (o.total || 0), 0);
+  const filteredOrders = orders.filter(o => orderStatusFilter === 'all' || o.status === orderStatusFilter);
+  const dailyRecap = orders.filter(o => new Date(o.created_at).toDateString() === new Date().toDateString() && o.status === 'Completed').reduce((acc, o) => acc + (o.total || 0), 0);
+  const monthlyRecap = orders.filter(o => new Date(o.created_at).getMonth() === new Date().getMonth() && o.status === 'Completed').reduce((acc, o) => acc + (o.total || 0), 0);
   const bestSellers = [...products].sort((a, b) => (b.sold || 0) - (a.sold || 0)).slice(0, 3);
 
   if (isSyncing) return (
@@ -410,7 +411,30 @@ export function AdminDashboard() {
           {/* TAB: PENJUALAN */}
           {activeTab === 'orders' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="orders" className="p-8 lg:p-12">
-              <h1 className="text-4xl font-black mb-12 tracking-tighter uppercase italic leading-none">Daftar Penjualan</h1>
+              <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12">
+                <div>
+                  <h1 className="text-4xl font-black tracking-tighter uppercase italic leading-none">Daftar Penjualan</h1>
+                  <p className="text-gray-400 font-bold mt-2 uppercase text-[10px] tracking-widest">Kelola Transaksi Pelanggan</p>
+                </div>
+                
+                <div className="flex bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
+                  {[
+                    { id: 'all', label: 'SEMUA', icon: <Filter className="w-3.5 h-3.5" /> },
+                    { id: 'Completed', label: 'SUKSES', icon: <CheckCircle className="w-3.5 h-3.5 text-green-500" /> },
+                    { id: 'Pending', label: 'PENDING', icon: <RefreshCw className="w-3.5 h-3.5 text-amber-500" /> },
+                    { id: 'Refund Requested', label: 'REFUND', icon: <X className="w-3.5 h-3.5 text-red-500" /> },
+                  ].map(f => (
+                    <button
+                      key={f.id}
+                      onClick={() => setOrderStatusFilter(f.id as any)}
+                      className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black tracking-widest transition-all whitespace-nowrap ${orderStatusFilter === f.id ? 'bg-gray-900 text-white shadow-lg' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-50'}`}
+                    >
+                      {f.icon} {f.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden text-sm">
                 <table className="w-full text-left">
                   <thead className="bg-gray-50 text-[10px] uppercase font-black tracking-[0.2em] text-gray-400">
@@ -424,16 +448,34 @@ export function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {orders.map(o => (
-                      <tr key={o.id} className="hover:bg-gray-50/50 transition-all border-b border-gray-50">
-                        <td className="p-6 pl-8 font-mono font-bold text-gray-400">#{o.id.toString().slice(-6)}</td>
-                        <td className="p-6 font-black text-gray-900 uppercase">{o.customer_name}</td>
-                        <td className="p-6 font-black text-[var(--accent)]">Rp {o.total.toLocaleString()}</td>
-                        <td className="p-6 font-bold text-gray-400">{o.tracking_number || '-'}</td>
-                        <td className="p-6"><span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest ${o.status === 'Pending' ? 'bg-amber-100 text-amber-600' : 'bg-green-100 text-green-600'}`}>{o.status}</span></td>
-                        <td className="p-6"><button onClick={() => setSelectedOrder(o)} className="bg-gray-950 text-white px-6 py-2.5 rounded-xl text-[10px] font-black uppercase flex items-center gap-2 hover:scale-105 transition-all"><Eye className="w-4 h-4 text-pink-400" /> Kelola</button></td>
+                    {filteredOrders.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="p-20 text-center">
+                          <ShoppingBag className="w-12 h-12 text-gray-200 mx-auto mb-4" />
+                          <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Tidak ada pesanan dengan status ini</p>
+                        </td>
                       </tr>
-                    ))}
+                    ) : (
+                      filteredOrders.map(o => (
+                        <tr key={o.id} className="hover:bg-gray-50/50 transition-all border-b border-gray-50">
+                          <td className="p-6 pl-8 font-mono font-bold text-gray-400">#{o.id.toString().slice(-6)}</td>
+                          <td className="p-6 font-black text-gray-900 uppercase">{o.customer_name}</td>
+                          <td className="p-6 font-black text-[var(--accent)]">Rp {o.total.toLocaleString()}</td>
+                          <td className="p-6 font-bold text-gray-400">{o.tracking_number || '-'}</td>
+                          <td className="p-6">
+                            <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                              o.status === 'Pending' ? 'bg-amber-100 text-amber-600' : 
+                              o.status === 'Completed' || o.status === 'Shipped' ? 'bg-green-100 text-green-600' :
+                              o.status === 'Refund Requested' ? 'bg-red-100 text-red-600' :
+                              'bg-gray-100 text-gray-600'
+                            }`}>
+                              {o.status === 'Refund Requested' ? 'Refund' : o.status}
+                            </span>
+                          </td>
+                          <td className="p-6"><button onClick={() => setSelectedOrder(o)} className="bg-gray-950 text-white px-6 py-2.5 rounded-xl text-[10px] font-black uppercase flex items-center gap-2 hover:scale-105 transition-all"><Eye className="w-4 h-4 text-pink-400" /> Kelola</button></td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
