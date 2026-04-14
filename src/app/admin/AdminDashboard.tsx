@@ -69,6 +69,7 @@ export function AdminDashboard() {
              if (isNew && prevOrders.length > 0) {
                  const newCount = latestOrders.length - prevOrders.length;
                  toast.success(`Terdapat ${newCount} Pesanan Baru masuk!`);
+                 new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play().catch(() => {});
              }
              return latestOrders; // Sinkronisasi penuh
           });
