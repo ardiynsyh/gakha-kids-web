@@ -6,6 +6,7 @@ import { useWishlist } from '../context/WishlistContext';
 import { calculateDiscountBadge } from '../components/ui/utils';
 import { SEO } from '../components/SEO';
 import { supabase } from '../../lib/supabase';
+import { useStore } from '../context/StoreContext';
 
 // Helper icon mapping if lucide-center is not correct (it should be lucide-react)
 import { Heart as HeartIcon, ShoppingBag as ShoppingBagIcon } from 'lucide-react';
@@ -15,6 +16,7 @@ export function ShopPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+  const { config } = useStore();
 
   useEffect(() => {
     async function fetchProducts() {
@@ -33,6 +35,10 @@ export function ShopPage() {
   }, [categoryId]);
 
   const getTitle = () => {
+    // Check dynamic categories from config first
+    const dynamicCat = config?.productCategories?.find((c: any) => c.id === categoryId);
+    if (dynamicCat) return `Koleksi ${dynamicCat.name.replace(/[^\w\s]/gi, '').trim()}`;
+
     switch(categoryId) {
       case 'new': return 'Koleksi Terbaru';
       case 'boys': return 'Koleksi Anak Laki-Laki';

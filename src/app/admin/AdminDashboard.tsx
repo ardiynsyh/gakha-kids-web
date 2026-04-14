@@ -125,6 +125,7 @@ export function AdminDashboard() {
   };
 
   const handleAddProduct = () => {
+    const defaultCategory = config?.productCategories?.length > 0 ? config.productCategories[0].id : 'born';
     const newProduct = {
       id: Date.now(),
       name: "Produk Baru",
@@ -132,7 +133,7 @@ export function AdminDashboard() {
       image: "https://images.unsplash.com/photo-1632232963035-bc14755747c9?auto=format&fit=crop&w=500&q=60",
       color: "#cccccc",
       linktreeUrl: "https://linktr.ee/",
-      categories: ["new"],
+      categories: [defaultCategory],
       sizes: ["S", "M", "L", "XL"],
       details: ""
     };
@@ -268,58 +269,93 @@ export function AdminDashboard() {
                         />
                          <p className="text-[10px] text-gray-400 mt-1 font-mono">ID: {p.id}</p>
                       </td>
-                      <td className="p-6 space-y-1">
-                        <input 
-                          type="text" 
-                          value={p.price} 
-                          onChange={(e) => handleUpdateProduct(p.id, 'price', e.target.value)}
-                          className="w-full bg-transparent border-none focus:outline-none text-[var(--accent)] font-black text-base"
-                        />
-                        <input 
-                          type="text" 
-                          value={p.originalPrice || ''} 
-                          onChange={(e) => handleUpdateProduct(p.id, 'originalPrice', e.target.value)}
-                          className="w-full bg-transparent border-none focus:outline-none text-gray-400 line-through text-xs"
-                          placeholder="Hrg Coret"
-                        />
+                      <td className="p-6 space-y-2">
+                        <div className="relative">
+                          <span className="absolute left-2 top-1.5 text-[10px] text-gray-400 font-bold">SALE</span>
+                          <input 
+                            type="text" 
+                            value={p.price} 
+                            onChange={(e) => handleUpdateProduct(p.id, 'price', e.target.value)}
+                            className="w-full bg-gray-50 border border-gray-100 rounded-lg pl-10 pr-3 py-1.5 focus:bg-white focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)] outline-none text-[var(--accent)] font-black text-sm transition-all"
+                            placeholder="Rp 0"
+                          />
+                        </div>
+                        <div className="relative">
+                          <span className="absolute left-2 top-1.5 text-[10px] text-gray-400 font-bold">DISC</span>
+                          <input 
+                            type="text" 
+                            value={p.originalPrice || ''} 
+                            onChange={(e) => handleUpdateProduct(p.id, 'originalPrice', e.target.value)}
+                            className="w-full bg-gray-50 border border-gray-100 rounded-lg pl-10 pr-3 py-1.5 focus:bg-white focus:border-gray-300 outline-none text-gray-400 line-through text-[11px] transition-all"
+                            placeholder="Harga Coret"
+                          />
+                        </div>
                       </td>
                       <td className="p-6">
                          <div className="space-y-3">
-                            <div className="flex flex-wrap gap-1.5">
-                               {(p.sizes || []).map((s: string) => (
-                                 <span key={s} className="bg-gray-100/50 text-gray-600 text-[9px] px-2.5 py-1 rounded-md border border-gray-200 font-black uppercase">{s}</span>
-                               ))}
+                            <div className="flex flex-wrap gap-1.5 max-w-[200px]">
+                               {['NB', '0-6M', '6-12M', '12-18M', '18-24M', '2T', '3T', '4T', '5T', 'S', 'M', 'L', 'XL', 'XXL'].map((s) => {
+                                 const isSelected = (p.sizes || []).includes(s);
+                                 return (
+                                   <button 
+                                     key={s}
+                                     onClick={() => {
+                                       const currentSizes = p.sizes || [];
+                                       const newSizes = isSelected 
+                                         ? currentSizes.filter((size: string) => size !== s)
+                                         : [...currentSizes, s];
+                                       handleUpdateProduct(p.id, 'sizes', newSizes);
+                                     }}
+                                     className={`text-[9px] px-2 py-1 rounded-md border font-black transition-all ${
+                                       isSelected 
+                                       ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-sm' 
+                                       : 'bg-white text-gray-400 border-gray-100 hover:border-gray-300'
+                                     }`}
+                                   >
+                                     {s}
+                                   </button>
+                                 );
+                               })}
                             </div>
-                            <input 
-                              type="text" 
-                              placeholder="Ketik S, M, L, XL..."
-                              className="w-full text-[11px] border border-gray-200 rounded-lg p-2 focus:border-[var(--accent)] transition-all outline-none"
-                              onBlur={(e) => handleUpdateProduct(p.id, 'sizes', e.target.value.split(',').map(s => s.trim()))}
-                            />
-                            {p.size_chart_image && (
-                               <div className="flex items-center gap-2 text-[10px] text-blue-500 font-bold">
-                                  <Ruler className="w-3 h-3" /> Chart Aktif
-                               </div>
-                            )}
+                            <div className="flex items-center gap-2">
+                               <input 
+                                 type="text" 
+                                 placeholder="Custom size..."
+                                 className="flex-1 text-[10px] border border-gray-100 rounded-lg px-2 py-1 bg-gray-50/50 outline-none focus:border-gray-300"
+                                 onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                       const val = (e.target as HTMLInputElement).value.trim().toUpperCase();
+                                       if (val && !(p.sizes || []).includes(val)) {
+                                          handleUpdateProduct(p.id, 'sizes', [...(p.sizes || []), val]);
+                                          (e.target as HTMLInputElement).value = '';
+                                       }
+                                    }
+                                 }}
+                               />
+                            </div>
                          </div>
                       </td>
                       <td className="p-6">
                          <div className="space-y-3">
                             <select
-                              value={(p.categories || []).find((c: string) => c !== 'new') || 'born'}
+                              value={(p.categories || []).find((c: string) => c !== 'new') || (config?.productCategories?.[0]?.id || 'born')}
                               onChange={(e) => {
                                 const otherCats = (p.categories || []).includes('new') ? ['new'] : [];
                                 handleUpdateProduct(p.id, 'categories', [...otherCats, e.target.value]);
                               }}
                               className="w-full bg-white border border-gray-200 rounded-lg px-2 py-2 text-[11px] font-bold text-gray-700 outline-none focus:ring-1 focus:ring-[var(--accent)]"
                             >
-                              <option value="born">🤱 Born (0-6)</option>
-                              <option value="baby">👶 Bayi (6-24)</option>
-                              <option value="toddler">🧸 Toddler (2-5)</option>
-                              <option value="boys">👦 Laki-Laki</option>
-                              <option value="girls">👧 Perempuan</option>
-                              <option value="accessories">🎒 Aksesoris</option>
-                              <option value="sale">🏷️ Diskon</option>
+                              {(config?.productCategories || [
+                                { id: 'born', name: '🤱 Born (0-6)' },
+                                { id: 'baby', name: '👶 Bayi (6-24)' },
+                                { id: 'toddler', name: '🧸 Toddler (2-5)' },
+                                { id: 'boys', name: '👦 Laki-Laki' },
+                                { id: 'girls', name: '👧 Perempuan' },
+                                { id: 'accessories', name: '🎒 Aksesoris' },
+                                { id: 'sale', name: '🏷️ Diskon' }
+                              ]).map((cat: any) => (
+                                <option key={cat.id} value={cat.id}>{cat.name}</option>
+                              ))}
                             </select>
                             <button 
                               onClick={() => {
@@ -393,6 +429,127 @@ export function AdminDashboard() {
                   </div>
                </div>
                
+                <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+                  <h2 className="text-xl font-bold mb-4 flex items-center justify-between">
+                     <span>📦 Kategori Produk</span>
+                     <button 
+                        onClick={() => {
+                           const newCats = [...(config.productCategories || [])];
+                           newCats.push({ id: 'kategori-' + Date.now(), name: '🏷️ Kategori Baru' });
+                           setConfig({...config, productCategories: newCats});
+                        }}
+                        className="p-2 bg-[var(--accent)] text-white rounded-lg hover:opacity-90"
+                     >
+                        <Plus className="w-4 h-4" />
+                     </button>
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     {(config.productCategories || []).map((cat: any, idx: number) => (
+                        <div key={idx} className="flex gap-2 items-center bg-gray-50 p-3 rounded-xl border border-gray-100">
+                           <div className="flex-1 space-y-2">
+                              <div>
+                                 <label className="text-[9px] font-black text-gray-400 uppercase">Nama & Emoji</label>
+                                 <input 
+                                    type="text" 
+                                    value={cat.name} 
+                                    onChange={(e) => {
+                                       const newCats = [...config.productCategories];
+                                       newCats[idx].name = e.target.value;
+                                       setConfig({...config, productCategories: newCats});
+                                    }}
+                                    className="w-full bg-white border border-gray-200 rounded-lg p-2 text-xs font-bold"
+                                 />
+                              </div>
+                              <div>
+                                 <label className="text-[9px] font-black text-gray-400 uppercase">Slug / ID (untuk filter URL)</label>
+                                 <input 
+                                    type="text" 
+                                    value={cat.id} 
+                                    onChange={(e) => {
+                                       const newCats = [...config.productCategories];
+                                       newCats[idx].id = e.target.value.toLowerCase().replace(/\s+/g, '-');
+                                       setConfig({...config, productCategories: newCats});
+                                    }}
+                                    className="w-full bg-white border border-gray-200 rounded-lg p-2 text-xs font-mono"
+                                 />
+                              </div>
+                           </div>
+                           <button 
+                              onClick={() => {
+                                 const newCats = config.productCategories.filter((_: any, i: number) => i !== idx);
+                                 setConfig({...config, productCategories: newCats});
+                              }}
+                              className="p-2 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                           >
+                              <Trash className="w-4 h-4" />
+                           </button>
+                        </div>
+                     ))}
+                  </div>
+                  {(config.productCategories || []).length === 0 && (
+                     <p className="text-center py-4 text-gray-400 text-sm">Belum ada kategori kustom. Gunakan tombol + untuk menambahkan.</p>
+                  )}
+               </div>
+
+               <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+                  <h2 className="text-xl font-bold mb-4 flex items-center justify-between">
+                     <span>🔗 Menu Navigasi</span>
+                     <button 
+                        onClick={() => {
+                           const newLinks = [...(config.navigation?.links || [])];
+                           newLinks.push({ label: 'MENU BARU', href: '/shop/all' });
+                           setConfig({...config, navigation: {...config.navigation, links: newLinks}});
+                        }}
+                        className="p-2 bg-[var(--accent)] text-white rounded-lg hover:opacity-90"
+                     >
+                        <Plus className="w-4 h-4" />
+                     </button>
+                  </h2>
+                  <div className="space-y-3">
+                     {(config.navigation?.links || []).map((link: any, idx: number) => (
+                        <div key={idx} className="flex gap-4 items-center bg-gray-50 p-4 rounded-xl border border-gray-100">
+                           <div className="flex-1 grid grid-cols-2 gap-4">
+                              <div>
+                                 <label className="text-[9px] font-black text-gray-400 uppercase">Label Menu</label>
+                                 <input 
+                                    type="text" 
+                                    value={link.label} 
+                                    onChange={(e) => {
+                                       const newLinks = [...config.navigation.links];
+                                       newLinks[idx].label = e.target.value.toUpperCase();
+                                       setConfig({...config, navigation: {...config.navigation, links: newLinks}});
+                                    }}
+                                    className="w-full bg-white border border-gray-200 rounded-lg p-2 text-xs font-black"
+                                 />
+                              </div>
+                              <div>
+                                 <label className="text-[9px] font-black text-gray-400 uppercase">Link (Href)</label>
+                                 <input 
+                                    type="text" 
+                                    value={link.href} 
+                                    onChange={(e) => {
+                                       const newLinks = [...config.navigation.links];
+                                       newLinks[idx].href = e.target.value;
+                                       setConfig({...config, navigation: {...config.navigation, links: newLinks}});
+                                    }}
+                                    className="w-full bg-white border border-gray-200 rounded-lg p-2 text-xs font-mono"
+                                 />
+                              </div>
+                           </div>
+                           <button 
+                              onClick={() => {
+                                 const newLinks = config.navigation.links.filter((_: any, i: number) => i !== idx);
+                                 setConfig({...config, navigation: {...config.navigation, links: newLinks}});
+                              }}
+                              className="p-2 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                           >
+                              <Trash className="w-4 h-4" />
+                           </button>
+                        </div>
+                     ))}
+                  </div>
+               </div>
+
                <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
                   <h2 className="text-xl font-bold mb-4">📱 WhatsApp & Social Media</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
