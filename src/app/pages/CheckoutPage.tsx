@@ -11,6 +11,12 @@ export function CheckoutPage() {
   const navigate = useNavigate();
   useMidtrans();
 
+  const { cart, subtotal, updateQuantity, removeFromCart, clearCart } = useCart();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [discount, setDiscount] = useState(0);
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+
   const [cities, setCities] = useState<any[]>([]);
   const [selectedCityId, setSelectedCityId] = useState('');
   const [shippingOptions, setShippingOptions] = useState<any[]>([]);
@@ -93,14 +99,15 @@ export function CheckoutPage() {
     }
   };
 
+  const roundedDiscount = Math.round(discount);
+
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (cart.length === 0) return;
     setIsSubmitting(true);
 
     const orderId = Date.now();
-    const roundedDiscount = Math.round(discount);
-    const shippingFee = selectedShipping?.cost[0].value || 0;
+    const shippingFee = selectedShipping?.cost?.[0]?.value || 0;
     const finalTotal = subtotal - roundedDiscount + shippingFee;
 
     const finalizeOrder = async (status: string) => {
@@ -341,8 +348,8 @@ export function CheckoutPage() {
                               <p className="text-[9px] text-gray-400 font-bold leading-tight">{opt.description}</p>
                             </div>
                             <div className="mt-4">
-                              <p className="text-sm font-black text-blue-600">Rp {opt.cost[0].value.toLocaleString()}</p>
-                              <p className="text-[9px] text-gray-400 font-medium">Estimasi: {opt.cost[0].etd} Hari</p>
+                              <p className="text-sm font-black text-blue-600">Rp {opt.cost?.[0]?.value?.toLocaleString() || '0'}</p>
+                              <p className="text-[9px] text-gray-400 font-medium">Estimasi: {opt.cost?.[0]?.etd || '-'} Hari</p>
                             </div>
                           </button>
                         ))}
@@ -393,7 +400,7 @@ export function CheckoutPage() {
                       <>
                         <div className="flex justify-between text-[11px] pt-3 border-t border-gray-50">
                            <span className="text-gray-400 font-bold uppercase tracking-widest">Total Sebelum Diskon</span>
-                           <span className="text-gray-400 line-through">Rp {(subtotal + (selectedShipping?.cost[0].value || 0)).toLocaleString()}</span>
+                           <span className="text-gray-400 line-through">Rp {(subtotal + (selectedShipping?.cost?.[0]?.value || 0)).toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between text-sm text-green-600 bg-green-50/50 p-2 rounded-lg border border-green-100/50">
                           <span className="font-black uppercase tracking-widest text-[10px] flex items-center gap-1"><Zap className="w-3 h-3" /> Potongan Kupon</span>
@@ -406,7 +413,7 @@ export function CheckoutPage() {
                           <span className="text-gray-900 font-bold uppercase tracking-tight text-[10px] block opacity-50">Total Pembayaran</span>
                           <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-md font-black italic">Midtrans Secure</span>
                        </div>
-                       <span className="text-3xl font-black text-[var(--accent)] tracking-tighter">Rp {(subtotal + (selectedShipping?.cost[0].value || 0) - roundedDiscount).toLocaleString()}</span>
+                       <span className="text-3xl font-black text-[var(--accent)] tracking-tighter">Rp {(subtotal + (selectedShipping?.cost?.[0]?.value || 0) - roundedDiscount).toLocaleString()}</span>
                     </div>
                  </div>
                  <button type="submit" form="order-form" disabled={isSubmitting} className="w-full bg-[var(--text-primary)] hover:bg-[var(--accent)] text-white py-6 rounded-3xl font-black text-xs uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3 shadow-2xl disabled:opacity-50">
