@@ -4,14 +4,8 @@ import { useEffect } from 'react';
  * Dynamically injects the correct Midtrans Snap.js script based on environment variables.
  *
  * Env Variables (set in Vercel or .env.local):
- *   VITE_MIDTRANS_CLIENT_KEY  → Your Client Key (Sandbox OR Production)
- *   VITE_MIDTRANS_IS_PRODUCTION → Set to "true" to use Production, default is Sandbox
- *
- * To switch Sandbox → Production:
- *   1. Go to Vercel → Settings → Environment Variables
- *   2. Change VITE_MIDTRANS_CLIENT_KEY to your Production Client Key (Mid-client-xxx)
- *   3. Change VITE_MIDTRANS_IS_PRODUCTION to "true"
- *   4. Redeploy
+ *   VITE_MIDTRANS_CLIENT_KEY     → Client Key (SB-Mid-client-... for Sandbox, Mid-client-... for Production)
+ *   VITE_MIDTRANS_IS_PRODUCTION  → "true" for Production endpoint, anything else = Sandbox
  */
 export function useMidtrans() {
   useEffect(() => {
@@ -19,17 +13,18 @@ export function useMidtrans() {
     const isProduction = import.meta.env.VITE_MIDTRANS_IS_PRODUCTION === 'true';
 
     if (!clientKey) {
-      console.warn('[Midtrans] VITE_MIDTRANS_CLIENT_KEY is not set. Payment popup will be disabled.');
+      console.warn('[Midtrans] VITE_MIDTRANS_CLIENT_KEY is not set. Payment popup disabled.');
       return;
     }
 
-    // Remove existing Snap script to prevent duplicates on hot reload
-    const existing = document.getElementById('midtrans-snap-script');
-    if (existing) existing.remove();
+    // Jika sudah ada, jangan load ulang
+    if (document.getElementById('midtrans-snap-script')) return;
 
     const snapUrl = isProduction
       ? 'https://app.midtrans.com/snap/snap.js'
       : 'https://app.sandbox.midtrans.com/snap/snap.js';
+
+    console.log('[Midtrans] Loading snap.js from:', snapUrl, '| Key:', clientKey.substring(0, 20) + '...');
 
     const script = document.createElement('script');
     script.id = 'midtrans-snap-script';
@@ -37,12 +32,15 @@ export function useMidtrans() {
     script.setAttribute('data-client-key', clientKey);
     script.async = true;
 
+    script.onload = () => {
+      console.log('[Midtrans] snap.js loaded successfully ✅');
+    };
+    script.onerror = () => {
+      console.error('[Midtrans] Failed to load snap.js ❌');
+    };
+
     document.head.appendChild(script);
 
-    return () => {
-      // Cleanup on unmount
-      const s = document.getElementById('midtrans-snap-script');
-      if (s) s.remove();
-    };
+    // Jangan remove saat unmount — snap perlu tetap ada
   }, []);
 }
