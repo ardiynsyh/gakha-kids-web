@@ -97,7 +97,34 @@ export function CheckoutPage() {
     };
 
     try {
-      // 1. Fetch token ke Serverless API
+      // Build item_details yang sesuai dengan gross_amount (Midtrans strict validation)
+      const midtransItems = [
+        // Produk dari keranjang
+        ...cart.map(c => ({
+          id: c.id.toString(),
+          price: Math.round(c.price),
+          quantity: c.quantity,
+          name: c.name.substring(0, 50)
+        })),
+        // Ongkos kirim
+        {
+          id: 'SHIPPING',
+          price: 15000,
+          quantity: 1,
+          name: 'Ongkos Kirim'
+        }
+      ];
+
+      // Tambahkan baris diskon jika ada (harga negatif)
+      if (discount > 0) {
+        midtransItems.push({
+          id: 'DISCOUNT',
+          price: -Math.round(discount),
+          quantity: 1,
+          name: 'Diskon Kupon'
+        });
+      }
+
       const res = await fetch('/api/midtrans', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -109,9 +136,7 @@ export function CheckoutPage() {
             phone: formData.whatsapp,
             shipping_address: { address: formData.address, city: formData.city }
           },
-          item_details: cart.map(c => ({
-             id: c.id, price: c.price, quantity: c.quantity, name: c.name
-          }))
+          item_details: midtransItems
         })
       });
 
