@@ -16,16 +16,30 @@ export function NewArrivals() {
     async function fetchProducts() {
       setIsLoading(true);
       try {
-        // Fetch ONLY products with 'new' category (starred products)
+        // 1. Fetch products that contains 'new' label in categories array
         const { data, error } = await supabase
           .from('products')
           .select('*')
           .contains('categories', ['new'])
-          .order('id', { ascending: false })
-          .limit(8);
+          .order('id', { ascending: false });
         
         if (error) throw error;
-        if (data) setProducts(data);
+
+        // 2. Extra safety: if no starred products, check for any 'new' string in categories
+        if (!data || data.length === 0) {
+           const { data: fallback } = await supabase
+            .from('products')
+            .select('*')
+            .order('id', { ascending: false });
+           
+           // If we have manual star selection, use it, otherwise show latest
+           if (fallback) {
+             const filtered = fallback.filter(p => (p.categories || []).includes('new'));
+             setProducts(filtered.slice(0, 8));
+           }
+        } else {
+           setProducts(data.slice(0, 8));
+        }
       } catch (e) {
         console.error("Fetch error:", e);
       } finally {
