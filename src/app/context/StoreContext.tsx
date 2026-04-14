@@ -23,7 +23,23 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         .single();
       
       if (data && data.config_data) {
-        setConfig(data.config_data);
+        setConfig({
+           ...localConfig,
+           ...data.config_data,
+           // Kunci ke list yang sesuai dengan Admin Dashboard secara permanen
+           productCategories: [
+             { id: 'all', name: 'SEMUA KATEGORI' },
+             { id: 'born', name: 'NEW BORN' },
+             { id: '0-6', name: '0-6 BULAN' },
+             { id: '6-12', name: '6-12 BULAN' },
+             { id: '1-5', name: '1-5 TAHUN' },
+             { id: '5-12', name: '5-12 TAHUN' },
+             { id: 'boys', name: 'ANAK LAKI-LAKI' },
+             { id: 'girls', name: 'ANAK PEREMPUAN' },
+             { id: 'baby', name: 'BAYI' },
+             { id: 'toddler', name: 'TODDLER' }
+           ]
+        });
       }
     } catch (e) {
       console.error('Error fetching config from cloud:', e);
