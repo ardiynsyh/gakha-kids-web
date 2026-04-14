@@ -212,7 +212,6 @@ export function NavigationBar() {
                                    className="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-[var(--bg-secondary)] hover:text-[var(--accent)] text-[13px] font-bold text-[var(--text-primary)] transition-all"
                                    onClick={() => setIsCategoryOpen(false)}
                                  >
-                                   <span className="text-lg leading-none">🏷️</span>
                                    <span className="flex-1">{cat.name}</span>
                                    <ArrowRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
                                  </Link>
