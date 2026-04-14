@@ -124,7 +124,7 @@ export function ShopPage() {
                           }}
                           className="w-full bg-white text-gray-900 py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors shadow-lg"
                         >
-                          <ShoppingBagIcon className="w-5 h-5" />
+                          <ShoppingBag className="w-5 h-5" />
                           <span className="font-medium">Lihat Detail</span>
                         </button>
                       </div>
@@ -151,7 +151,7 @@ export function ShopPage() {
           )})
         ) : (
           <div className="col-span-full py-16 text-center text-gray-500">
-            <ShoppingBagIcon className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+            <ShoppingBag className="w-12 h-12 mx-auto mb-4 text-gray-300" />
             <p>Maaf, produk untuk kategori ini belum tersedia.</p>
           </div>
         )}
