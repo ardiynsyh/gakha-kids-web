@@ -440,22 +440,62 @@ export function AdminDashboard() {
                          ))}
                       </div>
                       <div className="mt-6 pt-6 border-t border-white/10 space-y-4">
-                         <div className="flex justify-between items-end">
+                         {selectedOrder.status !== 'Shipped' ? (
+                           <div className="space-y-3">
+                              <label className="text-[10px] font-black uppercase text-gray-500">Masukkan Nomor Resi / AWB</label>
+                              <div className="flex gap-2">
+                                 <input 
+                                   id="tracking-input"
+                                   placeholder="Contoh: JNE12345678"
+                                   defaultValue={selectedOrder.tracking_number || ''}
+                                   className="flex-1 bg-white/5 border border-white/10 rounded-xl p-3 text-xs outline-none focus:border-[var(--accent)]"
+                                 />
+                                 <button 
+                                   onClick={async () => {
+                                      const resi = (document.getElementById('tracking-input') as HTMLInputElement).value;
+                                      if (!resi) return toast.error("Masukkan nomor resi dulu!");
+                                      
+                                      const { error } = await supabase.from('orders').update({ 
+                                         status: 'Shipped',
+                                         tracking_number: resi 
+                                      }).eq('id', selectedOrder.id);
+                                      
+                                      if (!error) {
+                                         setOrders(orders.map(o => o.id === selectedOrder.id ? { ...o, status: 'Shipped', tracking_number: resi } : o));
+                                         setSelectedOrder({ ...selectedOrder, status: 'Shipped', tracking_number: resi });
+                                         toast.success("Pesanan ditandai sebagai DIKIRIM!");
+                                      }
+                                   }}
+                                   className="bg-green-600 text-white px-4 rounded-xl font-bold text-[10px] uppercase hover:bg-green-700 transition-colors"
+                                 >
+                                    Kirim
+                                 </button>
+                              </div>
+                           </div>
+                         ) : (
+                           <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-2xl">
+                              <p className="text-[10px] font-black uppercase text-green-500 mb-1">Status: Dikirim</p>
+                              <p className="font-mono text-sm font-bold text-white">Resi: {selectedOrder.tracking_number}</p>
+                           </div>
+                         )}
+
+                         <div className="flex justify-between items-end mt-4">
                             <span className="text-[10px] font-black uppercase text-gray-400">Total Pembayaran</span>
                             <span className="text-2xl font-black text-[var(--accent)]">Rp {selectedOrder.total.toLocaleString()}</span>
                          </div>
-                         <div className="grid grid-cols-2 gap-2">
+
+                         <div className="grid grid-cols-2 gap-2 mt-4">
                             <button 
                               onClick={() => handleUpdateOrderStatus(selectedOrder.id, 'Processed')}
-                              className={`flex items-center justify-center p-3 rounded-xl transition-all ${selectedOrder.status === 'Processed' ? 'bg-green-600 text-white' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                              className={`flex items-center justify-center p-3 rounded-xl transition-all ${selectedOrder.status === 'Processed' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white/10 text-white hover:bg-white/20'}`}
                             >
-                               <CheckCircle className="w-5 h-5" />
+                               <CheckCircle className="w-5 h-5 mr-2" /> <span className="text-[10px] font-bold uppercase">Proses</span>
                             </button>
                             <button 
-                              onClick={() => handleUpdateOrderStatus(selectedOrder.id, 'Canceled')}
-                              className="bg-white/10 text-red-400 p-3 rounded-xl hover:bg-red-400/20 transition-all font-bold text-[10px] uppercase"
+                              onClick={() => handleUpdateOrderStatus(selectedOrder.id, 'Completed')}
+                              className={`flex items-center justify-center p-3 rounded-xl transition-all ${selectedOrder.status === 'Completed' ? 'bg-green-600 text-white' : 'bg-white/10 text-white hover:bg-white/20'}`}
                             >
-                               Hapus/Batal
+                               <CheckCircle className="w-5 h-5 mr-2" /> <span className="text-[10px] font-bold uppercase">Selesai</span>
                             </button>
                          </div>
                       </div>
