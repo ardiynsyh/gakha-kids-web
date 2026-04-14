@@ -219,7 +219,7 @@ export function NavigationBar() {
                                ))
                              )}
                              <div className="pt-2 mt-2 border-t border-[var(--border-color)]">
-                                <Link to="/shop" className="text-[10px] font-black text-[var(--accent)] uppercase tracking-widest text-center block py-2 hover:opacity-70">Lihat Semua Produk &rarr;</Link>
+                                <Link to="/shop/all" className="text-[10px] font-black text-[var(--accent)] uppercase tracking-widest text-center block py-2 hover:opacity-70">Lihat Semua Produk &rarr;</Link>
                              </div>
                           </div>
                        </div>
