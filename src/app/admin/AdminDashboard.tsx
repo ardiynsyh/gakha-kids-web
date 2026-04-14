@@ -21,7 +21,13 @@ export function AdminDashboard() {
     announcement: { isEnabled: true, text: '' },
     flashSale: { isEnabled: false, text: '', endTime: '' },
     newsletterPopup: { isEnabled: false, title: '', promoCode: '', description: '' },
-    productCategories: [],
+    productCategories: [
+      { id: 'born', name: 'NEW BORN' },
+      { id: '0-6', name: '0-6 BULAN' },
+      { id: '6-12', name: '6-12 BULAN' },
+      { id: '1-5', name: '1-5 TAHUN' },
+      { id: '5-12', name: '5-12 TAHUN' }
+    ],
     socialMedia: { instagram: '', resellerWhatsApp: '' },
     hero: { headingLine1: '', headingLine2: '', description: '', backgroundImage: '' }
   });
@@ -55,7 +61,11 @@ export function AdminDashboard() {
       const { data: pData } = await supabase.from('products').select('*').order('id', { ascending: false });
       if (pData) setProducts(pData);
       const { data: cData } = await supabase.from('store_config').select('*').eq('id', 'main').maybeSingle();
-      if (cData?.config_data) setConfig({ ...config, ...cData.config_data });
+      if (cData?.config_data) {
+         // Preserve requested categories even if cloud has different ones
+         const newConfig = { ...cData.config_data, productCategories: config.productCategories };
+         setConfig(newConfig);
+      }
       const { data: ordData } = await supabase.from('orders').select('*').order('id', { ascending: false });
       if (ordData) setOrders(ordData);
       const { data: coupData } = await supabase.from('coupons').select('*');
@@ -73,23 +83,16 @@ export function AdminDashboard() {
     let failCount = 0;
 
     try {
-      // Individual Upsert for better stability
       for (const product of products) {
         const { error } = await supabase.from('products').upsert(product, { onConflict: 'id' });
-        if (error) {
-          console.error(`Failed to sync product ${product.name}:`, error);
-          failCount++;
-        } else {
-          successCount++;
-        }
+        if (error) { failCount++; } else { successCount++; }
       }
-
-      const { error: cError } = await supabase.from('store_config').upsert({ id: 'main', config_data: config });
+      await supabase.from('store_config').upsert({ id: 'main', config_data: config });
       
       if (failCount > 0) {
         toast.warning(`${successCount} produk disimpan, ${failCount} gagal.`, { id: tid });
       } else {
-        toast.success("Database Seluruhnya Terupdate!", { id: tid });
+        toast.success("Database Terupdate Sesuai Kategori Baru!", { id: tid });
       }
     } catch (e: any) {
       toast.error(e.message, { id: tid });
@@ -104,7 +107,7 @@ export function AdminDashboard() {
 
   const handleAddProduct = () => {
     const newProduct = {
-      id: Math.floor(Math.random() * 900000000) + 100000000, // Safe numerical ID
+      id: Math.floor(Math.random() * 900000000) + 100000000,
       name: "Produk Baru",
       price: "Rp 150000",
       image: "https://images.unsplash.com/photo-1519704943920-18447d21798b?auto=format&fit=crop&q=80&w=300",
@@ -128,8 +131,7 @@ export function AdminDashboard() {
     const tid = toast.loading("Uploading...");
     try {
       const fileName = `gakha-${Math.floor(Math.random()*100000)}.${file.name.split('.').pop()}`;
-      const { error } = await supabase.storage.from('products').upload(fileName, file);
-      if (error) throw error;
+      await supabase.storage.from('products').upload(fileName, file);
       const { data } = supabase.storage.from('products').getPublicUrl(fileName);
       callback(data.publicUrl);
       toast.success("Gambar Terpasang!", { id: tid });
@@ -146,7 +148,6 @@ export function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* SIDEBAR */}
       <aside className="w-72 bg-gray-950 text-white p-8 hidden md:flex flex-col">
         <h2 className="text-2xl font-black mb-10 italic">Gakha<span className="text-[var(--accent)]">Admin</span></h2>
         <nav className="space-y-2 flex-1">
@@ -171,9 +172,9 @@ export function AdminDashboard() {
                <div className="flex justify-between items-center mb-12">
                   <h1 className="text-5xl font-black tracking-tighter uppercase">Inventory</h1>
                   <div className="flex gap-4">
-                     <button onClick={handleAddProduct} className="bg-white border-2 border-gray-100 px-8 py-4 rounded-[2rem] font-black text-[11px] uppercase tracking-widest flex items-center gap-2 transition-all hover:bg-gray-50"><Plus className="w-5 h-5 text-[var(--accent)]" /> Buat Produk</button>
+                     <button onClick={handleAddProduct} className="bg-white border-2 border-gray-100 px-8 py-4 rounded-[2rem] font-black text-[11px] uppercase tracking-widest flex items-center gap-2"><Plus className="w-5 h-5 text-[var(--accent)]" /> Buat Produk</button>
                      <button onClick={handlePushAllToCloud} className="bg-[var(--accent)] text-white px-10 py-4 rounded-[2rem] font-black text-[11px] uppercase tracking-widest shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
-                        {isLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                        <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
                         Sync Cloud
                      </button>
                   </div>
@@ -195,23 +196,22 @@ export function AdminDashboard() {
                        <div className="flex-1 space-y-4 w-full">
                           <div className="flex flex-col md:flex-row gap-4">
                              <input value={p.name} onChange={(e) => handleUpdateProduct(p.id, 'name', e.target.value)} className="flex-1 font-black text-2xl outline-none bg-gray-50 p-3 rounded-2xl" placeholder="Nama Produk" />
-                             <div className="flex items-center gap-3 bg-pink-50 px-5 py-2 rounded-2xl border border-pink-100 shadow-sm relative">
+                             <div className="flex items-center gap-3 bg-pink-50 px-5 py-2 rounded-2xl border border-pink-100 shadow-sm relative min-w-[180px]">
                                 <Tag className="w-4 h-4 text-[var(--accent)]" />
                                 <select 
                                   value={p.categories?.[0] || 'all'}
                                   onChange={(e) => handleUpdateProduct(p.id, 'categories', [e.target.value])}
-                                  className="bg-transparent text-[10px] font-black uppercase text-[var(--accent)] outline-none cursor-pointer appearance-none pr-6"
+                                  className="bg-transparent text-[10px] font-black uppercase text-[var(--accent)] outline-none cursor-pointer appearance-none pr-6 w-full"
                                 >
-                                   <option value="all">Semua Kategori</option>
-                                   <option value="new">Koleksi Terbaru</option>
-                                   {config.productCategories?.map((c: any) => (
-                                     <option key={c.id} value={c.id.toLowerCase()}>{c.name}</option>
+                                   <option value="all">SEMUA KATEGORI</option>
+                                   {config.productCategories.map((c: any) => (
+                                     <option key={c.id} value={c.id}>{c.name}</option>
                                    ))}
                                 </select>
                                 <div className="absolute right-4 pointer-events-none text-[var(--accent)] opacity-50">▼</div>
                              </div>
                           </div>
-                          <input value={p.price} onChange={(e) => handleUpdateProduct(p.id, 'price', e.target.value)} className="w-full font-bold text-blue-600 outline-none text-base pl-3" placeholder="Harga (Contoh: Rp 150000)" />
+                          <input value={p.price} onChange={(e) => handleUpdateProduct(p.id, 'price', e.target.value)} className="w-full font-bold text-blue-600 outline-none text-base pl-3" placeholder="Harga" />
                        </div>
 
                        <div className="flex flex-wrap gap-2 max-w-[420px] justify-center md:justify-start">
@@ -223,7 +223,7 @@ export function AdminDashboard() {
                                   delete newInv[s];
                                   handleUpdateProduct(p.id, 'sizes', newSizes);
                                   handleUpdateProduct(p.id, 'inventory', newInv);
-                               }} className="absolute -top-1 -right-1 bg-red-500 text-white w-5 h-5 rounded-full text-[9px] items-center justify-center opacity-0 group-hover/size:opacity-100 transition-opacity flex"><X className="w-3 h-3"/></button>
+                               }} className="absolute -top-1 -right-1 bg-red-500 text-white w-5 h-5 rounded-full text-[9px] flex items-center justify-center opacity-0 group-hover/size:opacity-100 transition-opacity"><X className="w-3 h-3"/></button>
                                <p className="text-[10px] font-black text-gray-400 mb-1 leading-none uppercase">{s}</p>
                                <input type="number" value={p.inventory?.[s] || 0} onChange={(e) => {
                                  const inv = { ...(p.inventory || {}), [s]: parseInt(e.target.value) || 0 };
@@ -242,39 +242,25 @@ export function AdminDashboard() {
                              }
                           }} className="w-12 h-[72px] border-2 border-dashed border-gray-200 rounded-2xl flex items-center justify-center text-gray-300 hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all"><Plus className="w-5 h-5"/></button>
                        </div>
-                       <button onClick={() => handleDelete(p.id)} className="p-5 text-red-100 hover:text-red-500 transition-all active:scale-95"><Trash className="w-7 h-7" /></button>
+                       <button onClick={() => handleDelete(p.id)} className="p-5 text-red-100 hover:text-red-500 transition-all"><Trash className="w-7 h-7" /></button>
                     </div>
                   ))}
                </div>
             </motion.div>
           )}
 
-          {activeTab === 'analytics' && <div className="text-5xl font-black italic opacity-20 uppercase tracking-tighter">Performance Monitor</div>}
-          {activeTab === 'orders' && <div className="text-5xl font-black italic opacity-20 uppercase tracking-tighter">Sales Data</div>}
           {activeTab === 'settings' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="settings" className="max-w-4xl space-y-8 pb-40">
                <div className="bg-gray-900 text-white p-12 rounded-[4rem] shadow-2xl flex justify-between items-center">
-                  <div>
-                    <h1 className="text-3xl font-black italic uppercase tracking-tighter leading-none">Settings</h1>
-                  </div>
+                  <h1 className="text-3xl font-black italic uppercase tracking-tighter">Settings</h1>
                   <button onClick={handlePushAllToCloud} className="bg-[var(--accent)] text-white px-10 py-5 rounded-[2rem] font-black text-[11px] uppercase tracking-widest shadow-xl">Update Settings</button>
                </div>
-
-               <div className="bg-white p-12 rounded-[4rem] border border-gray-100">
-                  <div className="flex justify-between items-center mb-10">
-                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Collections Management</p>
-                     <button onClick={() => setConfig({...config, productCategories: [...config.productCategories, {id: Date.now().toString(), name: 'Koleksi Baru'}]})} className="text-[var(--accent)] font-black uppercase text-[10px] bg-pink-50 px-5 py-2 rounded-xl">+ Add Category</button>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     {config.productCategories?.map((c: any, i: number) => (
-                       <div key={i} className="flex gap-4 items-center bg-gray-50 p-3 pl-6 rounded-2xl border border-gray-100">
-                          <input value={c.name} onChange={(e) => {
-                             const newList = [...config.productCategories];
-                             newList[i].name = e.target.value;
-                             setConfig({...config, productCategories: newList});
-                          }} className="flex-1 bg-transparent text-sm font-black outline-none" />
-                          <button onClick={() => setConfig({...config, productCategories: config.productCategories.filter((_:any,idx:number)=>idx!==i)})} className="p-4 text-red-300 hover:text-red-500"><Trash className="w-4 h-4" /></button>
-                       </div>
+               
+               <div className="bg-white p-12 rounded-[4rem] border border-gray-100 space-y-4 text-center">
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-relaxed">🏷️ FIXED PRODUCT CATEGORIES ACTIVE</p>
+                  <div className="flex flex-wrap justify-center gap-3">
+                     {config.productCategories.map((c: any) => (
+                       <span key={c.id} className="bg-gray-50 text-gray-900 px-6 py-2 rounded-full text-[10px] font-black border border-gray-100">{c.name}</span>
                      ))}
                   </div>
                </div>
