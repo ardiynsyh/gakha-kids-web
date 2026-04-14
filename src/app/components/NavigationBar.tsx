@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Heart, ShoppingBag, Menu, X, Moon, Sun } from 'lucide-react';
+import { Search, Heart, ShoppingBag, Menu, X, Moon, Sun, ChevronDown, ArrowRight } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import { Link, useNavigate } from 'react-router';
 import { useWishlist } from '../context/WishlistContext';
@@ -14,6 +14,8 @@ export function NavigationBar() {
   const { wishlist } = useWishlist();
   const { theme, toggleTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const [isMobileCategoryOpen, setIsMobileCategoryOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -171,6 +173,57 @@ export function NavigationBar() {
       {/* Bottom Menu Navigation */}
       <div className="hidden lg:flex items-center justify-center pb-6 pt-2">
          <div className="flex items-center space-x-10">
+            {/* Dynamic Categories Dropdown */}
+            <div 
+              className="relative group h-full"
+              onMouseEnter={() => setIsCategoryOpen(true)}
+              onMouseLeave={() => setIsCategoryOpen(false)}
+            >
+               <button className="flex items-center gap-1.5 text-[15px] font-black text-[var(--accent)] hover:opacity-80 transition-all uppercase tracking-tighter hover:scale-105 active:scale-95 group">
+                  <span className="bg-[var(--accent)]/10 px-3 py-1 rounded-full flex items-center gap-2">
+                    KATEGORI <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${isCategoryOpen ? 'rotate-180' : ''}`} />
+                  </span>
+               </button>
+
+               <AnimatePresence>
+                  {isCategoryOpen && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute top-full left-1/2 -translate-x-1/2 pt-4 w-64 z-[100]"
+                    >
+                       <div className="bg-[var(--bg-primary)] p-4 rounded-[2rem] shadow-2xl border border-[var(--border-color)] overflow-hidden">
+                          <div className="space-y-1">
+                             {(!config?.productCategories || config.productCategories.length === 0) ? (
+                               <div className="p-4 text-center">
+                                 <p className="text-[10px] font-bold text-gray-400 uppercase">Belum ada kategori</p>
+                                 <Link to="/admin" className="text-[9px] text-[var(--accent)] underline mt-1 block">Atur di Admin</Link>
+                               </div>
+                             ) : (
+                               config.productCategories.map((cat: any) => (
+                                 <Link 
+                                   key={cat.id} 
+                                   to={`/shop/${cat.id}`}
+                                   className="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-[var(--bg-secondary)] hover:text-[var(--accent)] text-[13px] font-bold text-[var(--text-primary)] transition-all"
+                                   onClick={() => setIsCategoryOpen(false)}
+                                 >
+                                   <span className="text-lg leading-none">{cat.name.split(' ')[0].length < 3 ? cat.name.split(' ')[0] : '🏷️'}</span>
+                                   <span className="flex-1">{cat.name.replace(/^[^\s]+\s/, '') || cat.name}</span>
+                                   <ArrowRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+                                 </Link>
+                               ))
+                             )}
+                             <div className="pt-2 mt-2 border-t border-[var(--border-color)]">
+                                <Link to="/shop" className="text-[10px] font-black text-[var(--accent)] uppercase tracking-widest text-center block py-2 hover:opacity-70">Lihat Semua Produk &rarr;</Link>
+                             </div>
+                          </div>
+                       </div>
+                    </motion.div>
+                  )}
+               </AnimatePresence>
+            </div>
+
             {config?.navigation?.links?.map((link: any, index: number) => (
               <Link key={index} to={link.href} className="flex items-center gap-1 text-[15px] font-black text-[var(--text-secondary)] hover:text-[var(--accent)] transition-all uppercase tracking-tighter hover:scale-105 active:scale-95">
                 {link.label}
@@ -189,6 +242,37 @@ export function NavigationBar() {
             className="lg:hidden border-t border-[var(--border-color)] bg-[var(--bg-primary)] overflow-hidden"
           >
             <div className="px-4 pt-2 pb-6 space-y-2">
+                {/* Mobile Categories Accordion */}
+                <div className="border-b border-[var(--border-color)]">
+                   <button 
+                    onClick={() => setIsMobileCategoryOpen(!isMobileCategoryOpen)}
+                    className="w-full flex justify-between items-center px-4 py-3.5 text-[13px] font-black text-[var(--text-primary)] uppercase"
+                   >
+                      KATEGORI <ChevronDown className={`w-4 h-4 transition-transform ${isMobileCategoryOpen ? 'rotate-180' : ''}`} />
+                   </button>
+                   <AnimatePresence>
+                      {isMobileCategoryOpen && (
+                        <motion.div 
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden bg-[var(--bg-secondary)]/50 rounded-2xl mx-1 mb-2"
+                        >
+                           {config?.productCategories?.map((cat: any) => (
+                             <Link 
+                               key={cat.id} 
+                               to={`/shop/${cat.id}`}
+                               className="block px-6 py-3 text-[12px] font-bold text-[var(--text-secondary)] border-b border-[var(--border-color)]/50 last:border-0"
+                               onClick={() => setIsMobileMenuOpen(false)}
+                             >
+                               {cat.name}
+                             </Link>
+                           ))}
+                        </motion.div>
+                      )}
+                   </AnimatePresence>
+                </div>
+
               {config?.navigation?.links?.map((link: any, index: number) => (
                   <Link 
                   key={index} 

@@ -162,6 +162,37 @@ export function AdminDashboard() {
     setProducts([newProduct, ...products]);
   };
 
+  const handlePushAllToCloud = async () => {
+    const confirmPush = window.confirm("Ini akan menyinkronkan seluruh data lokal ke cloud. Lanjutkan?");
+    if (!confirmPush) return;
+
+    setIsLoading(true);
+    const loadingToast = toast.loading("Menyinkronkan koleksi produk...");
+
+    try {
+      // Upsert all products to Supabase
+      const { error: productsError } = await supabase
+        .from('products')
+        .upsert(products, { onConflict: 'id' });
+
+      if (productsError) throw productsError;
+
+      // Upsert store config
+      const { error: configError } = await supabase
+        .from('store_config')
+        .upsert({ id: 'main', ...config });
+
+      if (configError) throw configError;
+
+      toast.success("Berhasil! Semua data kini tersinkron di Cloud.", { id: loadingToast });
+    } catch (error: any) {
+      console.error(error);
+      toast.error("Gagal sinkron: " + error.message, { id: loadingToast });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (isSyncing) return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center flex-col gap-4">
       <div className="w-16 h-16 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin"></div>
@@ -236,6 +267,13 @@ export function AdminDashboard() {
                 >
                   <Plus className="w-5 h-5" />
                   Tambah Produk
+                </button>
+                <button 
+                  onClick={handlePushAllToCloud}
+                  disabled={isLoading}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg active:scale-95 flex items-center gap-2"
+                >
+                  🚀 Push Semua ke Cloud
                 </button>
                 <button 
                   onClick={() => saveProducts()}

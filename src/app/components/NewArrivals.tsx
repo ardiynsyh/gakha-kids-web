@@ -14,14 +14,31 @@ export function NewArrivals() {
 
   useEffect(() => {
     async function fetchProducts() {
-      const { data } = await supabase
-        .from('products')
-        .select('*')
-        .contains('categories', ['new'])
-        .limit(8);
-      
-      if (data) setProducts(data);
-      setIsLoading(false);
+      setIsLoading(true);
+      try {
+        // 1. Try to fetch products with 'new' category
+        let { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .contains('categories', ['new'])
+          .limit(8);
+        
+        // 2. Fallback: If no 'new' products, just get the latest 8 products
+        if (!data || data.length === 0 || error) {
+          const { data: fallbackData } = await supabase
+            .from('products')
+            .select('*')
+            .order('id', { ascending: false })
+            .limit(8);
+          if (fallbackData) data = fallbackData;
+        }
+
+        if (data) setProducts(data);
+      } catch (e) {
+        console.error("Fetch error:", e);
+      } finally {
+        setIsLoading(false);
+      }
     }
     fetchProducts();
   }, []);
