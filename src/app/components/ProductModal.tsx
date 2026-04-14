@@ -152,23 +152,31 @@ export function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
                      <h4 className="text-[10px] font-black uppercase tracking-widest text-[var(--text-secondary)] mb-4">Pilih Ukuran Tersedia</h4>
                      <div className="flex flex-wrap gap-2">
                          {product.sizes?.map((size: string) => {
-                            const stock = product.inventory?.[size] ?? 0;
-                            const isOut = stock === 0;
-                            return (
-                               <button 
-                                  key={size} 
-                                  disabled={isOut}
-                                  onClick={() => setSelectedSize(size)}
-                                  className={`w-12 h-12 flex flex-col items-center justify-center border-2 rounded-xl font-bold transition-all relative ${
-                                    selectedSize === size ? 'border-[var(--accent)] text-[var(--accent)] bg-[var(--accent)]/5' : 
-                                    isOut ? 'opacity-30 cursor-not-allowed border-gray-100' : 'border-[var(--border-color)] hover:border-[var(--accent)]'
-                                  }`}
-                               >
-                                  <span className="text-sm">{size}</span>
-                                  <span className="text-[8px] font-black absolute -bottom-1 bg-white px-1">{stock}</span>
-                               </button>
-                            );
-                         })}
+                          const stock = product.inventory?.[size] ?? 0;
+                          const isOutOfStock = stock <= 0;
+                          return (
+                            <button
+                              key={size}
+                              disabled={isOutOfStock}
+                              onClick={() => setSelectedSize(size)}
+                              className={`relative px-4 py-2 rounded-xl border-2 font-black transition-all min-w-[60px] ${
+                                selectedSize === size
+                                  ? 'bg-black text-white border-black shadow-lg scale-105'
+                                  : isOutOfStock
+                                    ? 'bg-gray-50 text-gray-300 border-gray-100 opacity-40 cursor-not-allowed'
+                                    : 'bg-white text-gray-900 border-gray-100 hover:border-black'
+                              }`}
+                            >
+                              <span className="block text-sm">{size}</span>
+                              <span className={`text-[8px] uppercase tracking-tighter ${isOutOfStock ? 'text-red-400' : 'opacity-50'}`}>
+                                {isOutOfStock ? 'Habis' : `${stock} pcs`}
+                              </span>
+                              {selectedSize === size && (
+                                <motion.div layoutId="activeSize" className="absolute -top-1 -right-1 w-3 h-3 bg-[var(--accent)] rounded-full border-2 border-white" />
+                              )}
+                            </button>
+                          );
+                        })}
                      </div>
                   </div>
 
