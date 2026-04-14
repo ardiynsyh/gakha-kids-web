@@ -178,10 +178,17 @@ export function AdminDashboard() {
     setIsLoading(true);
     const loadingToast = toast.loading("Menyinkronkan koleksi produk...");
 
-    try {
+      // Upsert all products to Supabase with full data integrity
+      const formattedProducts = products.map(p => ({
+        ...p,
+        sizes: Array.isArray(p.sizes) ? p.sizes : [],
+        inventory: p.inventory || {},
+        categories: Array.isArray(p.categories) ? p.categories : []
+      }));
+
       const { error: productsError } = await supabase
         .from('products')
-        .upsert(products, { onConflict: 'id' });
+        .upsert(formattedProducts, { onConflict: 'id' });
 
       if (productsError) throw productsError;
 
