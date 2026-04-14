@@ -38,11 +38,19 @@ export function CheckoutPage() {
   // Fetch Cities on Mount
   useEffect(() => {
     fetch('/api/shipping?type=cities')
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) setCities(data);
+      .then(async (res) => {
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setCities(data);
+        } else {
+          console.error("API Shipping Error (Not an array):", data);
+          toast.error("Gagal memuat daftar kota. Cek API Key RajaOngkir di Vercel.");
+        }
       })
-      .catch(err => console.error("Error fetching cities:", err));
+      .catch(err => {
+        console.error("Error fetching cities:", err);
+        toast.error("Koneksi ke sistem ongkir terputus.");
+      });
   }, []);
 
   // Fetch Shipping Costs when City/Weight changes

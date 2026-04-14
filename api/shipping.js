@@ -1,4 +1,4 @@
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+// Menggunakan native fetch (Node.js 18+)
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -20,10 +20,15 @@ export default async function handler(req, res) {
     const { type } = req.query;
 
     if (req.method === 'GET' && type === 'cities') {
-      const response = await fetch('https://api.rajaongkir.com/starter/city', {
+      const resp = await fetch('https://api.rajaongkir.com/starter/city', {
         headers: { 'key': apiKey }
       });
-      const data = await response.json();
+      const data = await resp.json();
+      
+      if (data.rajaongkir?.status?.code !== 200) {
+        return res.status(data.rajaongkir?.status?.code || 500).json(data.rajaongkir?.status || { description: 'Unknown Error' });
+      }
+      
       return res.status(200).json(data.rajaongkir.results);
     }
 
