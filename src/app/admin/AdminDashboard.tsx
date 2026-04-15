@@ -241,7 +241,16 @@ export function AdminDashboard() {
 
   const currentStats = getFilteredOrders();
   const totalRevenue = currentStats.reduce((acc, o) => acc + (o.total || 0), 0);
-  const totalShipping = currentStats.reduce((acc, o) => acc + (o.shipping_fee || 0), 0);
+  
+  // Smart Fallback for Shipping Fee: If missing, calculate from (Total - Subtotal Items)
+  const totalShipping = currentStats.reduce((acc, o) => {
+    if (o.shipping_fee && o.shipping_fee > 0) return acc + o.shipping_fee;
+    // Fallback calculation
+    const itemsSubtotal = Array.isArray(o.items) ? o.items.reduce((sum: number, it: any) => sum + (it.price * it.quantity), 0) : o.total;
+    const calculatedShipping = o.total - itemsSubtotal;
+    return acc + (calculatedShipping > 0 ? calculatedShipping : 0);
+  }, 0);
+
   const productRevenue = totalRevenue - totalShipping;
   const totalItemsSold = currentStats.reduce((acc, o) => {
     return acc + (Array.isArray(o.items) ? o.items.reduce((sum: number, it: any) => sum + (it.quantity || 0), 0) : 0);
