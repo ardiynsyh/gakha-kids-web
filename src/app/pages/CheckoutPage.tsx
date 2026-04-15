@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { INDONESIA_CITIES } from '../../data/indonesiaCities';
 import { useCart } from '../context/CartContext';
 import { ShoppingBag, Trash2, Plus, Minus, ArrowRight, CreditCard, Truck, ShieldCheck, Ticket, Zap } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
@@ -35,22 +36,28 @@ export function CheckoutPage() {
   // Calculate Total Weight
   const totalWeight = cart.reduce((acc, item) => acc + ( (item as any).weight || 200 ) * item.quantity, 0);
 
-  // Fetch Cities on Mount
+  // Load cities: gunakan data statis dulu, coba API di background
+  const hasFetchedCities = useRef(false);
   useEffect(() => {
+    if (hasFetchedCities.current) return;
+    hasFetchedCities.current = true;
+
+    // Tampilkan data statis bundled langsung (selalu berhasil)
+    setCities(INDONESIA_CITIES);
+
+    // Coba upgrade ke live API di background (jika API key sudah diset di Vercel)
     fetch('/api/shipping?type=cities')
       .then(async (res) => {
         const data = await res.json();
-        if (Array.isArray(data)) {
+        if (Array.isArray(data) && data.length > 0) {
+          // Upgrade ke full list dari API jika berhasil
           setCities(data);
-        } else {
-          console.error("API Shipping Error:", data);
-          const errorMsg = data.description || data.error || "Gagal memuat daftar kota (Cek API Key)";
-          toast.error(errorMsg);
         }
+        // Jika API gagal, biarkan data statis yang tampil (sudah di-set di atas)
       })
-      .catch(err => {
-        console.error("Error fetching cities:", err);
-        toast.error("Koneksi ke sistem ongkir terputus.");
+      .catch(() => {
+        // Silent fail - data statis sudah tampil
+        console.warn('RajaOngkir API tidak tersedia, menggunakan data kota lokal.');
       });
   }, []);
 
