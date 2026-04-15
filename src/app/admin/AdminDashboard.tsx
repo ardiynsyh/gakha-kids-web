@@ -127,6 +127,23 @@ export function AdminDashboard() {
     }
   };
 
+  const applyGakhaBranding = () => {
+    const gakhaDefaults = {
+      announcement: { isEnabled: true, text: 'GAKHA MARKET: FOOTBALL CULTURE & TERRACE WEAR — BELANJA SEKARANG!' },
+      hero: { 
+        headingLine1: 'GAKHA MARKET', 
+        headingLine2: 'FOOTBALL CULTURE', 
+        description: 'Premium Terrace Wear for the Identity and Pride of Indonesia.', 
+        backgroundImage: '' 
+      },
+      featuredTitle: 'CURATED SELECTION',
+      featuredDescription: 'Produk pilihan terbaik GAKHA Market. Identitas dan karakter teras tribun.',
+      socialMedia: { instagram: 'gakha.official', resellerWhatsApp: config.socialMedia?.resellerWhatsApp || '628123456789' }
+    };
+    setConfig({ ...config, ...gakhaDefaults });
+    toast.success("Teks Branding GAKHA Terpasang! Jangan lupa klik Simpan Pengaturan.");
+  };
+
   const handleSaveConfig = async () => {
     setIsLoading(true);
     const tid = toast.loading("Menyimpan Pengaturan...");
@@ -612,7 +629,10 @@ export function AdminDashboard() {
                   <h1 className="text-3xl font-black italic uppercase tracking-tighter mb-1">Konfigurasi Toko</h1>
                   <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest">Atur Tampilan Halaman Utama</p>
                 </div>
-                <button onClick={handleSaveConfig} className="bg-[var(--accent)] text-white px-8 py-4 rounded-xl font-black text-[11px] uppercase tracking-widest shadow-lg relative z-10 hover:scale-105 transition-all">Simpan Pengaturan</button>
+                <div className="flex gap-4 relative z-10">
+                   <button onClick={applyGakhaBranding} className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-6 py-4 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all ring-1 ring-white/10">Sinkronisasi Branding GAKHA</button>
+                   <button onClick={handleSaveConfig} className="bg-[var(--accent)] text-white px-8 py-4 rounded-xl font-black text-[11px] uppercase tracking-widest shadow-lg hover:scale-105 transition-all">Simpan Pengaturan</button>
+                </div>
                 <Settings className="absolute -bottom-10 -right-4 w-40 h-40 opacity-5 rotate-12" />
               </div>
 
