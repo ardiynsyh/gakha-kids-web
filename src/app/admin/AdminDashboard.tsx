@@ -716,6 +716,7 @@ export function AdminDashboard() {
               </div>
               <div className="flex gap-4">
                 <button onClick={() => setIsAddingCoupon(false)} className="flex-1 py-4 font-black uppercase text-[10px] text-gray-400 hover:bg-gray-50 rounded-xl">Batal</button>
+                <button onClick={() => {
                   const c = (document.getElementById('ccode') as HTMLInputElement).value;
                   const v = (document.getElementById('cval') as HTMLInputElement).value;
                   const e = (document.getElementById('cexp') as HTMLInputElement).value;
