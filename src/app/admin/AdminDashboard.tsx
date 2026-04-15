@@ -35,6 +35,8 @@ export function AdminDashboard() {
       { id: 'accessories', name: 'AKSESORIS' }
     ],
     featuredProducts: [], // Array of product IDs to show on home
+    featuredTitle: 'Pilihan Koleksi Utama',
+    featuredDescription: 'Kurasi produk terbaik GAKHA Market pilihan tim kami. Mulai dari Football Culture hingga Regional Series.',
     socialMedia: { instagram: 'gakha.official', resellerWhatsApp: '628123456789' },
     hero: { headingLine1: 'GAKHA', headingLine2: 'FOOTBALL CULTURE', description: 'Premium Terrace Wear for the Culture', backgroundImage: '' }
   });
@@ -639,6 +641,17 @@ export function AdminDashboard() {
                     <p className="text-[9px] text-gray-400 font-bold uppercase mt-1 tracking-widest">Pilih Produk yang akan tampil di Section Unggulan</p>
                   </div>
                   <span className="bg-amber-100 text-amber-600 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">{config.featuredProducts?.length || 0} Terpilih</span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Judul Seksi Kurasi</label>
+                    <input value={config.featuredTitle} onChange={(e) => setConfig({ ...config, featuredTitle: e.target.value })} className="w-full bg-gray-50 border border-gray-100 p-4 rounded-xl font-black text-[#003300] outline-none" placeholder="Contoh: UNGGULAN MINGGU INI" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Deskripsi Seksi</label>
+                    <input value={config.featuredDescription} onChange={(e) => setConfig({ ...config, featuredDescription: e.target.value })} className="w-full bg-gray-50 border border-gray-100 p-4 rounded-xl font-bold text-gray-500 text-sm outline-none" placeholder="Kalimat ajakan beli..." />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 overflow-y-auto max-h-[400px] p-2 custom-scrollbar">

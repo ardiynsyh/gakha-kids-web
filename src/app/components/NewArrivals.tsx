@@ -118,10 +118,10 @@ export function NewArrivals() {
              Your Terrace Identity
           </span>
           <h3 className="text-[clamp(2.5rem,6vw,4.5rem)] font-black text-[#001a00] leading-tight tracking-tight relative z-10 mt-6">
-            Pilihan <span className="text-[#2e7d32]">Koleksi Utama</span>
+            {config.featuredTitle || 'Pilihan Koleksi Utama'}
           </h3>
           <p className="text-[#003300]/60 mt-5 max-w-md mx-auto text-sm leading-relaxed font-medium">
-            Kurasi produk terbaik GAKHA Market pilihan tim kami. Mulai dari Football Culture hingga Regional Series.
+            {config.featuredDescription || 'Kurasi produk terbaik GAKHA Market pilihan tim kami.'}
           </p>
         </motion.div>
 
