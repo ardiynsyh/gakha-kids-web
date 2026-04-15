@@ -503,10 +503,12 @@ export function AdminDashboard() {
                 <table className="w-full text-left">
                   <thead className="bg-gray-50 text-[10px] uppercase font-black tracking-[0.2em] text-gray-400">
                     <tr className="border-b border-gray-100">
-                      <th className="p-6 pl-8">ID Pesanan</th>
+                      <th className="p-6">ID Pesanan</th>
                       <th className="p-6">Pembeli</th>
-                      <th className="p-6">Nominal</th>
-                      <th className="p-6">No. Resi (AWB)</th>
+                      <th className="p-6">Produk</th>
+                      <th className="p-6">Ongkir</th>
+                      <th className="p-6">Total</th>
+                      <th className="p-6">No. Resi</th>
                       <th className="p-6">Status</th>
                       <th className="p-6">Aksi</th>
                     </tr>
@@ -522,9 +524,11 @@ export function AdminDashboard() {
                     ) : (
                       filteredOrders.map(o => (
                         <tr key={o.id} className="hover:bg-gray-50/50 transition-all border-b border-gray-50">
-                          <td className="p-6 pl-8 font-mono font-bold text-gray-400">#{o.id.toString().slice(-6)}</td>
+                          <td className="p-6 font-mono font-bold text-gray-400">#{o.id.toString().slice(-6)}</td>
                           <td className="p-6 font-black text-gray-900 uppercase">{o.customer_name}</td>
-                          <td className="p-6 font-black text-[var(--accent)]">Rp {o.total.toLocaleString()}</td>
+                          <td className="p-6 font-bold text-gray-700">Rp {(o.total - (o.shipping_fee || 0)).toLocaleString()}</td>
+                          <td className="p-6 font-bold text-[#2e7d32]">Rp {(o.shipping_fee || 0).toLocaleString()}</td>
+                          <td className="p-6 font-black text-blue-600">Rp {o.total.toLocaleString()}</td>
                           <td className="p-6 font-bold text-gray-400">{o.tracking_number || '-'}</td>
                           <td className="p-6">
                             <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest ${
