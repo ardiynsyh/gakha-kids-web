@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { HeroBanner } from '../components/HeroBanner';
 import { Features } from '../components/Features';
-import { TopDeals } from '../components/TopDeals';
 import { NewArrivals } from '../components/NewArrivals';
 import { Testimonials } from '../components/Testimonials';
 import { TribalCulture } from '../components/TribalCulture';
@@ -134,7 +133,6 @@ export function HomePage() {
       <Features />
       <NewArrivals />
       <TribalCulture />
-      <TopDeals />
     </div>
   );
 }
