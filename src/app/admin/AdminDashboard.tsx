@@ -124,16 +124,34 @@ export function AdminDashboard() {
     }
   };
 
+  const handleSaveConfig = async () => {
+    setIsLoading(true);
+    const tid = toast.loading("Menyimpan Pengaturan...");
+    try {
+      const { error } = await supabase.from('store_config').upsert({ id: 'main', config_data: config }, { onConflict: 'id' });
+      if (error) throw error;
+      toast.success("Pengaturan Toko Berhasil Diperbarui!", { id: tid });
+    } catch (e: any) { 
+      console.error(e);
+      toast.error(`Gagal Simpan: ${e.message}`, { id: tid }); 
+    }
+    setIsLoading(false);
+  };
+
   const handlePushAllToCloud = async () => {
     setIsLoading(true);
-    const tid = toast.loading("Sinkronisasi Cloud...");
+    const tid = toast.loading("Sinkronisasi Produk ke Cloud...");
     try {
+      // Hanya sinkron produk
       for (const product of products) {
-        await supabase.from('products').upsert(product, { onConflict: 'id' });
+        const { error } = await supabase.from('products').upsert(product, { onConflict: 'id' });
+        if (error) throw error;
       }
-      await supabase.from('store_config').upsert({ id: 'main', config_data: config });
-      toast.success("Database Tersimpan Rapi!", { id: tid });
-    } catch (e: any) { toast.error(`Error: ${e.message}`, { id: tid }); }
+      toast.success("Daftar Produk Berhasil Tersimpan!", { id: tid });
+    } catch (e: any) { 
+      console.error(e);
+      toast.error(`Sync Gagal: ${e.message}`, { id: tid }); 
+    }
     setIsLoading(false);
   };
 
@@ -591,7 +609,7 @@ export function AdminDashboard() {
                   <h1 className="text-3xl font-black italic uppercase tracking-tighter mb-1">Konfigurasi Toko</h1>
                   <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest">Atur Tampilan Halaman Utama</p>
                 </div>
-                <button onClick={handlePushAllToCloud} className="bg-[var(--accent)] text-white px-8 py-4 rounded-xl font-black text-[11px] uppercase tracking-widest shadow-lg relative z-10 hover:scale-105 transition-all">Simpan Pengaturan</button>
+                <button onClick={handleSaveConfig} className="bg-[var(--accent)] text-white px-8 py-4 rounded-xl font-black text-[11px] uppercase tracking-widest shadow-lg relative z-10 hover:scale-105 transition-all">Simpan Pengaturan</button>
                 <Settings className="absolute -bottom-10 -right-4 w-40 h-40 opacity-5 rotate-12" />
               </div>
 
@@ -665,14 +683,32 @@ export function AdminDashboard() {
               </div>
               <div className="flex gap-4">
                 <button onClick={() => setIsAddingCoupon(false)} className="flex-1 py-4 font-black uppercase text-[10px] text-gray-400 hover:bg-gray-50 rounded-xl">Batal</button>
-                <button onClick={() => {
                   const c = (document.getElementById('ccode') as HTMLInputElement).value;
                   const v = (document.getElementById('cval') as HTMLInputElement).value;
                   const e = (document.getElementById('cexp') as HTMLInputElement).value;
                   if (c && v) {
-                    supabase.from('coupons').insert([{ id: Date.now(), code: c.toUpperCase(), value: parseInt(v), expiry_date: e || null }]).then(() => { fetchData(); setIsAddingCoupon(false); toast.success("Kupon Dibuat!"); });
+                    setIsLoading(true);
+                    const tid = toast.loading("Memvalidasi Kupon...");
+                    supabase.from('coupons')
+                      .insert([{ 
+                        code: c.toUpperCase(), 
+                        value: parseInt(v), 
+                        expiry_date: e || null 
+                      }])
+                      .then(({ error }) => {
+                        setIsLoading(false);
+                        if (error) {
+                          toast.error(`Gagal: ${error.message}`, { id: tid });
+                        } else {
+                          fetchData();
+                          setIsAddingCoupon(false);
+                          toast.success("Kupon Baru Berhasil Dibuat!", { id: tid });
+                        }
+                      });
+                  } else {
+                    toast.error("Kode dan Nilai Kupon wajib diisi!");
                   }
-                }} className="flex-1 bg-[var(--accent)] text-white py-4 rounded-xl font-black uppercase tracking-widest text-[11px] shadow-lg border border-pink-500 hover:scale-105 transition-all">Simpan Kupon</button>
+                }} className="flex-1 bg-[#003300] text-white py-4 rounded-xl font-black uppercase tracking-widest text-[11px] shadow-lg hover:scale-105 transition-all">Simpan Kupon</button>
               </div>
             </motion.div>
           </div>
