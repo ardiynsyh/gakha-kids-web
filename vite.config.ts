@@ -109,6 +109,81 @@ export default defineConfig({
           }
         });
 
+        server.middlewares.use('/api/shipping', async (req, res, next) => {
+          const rajaongkirKey = process.env.RAJAONGKIR_API_KEY;
+          if (!rajaongkirKey) {
+            res.statusCode = 500;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ error: 'RAJAONGKIR_API_KEY belum diset di .env.local' }));
+            return;
+          }
+
+          const url = new URL(req.url!, `http://localhost`);
+          const type = url.searchParams.get('type');
+
+          if (req.method === 'GET' && type === 'cities') {
+            try {
+              const resp = await fetch('https://api.rajaongkir.com/starter/city', {
+                headers: { 'key': rajaongkirKey }
+              });
+              const data = await resp.json();
+              res.setHeader('Content-Type', 'application/json');
+              if (data.rajaongkir?.status?.code !== 200) {
+                res.statusCode = data.rajaongkir?.status?.code || 500;
+                res.end(JSON.stringify(data.rajaongkir?.status || { description: 'Unknown Error' }));
+              } else {
+                res.statusCode = 200;
+                res.end(JSON.stringify(data.rajaongkir.results));
+              }
+            } catch (e) {
+              res.statusCode = 500;
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ error: String(e) }));
+            }
+            return;
+          }
+
+          if (req.method === 'POST') {
+            let body = '';
+            req.on('data', chunk => { body += chunk.toString(); });
+            req.on('end', async () => {
+              try {
+                const { origin, destination, weight } = JSON.parse(body);
+                const couriers = ['jne', 'pos', 'tiki'];
+                const fetchCosts = couriers.map(async (courier) => {
+                  const response = await fetch('https://api.rajaongkir.com/starter/cost', {
+                    method: 'POST',
+                    headers: { 'key': rajaongkirKey, 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ origin, destination, weight, courier })
+                  });
+                  const d = await response.json();
+                  if (d.rajaongkir.status.code === 200) {
+                    return d.rajaongkir.results[0].costs.map((c: any) => ({
+                      ...c,
+                      courier_name: d.rajaongkir.results[0].name,
+                      courier_code: d.rajaongkir.results[0].code
+                    }));
+                  }
+                  return [];
+                });
+                const allResults = await Promise.all(fetchCosts);
+                res.setHeader('Content-Type', 'application/json');
+                res.statusCode = 200;
+                res.end(JSON.stringify(allResults.flat()));
+              } catch (e) {
+                res.statusCode = 500;
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify({ error: String(e) }));
+              }
+            });
+            return;
+          }
+
+          res.statusCode = 405;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ error: 'Method not allowed' }));
+        });
+
         server.middlewares.use('/api/midtrans', async (req, res, next) => {
           if (req.method === 'POST') {
             let body = '';
