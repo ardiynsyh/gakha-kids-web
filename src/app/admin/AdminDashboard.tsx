@@ -21,30 +21,21 @@ export function AdminDashboard() {
   const [isAddingSize, setIsAddingSize] = useState<any>(null);
   const [isAddingCoupon, setIsAddingCoupon] = useState(false);
   const [orderStatusFilter, setOrderStatusFilter] = useState<'all' | 'Completed' | 'Pending' | 'Refund Requested'>('all');
+  const [timeFilter, setTimeFilter] = useState<'day' | 'month' | 'year'>('month');
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
   const [config, setConfig] = useState<any>({
     announcement: { isEnabled: true, text: '' },
     productCategories: [
       { id: 'all', name: 'SEMUA KATEGORI' },
       { id: 'new', name: 'NEW DROP' },
+      { id: 'football', name: 'FOOTBALL CULTURE' },
+      { id: 'regional', name: 'REGIONAL SERIES' },
       { id: 'sale', name: 'PENAWARAN SPESIAL' },
-      { id: 'casuals', name: 'KOLEKSI CASUALS' },
-      { id: 'terrace', name: 'TERRACE WEAR' },
-      { id: 'accessories', name: 'AKSESORIS/SCARF' },
-      { id: 'jakarta', name: 'CITY: JAKARTA' },
-      { id: 'bandung', name: 'CITY: BANDUNG' },
-      { id: 'surabaya', name: 'CITY: SURABAYA' },
-      { id: 'malang', name: 'CITY: MALANG' },
-      { id: 'bali', name: 'CITY: BALI' },
-      { id: 'sleman', name: 'CITY: SLEMAN' },
-      { id: 'solo', name: 'CITY: SOLO' },
-      { id: 'semarang', name: 'CITY: SEMARANG' },
-      { id: 'medan', name: 'CITY: MEDAN' },
-      { id: 'jayapura', name: 'CITY: JAYAPURA' },
-      { id: 'samarinda', name: 'CITY: SAMARINDA' }
+      { id: 'accessories', name: 'AKSESORIS' }
     ],
-    socialMedia: { instagram: '', resellerWhatsApp: '' },
-    hero: { headingLine1: '', headingLine2: '', description: '', backgroundImage: '' }
+    socialMedia: { instagram: 'gakha.official', resellerWhatsApp: '628123456789' },
+    hero: { headingLine1: 'GAKHA', headingLine2: 'FOOTBALL CULTURE', description: 'Premium Terrace Wear for the Culture', backgroundImage: '' }
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isSyncing, setIsSyncing] = useState(true);
@@ -158,8 +149,8 @@ export function AdminDashboard() {
       originalPrice: "",
       image: "https://images.unsplash.com/photo-1540855513560-112df639c947?auto=format&fit=crop&q=80&w=300",
       categories: [selectedCategory === 'all' ? 'new' : selectedCategory],
-      sizes: ["S", "M", "L"],
-      inventory: { "S": 10, "M": 10, "L": 10 },
+      sizes: ["S", "M", "L", "XL", "XXL"],
+      inventory: { "S": 10, "M": 10, "L": 10, "XL": 10, "XXL": 10 },
       weight: 200
     };
     setProducts([newProduct, ...products]);
@@ -232,11 +223,34 @@ export function AdminDashboard() {
     }
   };
 
-  // Derived Data
+  // ─── Marketplace Analytics Logic ───────────────────────────────────────────
+  const getFilteredOrders = () => {
+    return orders.filter(o => {
+      const oDate = new Date(o.created_at);
+      const sDate = new Date(selectedDate);
+      
+      if (timeFilter === 'day') {
+        return oDate.toDateString() === sDate.toDateString();
+      } else if (timeFilter === 'month') {
+        return oDate.getMonth() === sDate.getMonth() && oDate.getFullYear() === sDate.getFullYear();
+      } else {
+        return oDate.getFullYear() === sDate.getFullYear();
+      }
+    }).filter(o => o.status === 'Completed');
+  };
+
+  const currentStats = getFilteredOrders();
+  const totalRevenue = currentStats.reduce((acc, o) => acc + (o.total || 0), 0);
+  const totalShipping = currentStats.reduce((acc, o) => acc + (o.shipping_fee || 0), 0);
+  const productRevenue = totalRevenue - totalShipping;
+  const totalItemsSold = currentStats.reduce((acc, o) => {
+    return acc + (Array.isArray(o.items) ? o.items.reduce((sum: number, it: any) => sum + (it.quantity || 0), 0) : 0);
+  }, 0);
+
+  // Filtered lists for the tables
   const filteredProducts = products.filter(p => selectedCategory === 'all' || p.categories?.includes(selectedCategory));
   const filteredOrders = orders.filter(o => orderStatusFilter === 'all' || o.status === orderStatusFilter);
-  const dailyRecap = orders.filter(o => new Date(o.created_at).toDateString() === new Date().toDateString() && o.status === 'Completed').reduce((acc, o) => acc + (o.total || 0), 0);
-  const monthlyRecap = orders.filter(o => new Date(o.created_at).getMonth() === new Date().getMonth() && o.status === 'Completed').reduce((acc, o) => acc + (o.total || 0), 0);
+
   const bestSellers = [...products].sort((a, b) => (b.sold || 0) - (a.sold || 0)).slice(0, 3);
 
   if (isSyncing) return (
@@ -251,8 +265,8 @@ export function AdminDashboard() {
       {/* SIDEBAR */}
       <aside className="w-24 lg:w-72 bg-gray-950 text-white p-6 lg:p-8 flex flex-col flex-shrink-0 transition-all z-10 shadow-2xl">
         <div className="flex items-center gap-3 mb-16 justify-center lg:justify-start">
-          <div className="w-12 h-12 bg-gradient-to-br from-[var(--accent)] to-pink-600 rounded-2xl flex items-center justify-center text-3xl font-black shadow-lg shadow-pink-500/30">G</div>
-          <h2 className="text-2xl font-black italic tracking-tighter hidden lg:block">Gakha<span className="text-[var(--accent)]">Admin</span></h2>
+          <div className="w-12 h-12 bg-[#2e7d32] border border-white/20 text-white flex items-center justify-center text-3xl font-black shadow-xl italic">G</div>
+          <h2 className="text-2xl font-black italic tracking-tighter hidden lg:block uppercase">Gakha<span className="text-[#2e7d32]">Market</span></h2>
         </div>
         <nav className="space-y-3 flex-1">
           {[
@@ -262,7 +276,7 @@ export function AdminDashboard() {
             { id: 'coupons', label: 'Kode Kupon', icon: <Zap className="w-5 h-5" /> },
             { id: 'settings', label: 'Seting Toko', icon: <Settings className="w-5 h-5" /> },
           ].map(tab => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all relative group ${activeTab === tab.id ? 'bg-[var(--accent)] text-white shadow-lg shadow-pink-500/20' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}>
+            <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all relative group ${activeTab === tab.id ? 'bg-[#2e7d32] text-white shadow-lg' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}>
               {tab.icon} <span className="font-bold text-[11px] uppercase tracking-widest hidden lg:block">{tab.label}</span>
               {activeTab === tab.id && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-8 bg-white rounded-r-full hidden lg:block" />}
             </button>
@@ -280,28 +294,52 @@ export function AdminDashboard() {
           {/* TAB: MONITOR */}
           {activeTab === 'analytics' && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key="analytics" className="p-8 lg:p-12">
-              <div className="flex justify-between items-end mb-12">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
                 <div>
-                  <h1 className="text-4xl font-black tracking-tighter uppercase italic leading-none">Monitor Dashboard</h1>
-                  <p className="text-gray-400 font-bold mb-0 mt-2 uppercase text-[10px] tracking-widest">Pantauan Data Real-Time</p>
+                  <h1 className="text-4xl font-black tracking-tighter uppercase italic leading-none">Marketplace Analytics</h1>
+                  <p className="text-gray-400 font-bold mb-0 mt-2 uppercase text-[10px] tracking-widest">Pantauan Arus Kas & Produk Terlaris</p>
+                </div>
+
+                <div className="flex bg-white p-2 rounded-2xl border border-gray-100 shadow-sm gap-2">
+                   <select 
+                     value={timeFilter} 
+                     onChange={(e) => setTimeFilter(e.target.value as any)}
+                     className="bg-gray-50 px-4 py-2 rounded-xl text-[10px] font-black uppercase outline-none"
+                   >
+                     <option value="day">Harian</option>
+                     <option value="month">Bulanan</option>
+                     <option value="year">Tahunan</option>
+                   </select>
+                   <input 
+                     type="date" 
+                     value={selectedDate} 
+                     onChange={(e) => setSelectedDate(e.target.value)}
+                     className="bg-gray-50 px-4 py-2 rounded-xl text-[10px] font-black uppercase outline-none"
+                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-                <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col justify-between">
-                  <p className="text-[10px] font-black text-gray-400 uppercase mb-4 tracking-widest font-mono">REKAP HARI INI</p>
-                  <h3 className="text-3xl font-black text-green-600 tracking-tighter">Rp {dailyRecap.toLocaleString()}</h3>
+                <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:rotate-12 transition-transform"><BarChart3 className="w-12 h-12" /></div>
+                  <p className="text-[10px] font-black text-gray-400 uppercase mb-4 tracking-widest">Revenue Barang</p>
+                  <h3 className="text-2xl font-black text-[#001a00] tracking-tighter">Rp {productRevenue.toLocaleString()}</h3>
                 </div>
-                <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col justify-between">
-                  <p className="text-[10px] font-black text-gray-400 uppercase mb-4 tracking-widest font-mono">REKAP BULAN INI</p>
-                  <h3 className="text-3xl font-black text-blue-600 tracking-tighter">Rp {monthlyRecap.toLocaleString()}</h3>
+                <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:rotate-12 transition-transform"><Truck className="w-12 h-12" /></div>
+                  <p className="text-[10px] font-black text-gray-400 uppercase mb-4 tracking-widest">Arus Kas Ongkir</p>
+                  <h3 className="text-2xl font-black text-[#2e7d32] tracking-tighter">Rp {totalShipping.toLocaleString()}</h3>
                 </div>
-                <div className="bg-gray-950 text-white p-8 rounded-[2rem] shadow-xl relative overflow-hidden flex flex-col justify-between">
-                  <div className="relative z-10">
-                    <p className="text-[10px] font-black text-gray-500 uppercase mb-2 tracking-widest font-mono">TOTAL PESANAN</p>
-                    <h3 className="text-5xl font-black italic">{orders.length}</h3>
-                  </div>
-                  <TrendingUp className="absolute -bottom-6 -right-6 w-32 h-32 opacity-10 text-[var(--accent)]" />
+                <div className="bg-[#003300] text-white p-8 rounded-[2.5rem] shadow-xl relative overflow-hidden flex flex-col justify-between">
+                   <div className="relative z-10">
+                     <p className="text-[10px] font-black text-white/40 uppercase mb-2 tracking-widest">Total Terjual</p>
+                     <h3 className="text-5xl font-black italic">{totalItemsSold} <span className="text-sm not-italic opacity-30 uppercase font-bold tracking-widest">Pcs</span></h3>
+                   </div>
+                   <Package className="absolute -bottom-6 -right-6 w-32 h-32 opacity-10 text-white" />
+                </div>
+                <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col justify-between">
+                   <p className="text-[10px] font-black text-gray-400 uppercase mb-4 tracking-widest">Gross Revenue</p>
+                   <h3 className="text-2xl font-black text-blue-600 tracking-tighter">Rp {totalRevenue.toLocaleString()}</h3>
                 </div>
               </div>
 
@@ -340,9 +378,9 @@ export function AdminDashboard() {
                     ))}
                   </div>
                   <div className="flex gap-3">
-                    <button onClick={handleAddProduct} className="bg-white border border-gray-200 px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-gray-50 transition-all text-gray-800"><Plus className="w-4 h-4 text-[var(--accent)]" /> Tambah Produk</button>
-                    <button onClick={handlePushAllToCloud} className="bg-[var(--accent)] text-white px-8 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-pink-500/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 border border-pink-500">
-                      <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} /> Sync Semua
+                    <button onClick={handleAddProduct} className="bg-white border border-gray-200 px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-gray-50 transition-all text-gray-800"><Plus className="w-4 h-4 text-[#2e7d32]" /> Tambah Produk</button>
+                    <button onClick={handlePushAllToCloud} className="bg-[#003300] text-white px-8 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center gap-2 border border-white/10">
+                      <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} /> Sinkronisasi
                     </button>
                   </div>
                 </div>
@@ -374,7 +412,7 @@ export function AdminDashboard() {
                           }} />
                           <Camera className="w-8 h-8 text-white" />
                         </label>
-                        {disc > 0 && <div className="absolute -top-3 -right-3 bg-red-500 text-white w-12 h-12 rounded-full flex items-center justify-center font-black text-[11px] shadow-lg border-[3px] border-white rotate-12">-{disc}%</div>}
+                        {disc > 0 && <div className="absolute -top-3 -right-3 bg-[#003300] text-white w-12 h-12 rounded-full flex items-center justify-center font-black text-[11px] shadow-lg border-[3px] border-white rotate-12">-{disc}%</div>}
                       </div>
 
                       {/* Input Info Produk (Rapi/Compact) */}
@@ -583,7 +621,7 @@ export function AdminDashboard() {
                     setProducts(prev => prev.map(p => p.id === isAddingSize ? { ...p, sizes: [...(p.sizes || []), v.toUpperCase()], inventory: { ...(p.inventory || {}), [v.toUpperCase()]: 0 } } : p));
                     setIsAddingSize(null);
                   }
-                }} className="flex-1 bg-[var(--accent)] text-white py-3 rounded-xl font-black uppercase text-[10px] shadow-lg hover:scale-105 transition-all">Tambahkan</button>
+                }} className="flex-1 bg-[#003300] text-white py-3 rounded-xl font-black uppercase text-[10px] shadow-lg hover:scale-105 transition-all">Tambahkan</button>
               </div>
             </motion.div>
           </div>

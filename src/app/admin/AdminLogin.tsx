@@ -42,34 +42,37 @@ export function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4 font-sans">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gray-900 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-             <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">GAKHA Cloud Admin</h1>
-          <p className="text-gray-500 text-sm mt-2">Login Cloud Management System</p>
+    <div className="min-h-screen bg-[#f1f8e9] flex flex-col items-center justify-center p-4 font-sans relative overflow-hidden">
+      {/* Background patterns */}
+      <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#003300 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
+      
+      <div className="max-w-md w-full bg-white rounded-[3rem] shadow-2xl p-12 border border-[#b9f6ca]/30 relative z-10 overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-1.5 bg-[#003300]" />
+        
+        <div className="text-center mb-12">
+          <div className="w-20 h-20 bg-[#003300] border-4 border-white shadow-xl text-white flex items-center justify-center mx-auto mb-6 text-4xl font-black italic">G</div>
+          <h1 className="text-4xl font-black text-[#001a00] italic tracking-tighter uppercase leading-none">GAKHA<span className="text-[#2e7d32]">MARKET</span></h1>
+          <p className="text-[#2e7d32] text-[9px] font-black uppercase tracking-[0.4em] mt-3">Authorized Personnel Only</p>
         </div>
         
-        <form onSubmit={handleLogin} className="space-y-5">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email Admin</label>
+        <form onSubmit={handleLogin} className="space-y-6">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] ml-1">Admin Identity</label>
             <input 
               type="email" 
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent outline-none transition-all"
-              placeholder="nama@email.com"
+              className="w-full bg-gray-50 border-b-2 border-transparent focus:border-[#2e7d32] p-4 rounded-2xl outline-none font-bold text-sm transition-all"
+              placeholder="admin@gakha.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
           
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] ml-1">Security Key</label>
             <input 
               type="password" 
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent outline-none transition-all"
+              className="w-full bg-gray-50 border-b-2 border-transparent focus:border-[#2e7d32] p-4 rounded-2xl outline-none font-bold text-sm transition-all"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -80,14 +83,14 @@ export function AdminLogin() {
           <button 
             type="submit"
             disabled={isLoading}
-            className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-gray-800 transition-all shadow-lg active:scale-95 disabled:opacity-50"
+            className="w-full bg-[#003300] text-white font-black py-5 rounded-3xl text-[11px] uppercase tracking-[0.4em] hover:bg-[#2e7d32] transition-all shadow-2xl active:scale-95 disabled:opacity-50"
           >
-            {isLoading ? 'Menghubungi Cloud...' : 'Masuk ke Dashboard'}
+            {isLoading ? 'Decrypting Access...' : 'Enter Dashboard'}
           </button>
         </form>
 
-        <p className="mt-8 text-center text-[10px] text-gray-400 uppercase tracking-widest font-bold">
-           Protected by Supabase Cloud Guard
+        <p className="mt-12 text-center text-[8px] text-gray-400 uppercase tracking-[0.4em] font-black">
+           GAKHA CORE — SECURITY VERified
         </p>
       </div>
     </div>
