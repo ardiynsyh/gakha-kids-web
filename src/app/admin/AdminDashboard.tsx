@@ -34,6 +34,7 @@ export function AdminDashboard() {
       { id: 'sale', name: 'PENAWARAN SPESIAL' },
       { id: 'accessories', name: 'AKSESORIS' }
     ],
+    featuredProducts: [], // Array of product IDs to show on home
     socialMedia: { instagram: 'gakha.official', resellerWhatsApp: '628123456789' },
     hero: { headingLine1: 'GAKHA', headingLine2: 'FOOTBALL CULTURE', description: 'Premium Terrace Wear for the Culture', backgroundImage: '' }
   });
@@ -628,6 +629,38 @@ export function AdminDashboard() {
               <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 space-y-5 shadow-sm text-center">
                 <p className="text-[11px] font-black text-gray-900 uppercase tracking-widest italic flex items-center justify-center gap-2"><Bell className="w-4 h-4 text-orange-400" /> Teks Bar Pengumuman Atas</p>
                 <input value={config.announcement?.text} onChange={(e) => setConfig({ ...config, announcement: { ...config.announcement, text: e.target.value } })} className="w-full max-w-2xl mx-auto bg-orange-50/50 border border-orange-200 p-5 rounded-2xl font-black text-orange-600 text-center outline-none" placeholder="Contoh: PROMO FREE ONGKIR" />
+              </div>
+
+              {/* FEATURED PRODUCTS SELECTION */}
+              <div className="bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm">
+                <div className="flex justify-between items-center mb-8">
+                  <div>
+                    <p className="text-[11px] font-black text-gray-900 uppercase tracking-widest italic flex items-center gap-2"><Sparkles className="w-4 h-4 text-amber-500" /> Kurasi Produk Beranda</p>
+                    <p className="text-[9px] text-gray-400 font-bold uppercase mt-1 tracking-widest">Pilih Produk yang akan tampil di Section Unggulan</p>
+                  </div>
+                  <span className="bg-amber-100 text-amber-600 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">{config.featuredProducts?.length || 0} Terpilih</span>
+                </div>
+
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 overflow-y-auto max-h-[400px] p-2 custom-scrollbar">
+                  {products.map(p => {
+                    const isFeatured = config.featuredProducts?.includes(p.id);
+                    return (
+                      <button 
+                        key={p.id} 
+                        onClick={() => {
+                          const current = config.featuredProducts || [];
+                          const next = isFeatured ? current.filter((id: any) => id !== p.id) : [...current, p.id];
+                          setConfig({ ...config, featuredProducts: next });
+                        }}
+                        className={`p-3 rounded-2xl border-2 transition-all text-left flex flex-col gap-3 relative ${isFeatured ? 'border-[#2e7d32] bg-green-50 shadow-md' : 'border-gray-100 bg-white hover:border-gray-200'}`}
+                      >
+                        <img src={p.image} className="w-full h-24 object-cover rounded-xl grayscale hover:grayscale-0" />
+                        <p className="text-[9px] font-black uppercase truncate">{p.name}</p>
+                        {isFeatured && <div className="absolute top-2 right-2 bg-[#2e7d32] text-white p-1 rounded-full"><CheckCircle className="w-3 h-3" /></div>}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
             </motion.div>
           )}
