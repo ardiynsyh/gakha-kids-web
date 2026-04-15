@@ -2,41 +2,353 @@
 @import './tailwind.css';
 @import './theme.css';
 
+/* ===================================================
+   GAKHA — Football Supporter Fashion
+   Design System: Dark Industrial, Tribal, Energik
+   =================================================== */
+
 :root {
   --bg-primary: #ffffff;
-  --bg-secondary: #f8f8fa;
-  --text-primary: #111111;
-  --text-secondary: #666666;
-  --border-color: #f0f0f0;
-  --card-bg: #f8f8fa;
-  --card-hover: #f0f0f5;
-  --accent: #fb246a;
+  --bg-secondary: #f3f7f3;
+  --text-primary: #001a00;
+  --text-secondary: #1b5e20;
+  --border-color: #e2e8f0;
+  --card-bg: #ffffff;
+  --card-hover: #f8faf9;
+  --accent: #2e7d32;       /* Forest green accent */
+  --accent-2: #4caf50;     /* Light green accent */
+  --accent-3: #003300;     /* Dark green */
 }
 
-.dark {
-  --bg-primary: #0f172a; /* Slate 900 */
-  --bg-secondary: #020617; /* Slate 950 */
-  --text-primary: #f8fafc; /* Slate 50 */
-  --text-secondary: #94a3b8; /* Slate 400 */
-  --border-color: #1e293b; /* Slate 800 */
-  --card-bg: #1e293b; /* Slate 800 */
-  --card-hover: #334155; /* Slate 700 */
-  --accent: #fb246a; /* Keep Pink */
+/* Override: default ke LIGHT mode */
+html {
+  color-scheme: light;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
-/* Global body styling to react smoothly to Dark Mode */
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  transition: background-color 0.5s ease, color 0.5s ease;
+  font-family: 'Outfit', sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+/* ===================================================
+   CUSTOM TEXTURE BACKGROUND (subtle noise grain)
+   =================================================== */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.15;
+  will-change: transform;
+}
+
+/* ===================================================
+   MARQUEE ANIMATION
+   =================================================== */
 @keyframes marquee {
   0% { transform: translateX(0%); }
   100% { transform: translateX(-50%); }
 }
 
 .animate-marquee {
-  animation: marquee 15s linear infinite;
+  animation: marquee 20s linear infinite;
+}
+
+/* ===================================================
+   ULTRAS FIRE FLICKER ANIMATION
+   =================================================== */
+@keyframes flicker {
+  0%, 100% { opacity: 1; text-shadow: 0 0 10px #FF3D00, 0 0 20px #FF3D00, 0 0 40px #FF6B00; }
+  50% { opacity: 0.85; text-shadow: 0 0 5px #FF3D00, 0 0 15px #FF3D00; }
+}
+
+.text-flicker {
+  animation: flicker 2s ease-in-out infinite;
+}
+
+/* ===================================================
+   GLASS CARD 
+   =================================================== */
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ===================================================
+   ULTRAS STRIPE ACCENT (tribal stripe pattern)
+   =================================================== */
+.ultras-stripe {
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 10px,
+    rgba(255, 61, 0, 0.08) 10px,
+    rgba(255, 61, 0, 0.08) 20px
+  );
+}
+
+/* ===================================================
+   SCAN LINE EFFECT (old school football visual)
+   =================================================== */
+.scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.05) 2px,
+    rgba(0, 0, 0, 0.05) 4px
+  );
+  pointer-events: none;
+}
+
+/* ===================================================
+   BUTTON STYLES
+   =================================================== */
+.btn-ultras {
+  background: var(--accent);
+  color: white;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-radius: 0;
+  clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  transition: all 0.2s ease;
+}
+
+.btn-ultras:hover {
+  background: var(--accent-2);
+  color: #000;
+  transform: translateY(-2px);
+}
+
+/* ===================================================
+   "ULTRAS BADGE" TEXT STYLE
+   =================================================== */
+.badge-ultras {
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  display: inline-block;
+}
+
+/* ===================================================
+   TRIBAL BORDER LINE
+   =================================================== */
+.tribal-border {
+  border-image: linear-gradient(90deg, transparent, var(--accent), var(--accent-2), var(--accent), transparent) 1;
+}
+
+/* ===================================================
+   ANIMATED GRADIENT BACKGROUND
+   =================================================== */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animated-gradient {
+  background: linear-gradient(-45deg, #0a0a0a, #1a0000, #0a0a0a, #001a00);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+}
+
+/* ===================================================
+   FOOTBALL FIELD GRID PATTERN
+   =================================================== */
+.field-grid {
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ===================================================
+   GLOW EFFECTS
+   =================================================== */
+.glow-red {
+  box-shadow: 0 0 20px rgba(255, 61, 0, 0.3), 0 0 60px rgba(255, 61, 0, 0.1);
+}
+
+.glow-gold {
+  box-shadow: 0 0 20px rgba(255, 214, 0, 0.3), 0 0 60px rgba(255, 214, 0, 0.1);
+}
+
+.text-glow-red {
+  text-shadow: 0 0 20px rgba(255, 61, 0, 0.6);
+}
+
+.text-glow-gold {
+  text-shadow: 0 0 20px rgba(255, 214, 0, 0.6);
+}
+
+/* ===================================================
+   CARD HOVER STATE
+   =================================================== */
+.product-card {
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 30px 60px rgba(255, 61, 0, 0.15);
+}
+
+/* ===================================================
+   SECTION DIVIDER — FIRE LINE
+   =================================================== */
+.fire-divider {
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #FF3D00, #FFD600, #FF3D00, transparent);
+  position: relative;
+}
+
+/* ===================================================
+   SCROLLBAR — FOREST GREEN THEME
+   =================================================== */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #050a07; }
+::-webkit-scrollbar-thumb { background: #1b5e20; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #2e7d32; }
+
+/* ===================================================
+   FOREST GREEN DESIGN TOKENS (Deep Concept)
+   =================================================== */
+:root {
+  --forest-dark:   #050a07;
+  --forest-deep:   #001a00;
+  --forest-green:  #003300;
+  --forest-mid:    #1b5e20;
+  --forest-bright: #2e7d32;
+  --forest-neon:   #4caf50;
+  --forest-pale:   #95d5b2;
+  --forest-glow:   rgba(45, 106, 79, 0.35);
+}
+
+/* ===================================================
+   RAIN DROP KEYFRAME (used by HeroBanner)
+   =================================================== */
+@keyframes rainFall {
+  0%   { transform: translateY(-120px) scaleY(0.6); opacity: 0; }
+  8%   { opacity: 1; }
+  88%  { opacity: 1; }
+  100% { transform: translateY(110vh)  scaleY(1);   opacity: 0; }
+}
+
+/* ===================================================
+   HEAVY MICRO-INTERACTION BUTTONS
+   Hover = slow scaleX expansion (0.7s cubic)
+   =================================================== */
+.gakha-btn-primary {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 44px;
+  background: var(--forest-green);
+  color: #fff;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  border: 1px solid rgba(45, 106, 79, 0.4);
+  transition: border-color 0.5s ease, color 0.5s ease;
+  cursor: pointer;
+}
+.gakha-btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--forest-bright);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.72s cubic-bezier(0.77, 0, 0.175, 1);
+}
+.gakha-btn-primary:hover::before { transform: scaleX(1); }
+.gakha-btn-primary > span { position: relative; z-index: 1; }
+
+.gakha-btn-ghost {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 44px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.45);
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: color 0.6s ease, border-color 0.6s ease;
+  cursor: pointer;
+}
+.gakha-btn-ghost:hover { color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.22); }
+
+/* ===================================================
+   PAGE WIPE — FADE TO FOREST GREEN
+   Applied as a fixed overlay on route change
+   =================================================== */
+.gakha-page-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  background: var(--forest-deep);
+}
+
+/* ===================================================
+   FOREST GLOW EFFECTS
+   =================================================== */
+.glow-forest {
+  box-shadow: 0 0 30px var(--forest-glow), 0 0 70px rgba(45, 106, 79, 0.12);
+}
+.text-glow-forest {
+  text-shadow: 0 0 24px var(--forest-glow), 0 0 60px rgba(45, 106, 79, 0.2);
+}
+.border-glow-forest {
+  box-shadow: 0 0 0 1px var(--forest-mid), 0 0 20px var(--forest-glow);
+}
+
+/* ===================================================
+   SCROLLBAR HIDE UTILITY
+   =================================================== */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ===================================================
+   CINEMATIC DEEP CARD
+   =================================================== */
+.deep-card {
+  background: rgba(13, 38, 24, 0.4);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(45, 106, 79, 0.12);
+  transition: border-color 0.5s ease, box-shadow 0.5s ease;
+}
+.deep-card:hover {
+  border-color: rgba(45, 106, 79, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(45, 106, 79, 0.1);
+}
+
+/* ===================================================
+   UPDATE: product-card hover to forest green glow
+   =================================================== */
+.product-card:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 30px 60px rgba(26, 74, 46, 0.2), 0 0 40px rgba(45, 106, 79, 0.1);
 }
 

@@ -1,90 +1,104 @@
+import { Link } from 'react-router';
 import { motion } from 'framer-motion';
-import { Star, Quote } from 'lucide-react';
-
-const testimonials = [
-  {
-    id: 1,
-    name: "Bunda Sarah",
-    role: "Ibu dari 2 anak",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=150&auto=format&fit=crop",
-    text: "Bajunya sangat lembut dan nyaman dipakai seharian. Anak saya paling suka koleksi terbarunya karena warnanya sangat ceria dan bahannya adem!",
-    rating: 5
-  },
-  {
-    id: 2,
-    name: "Mama Dina",
-    role: "Pelanggan Setia",
-    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop",
-    text: "Saksag-Go selalu jadi andalan kalau beli kado untuk keponakan. Kualitas jahitannya rapi dan sablonnya tidak mudah luntur walau dicuci berkali-kali.",
-    rating: 5
-  },
-  {
-    id: 3,
-    name: "Ibu Rina",
-    role: "Wiraswasta",
-    avatar: "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?q=80&w=150&auto=format&fit=crop",
-    text: "Pengirimannya sangat cepat dan adminnya ramah banget. Sangat puas belanja di sini. Pasti akan order lagi bulan depan untuk persiapan liburan!",
-    rating: 4
-  }
-];
 
 export function Testimonials() {
   return (
-    <section className="py-24 bg-[var(--bg-secondary)] border-t border-[var(--border-color)]">
-      <div className="max-w-[1800px] mx-auto px-[clamp(1.5rem,5vw,4rem)]">
-        <div className="text-center mb-16">
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-[clamp(2rem,4vw,3.5rem)] font-black text-[var(--text-primary)] font-serif italic mb-4 tracking-tighter"
-          >
-            Kata Mereka
-          </motion.h2>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-[var(--text-secondary)] max-w-2xl mx-auto"
-          >
-            Ribuan ibu telah mempercayakan kenyamanan pakaian anak mereka kepada Saksag-Go!. Berikut adalah beberapa cerita manis dari mereka.
-          </motion.p>
+    <section className="py-24 bg-[#f3f7f3] font-sans min-h-[50vh] flex flex-col justify-center border-t border-white">
+      <div className="max-w-[1400px] w-full mx-auto px-6 lg:px-12 relative">
+        
+        <div className="absolute top-0 right-12 text-[#1b5e20]/20 text-4xl font-light pointer-events-none">
+          +
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {testimonials.map((t, idx) => (
-            <motion.div
-              key={t.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.15 }}
-              className="bg-[var(--bg-primary)] p-8 rounded-3xl shadow-sm border border-[var(--border-color)] relative group hover:shadow-md transition-shadow"
-            >
-              <Quote className="absolute top-6 right-6 w-10 h-10 text-[var(--accent)] opacity-10 group-hover:scale-110 transition-transform" />
-              
-              <div className="flex gap-1 mb-6">
-                {[...Array(5)].map((_, i) => (
-                  <Star 
-                    key={i} 
-                    className={`w-5 h-5 ${i < t.rating ? 'fill-[#ffb000] text-[#ffb000]' : 'fill-gray-200 text-gray-200'}`} 
-                  />
-                ))}
+        {/* Footer-like Grid connecting to Footer */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12 relative z-10">
+           
+           {/* Column 1: LATEST DROPS */}
+           <div className="flex flex-col col-span-2 md:col-span-1">
+              <h3 
+                className="text-[#001a00] font-black text-xl mb-6 uppercase tracking-wider" 
+                style={{ fontFamily: "'Bebas Neue', Impact, sans-serif" }}
+              >
+                LATEST DROPS
+              </h3>
+              <div className="w-full max-w-[220px] aspect-[4/5] bg-white rounded-sm overflow-hidden border border-[#1b5e20]/20">
+                 <img 
+                    src="https://images.unsplash.com/photo-1542272454315-4c01d7abdf4a?q=80&w=400&auto=format&fit=crop" 
+                    alt="New Collection" 
+                    className="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-700 hover:scale-105 cursor-pointer" 
+                 />
               </div>
+           </div>
 
-              <p className="text-[var(--text-primary)] mb-8 leading-relaxed font-medium">"{t.text}"</p>
+           {/* Column 2: CLOTHING */}
+           <div className="flex flex-col">
+              <h3 
+                className="text-[#001a00] font-black text-xl mb-6 uppercase tracking-wider" 
+                style={{ fontFamily: "'Bebas Neue', Impact, sans-serif" }}
+              >
+                CLOTHING
+              </h3>
+              <ul className="space-y-3 text-sm text-[#003300]/70 font-medium tracking-wide" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                 <li className="hover:text-[#2e7d32] hover:translate-x-2 cursor-pointer transition-all duration-300">T-Shirts</li>
+                 <li className="hover:text-[#2e7d32] hover:translate-x-2 cursor-pointer transition-all duration-300">Hoodies & Sweaters</li>
+                 <li className="hover:text-[#2e7d32] hover:translate-x-2 cursor-pointer transition-all duration-300">Track Jackets</li>
+                 <li className="hover:text-[#2e7d32] hover:translate-x-2 cursor-pointer transition-all duration-300">Pants</li>
+              </ul>
+           </div>
 
-              <div className="flex items-center gap-4 mt-auto">
-                <img src={t.avatar} alt={t.name} className="w-12 h-12 rounded-full object-cover shadow-sm border-2 border-white" />
-                <div>
-                  <h4 className="font-bold text-[var(--text-primary)]">{t.name}</h4>
-                  <span className="text-sm text-[var(--text-secondary)]">{t.role}</span>
-                </div>
+           {/* Column 3: CULTURE */}
+           <div className="flex flex-col">
+              <h3 
+                className="text-[#001a00] font-black text-xl mb-6 uppercase tracking-wider" 
+                style={{ fontFamily: "'Bebas Neue', Impact, sans-serif" }}
+              >
+                CULTURE
+              </h3>
+              <ul className="space-y-3 text-sm text-[#003300]/70 font-medium tracking-wide" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                 <li className="hover:text-[#2e7d32] hover:translate-x-2 cursor-pointer transition-all duration-300">Lookbook</li>
+                 <li className="hover:text-[#2e7d32] hover:translate-x-2 cursor-pointer transition-all duration-300">Journal</li>
+                 <li className="hover:text-[#2e7d32] hover:translate-x-2 cursor-pointer transition-all duration-300">Campaigns</li>
+                 <li className="hover:text-[#2e7d32] hover:translate-x-2 cursor-pointer transition-all duration-300">Store</li>
+              </ul>
+           </div>
+
+           {/* Column 4: SOCIALS & Button */}
+           <div className="flex flex-col relative">
+              <h3 
+                className="text-[#001a00] font-black text-xl mb-6 uppercase tracking-wider" 
+                style={{ fontFamily: "'Bebas Neue', Impact, sans-serif" }}
+              >
+                COMMUNITY
+              </h3>
+              <ul className="space-y-3 text-sm text-[#003300]/70 font-medium tracking-wide" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                 <li className="hover:text-[#2e7d32] cursor-pointer transition-colors flex items-center gap-2">
+                    <span className="text-[#2e7d32]">/</span> Instagram
+                 </li>
+                 <li className="hover:text-[#2e7d32] cursor-pointer transition-colors flex items-center gap-2">
+                    <span className="text-[#2e7d32]">/</span> TikTok
+                 </li>
+                 <li className="hover:text-[#2e7d32] cursor-pointer transition-colors flex items-center gap-2">
+                    <span className="text-[#2e7d32]">/</span> Twitter
+                 </li>
+              </ul>
+
+              {/* Floated Primary Button */}
+              <div className="absolute top-[30%] right-0 hidden md:block">
+                 <motion.div whileHover="hovered" className="relative">
+                    <button className="gakha-btn-primary border-none shadow-xl shadow-[#001a00]" style={{ padding: '12px 24px', fontSize: '9px' }}>
+                       <span className="relative z-10 block whitespace-nowrap">Join WhatsApp Group</span>
+                    </button>
+                    {/* Pulsing indicator */}
+                    <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4caf50] opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-[#4caf50]"></span>
+                    </span>
+                 </motion.div>
               </div>
-            </motion.div>
-          ))}
+           </div>
+
         </div>
+
       </div>
     </section>
   );

@@ -57,13 +57,22 @@ export function ShopPage() {
     if (dynamicCat) return dynamicCat.name;
 
     switch(categoryId) {
-      case 'new': return 'Koleksi Terbaru';
-      case 'boys': return 'Koleksi Anak Laki-Laki';
-      case 'girls': return 'Koleksi Anak Perempuan';
-      case 'sale': return 'Promo & Diskon';
-      case 'toddler': return 'Koleksi Toddler (2-5 Thn)';
-      case 'baby': return 'Koleksi Bayi (6-24 Bln)';
-      case 'born': return 'Koleksi New Born (0-6 Bln)';
+      case 'new': return 'New Drop';
+      case 'sale': return 'Penawaran Spesial';
+      case 'casuals': return 'Koleksi Casuals';
+      case 'terrace': return 'Terrace Wear';
+      case 'accessories': return 'Aksesoris/Scarf';
+      case 'jakarta': return 'Regional: Jakarta';
+      case 'bandung': return 'Regional: Bandung';
+      case 'surabaya': return 'Regional: Surabaya';
+      case 'malang': return 'Regional: Malang';
+      case 'bali': return 'Regional: Bali';
+      case 'sleman': return 'Regional: Sleman';
+      case 'solo': return 'Regional: Solo';
+      case 'semarang': return 'Regional: Semarang';
+      case 'medan': return 'Regional: Medan';
+      case 'jayapura': return 'Regional: Jayapura';
+      case 'samarinda': return 'Regional: Samarinda';
       case 'all': return 'Semua Produk';
       default: return 'Koleksi Produk';
     }
@@ -73,7 +82,7 @@ export function ShopPage() {
     <div className="max-w-[1800px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-12 min-h-[60vh]">
       <SEO 
         title={getTitle()} 
-        description={`Lihat koleksi ${getTitle()} di Gakha Kids. Pakaian berkualitas tinggi untuk kenyamanan dan gaya buah hati Anda.`} 
+        description={`Lihat koleksi ${getTitle()} di GAKHA. Streetwear premium dengan desain otentik budaya supporter.`} 
       />
       <h1 className="text-[clamp(1.8rem,4vw,2.5rem)] font-extrabold text-[var(--text-primary)] mb-8 tracking-tight border-b border-[var(--border-color)] pb-4">{getTitle()}</h1>
       

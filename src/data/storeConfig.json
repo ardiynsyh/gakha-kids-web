@@ -1,11 +1,11 @@
 {
   "name": {
-    "prefix": "Gakha",
-    "highlight": "Kids"
+    "prefix": "GAKHA",
+    "highlight": ""
   },
   "announcement": {
-    "text": "Promo Ramadhan: Diskon hingga 50% untuk koleksi pilihan! Belanja sekarang.",
-    "link": "/shop/sale",
+    "text": "🔥 MUSIM BARU DROP! Koleksi Tribal Nusantara 2026 — GRATIS ONGKIR Se-Indonesia. BELA KOTAMU, PAKAI GAKHA",
+    "link": "/shop/new",
     "isEnabled": true
   },
   "navigation": {
@@ -15,20 +15,20 @@
         "href": "/"
       },
       {
-        "label": "PRODUK",
+        "label": "ALL GEAR",
         "href": "/shop/all"
       },
       {
-        "label": "TERBARU",
+        "label": "NEW DROP",
         "href": "/shop/new"
       },
       {
-        "label": "BAYI",
-        "href": "/shop/baby"
+        "label": "CASUALS",
+        "href": "/shop/casuals"
       },
       {
-        "label": "TODDLER",
-        "href": "/shop/toddler"
+        "label": "HOOLIGANS",
+        "href": "/shop/hooligans"
       },
       {
         "label": "RESELLER",
@@ -39,68 +39,68 @@
         "href": "/track-order"
       },
       {
-        "label": "HALAMAN",
+        "label": "TENTANG KAMI",
         "href": "/page/about"
       }
     ]
   },
   "hero": {
-    "backgroundImage": "https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=600&auto=format&fit=crop",
-    "badge": "Baju Bayi & Balita Premium",
-    "headingLine1": "Pusat Baju Bayi",
-    "headingLine2": "Premium & Modern",
-    "description": "Temukan koleksi baju bayi dan perlengkapan balita terbaik dengan bahan super lembut dan desain kekinian. Gakha Kids menjamin kenyamanan maksimal untuk setiap tumbuh kembang si kecil.",
-    "primaryButton": "Belanja Baju Bayi",
-    "secondaryButton": "Koleksi Balita"
+    "backgroundImage": "https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=800&auto=format&fit=crop",
+    "badge": "Football Casual & Hooligan Fashion",
+    "headingLine1": "Bela Kotamu,",
+    "headingLine2": "Pakai GAKHA",
+    "description": "Fashion jalanan untuk jiwa supporter sejati. Lahir dari tribun, dipakai di jalanan. Koleksi eksklusif terinspirasi kultur supporter sepak bola daerah-daerah besar Indonesia.",
+    "primaryButton": "Jelajahi Koleksi",
+    "secondaryButton": "New Drop"
   },
   "features": [
     {
       "iconName": "Truck",
-      "title": "Gratis Ongkir",
-      "description": "Koleksi baju bayi sampai rumah gratis ongkir min. Rp 200rb",
-      "color": "#A8E6CF"
+      "title": "Gratis Ongkir Se-Indonesia",
+      "description": "Pengiriman ke seluruh penjuru Nusantara. Dari Sabang sampai Merauke.",
+      "color": "#FF3D00"
     },
     {
       "iconName": "Shield",
-      "title": "Bahan Premium",
-      "description": "Baju bayi aman & lembut untuk kulit sensitif",
-      "color": "#B4D7F1"
+      "title": "Bahan Premium & Durable",
+      "description": "Bahan tebal, kuat, dan nyaman dipakai dari tribun hingga jalanan.",
+      "color": "#FF6B00"
     },
     {
       "iconName": "RefreshCw",
-      "title": "Garansi Retur",
-      "description": "Tukar ukuran baju bayi & balita dalam 30 hari",
-      "color": "#FFF9B0"
+      "title": "Garansi Penuh 30 Hari",
+      "description": "Tukar atau refund dalam 30 hari tanpa pertanyaan.",
+      "color": "#FFD600"
     },
     {
       "iconName": "Sparkles",
-      "title": "Desain Eksklusif",
-      "description": "Model baju bayi terbaru setiap minggu",
-      "color": "#FFD1DC"
+      "title": "Limited Edition Drop",
+      "description": "Setiap koleksi diproduksi terbatas. Kalau kehabisan, belum tentu restock.",
+      "color": "#FF3D00"
     }
   ],
   "footer": {
-    "description": "Gakha Kids adalah spesialis baju bayi dan balita premium yang menghadirkan kualitas kenyamanan terbaik dengan desain modern. Pilihan tepat untuk orang tua yang mengutamakan kualitas.",
+    "description": "GAKHA adalah brand fashion resmi untuk supporter sepak bola Indonesia. Terinspirasi dari kultur casuals dan hooligans, kami menjadi jembatan antara tribun dan jalanan.",
     "shopLinks": [
       {
-        "label": "Baju New Born (0-6 Bln)",
-        "href": "/shop/born"
+        "label": "New Drop",
+        "href": "/shop/new"
       },
       {
-        "label": "Baju Bayi (6-24 Bln)",
-        "href": "/shop/baby"
+        "label": "Koleksi Casuals",
+        "href": "/shop/casuals"
       },
       {
-        "label": "Baju Toddler (2-5 Thn)",
-        "href": "/shop/toddler"
+        "label": "Koleksi Hooligans",
+        "href": "/shop/hooligans"
       },
       {
-        "label": "Koleksi Anak Cowok",
-        "href": "/shop/boys"
+        "label": "Tribal Jawa",
+        "href": "/shop/jawa"
       },
       {
-        "label": "Koleksi Anak Cewek",
-        "href": "/shop/girls"
+        "label": "Tribal Sumatra",
+        "href": "/shop/sumatra"
       }
     ],
     "customerCareLinks": [
@@ -117,7 +117,7 @@
         "href": "/page/returns"
       },
       {
-        "label": "Panduan Ukuran Baju",
+        "label": "Panduan Ukuran",
         "href": "/page/size-guide"
       },
       {
@@ -125,11 +125,11 @@
         "href": "/page/faq"
       }
     ],
-    "newsletterTitle": "Update Promo Baju Bayi",
-    "newsletterDesc": "Langganan untuk info koleksi baju bayi terbaru dan diskon eksklusif.",
-    "newsletterPlaceholder": "Email Anda",
-    "newsletterButton": "Gabung",
-    "bottomText": "© 2026 Gakha Kids. Spesialis Baju Bayi & Balita.",
+    "newsletterTitle": "Join The Mob",
+    "newsletterDesc": "Daftar untuk info drop terbaru, promo eksklusif, dan konten kultur supporter Indonesia.",
+    "newsletterPlaceholder": "Email kamu, bro",
+    "newsletterButton": "JOIN",
+    "bottomText": "© 2026 GAKHA. Fashion untuk Jiwa Supporter Sejati.",
     "bottomLinks": [
       {
         "label": "Kebijakan Privasi",
@@ -146,32 +146,32 @@
     ]
   },
   "socialMedia": {
-    "instagram": "https://instagram.com/test",
-    "tiktok": "https://tiktok.com",
-    "twitter": "https://twitter.com",
-    "facebook": "https://facebook.com",
+    "instagram": "https://instagram.com/gakha",
+    "tiktok": "https://tiktok.com/@gakha",
+    "twitter": "https://twitter.com/gakha",
+    "facebook": "https://facebook.com/gakha",
     "resellerWhatsApp": "628123456789"
   },
   "topDeals": [
     {
-      "title": "Koleksi Anak Laki",
-      "image": "https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?q=80&w=600&auto=format&fit=crop",
-      "bg": "bg-blue-100",
-      "route": "/shop/boys",
+      "title": "Koleksi Jakmania",
+      "image": "https://images.unsplash.com/photo-1571939228382-b2f2b585ce15?q=80&w=600&auto=format&fit=crop",
+      "bg": "bg-red-900",
+      "route": "/shop/jakarta",
       "isLarge": true
     },
     {
-      "title": "Perempuan",
-      "image": "https://images.unsplash.com/photo-1514090458221-65bb69cf63e6?q=80&w=400&auto=format&fit=crop",
-      "bg": "bg-orange-100",
-      "route": "/shop/girls",
+      "title": "Koleksi Bobotoh",
+      "image": "https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?q=80&w=400&auto=format&fit=crop",
+      "bg": "bg-blue-900",
+      "route": "/shop/bandung",
       "isLarge": false
     },
     {
-      "title": "Aksesoris",
-      "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=400&auto=format&fit=crop",
-      "bg": "bg-lime-100",
-      "route": "/shop/categories",
+      "title": "Koleksi Aremania",
+      "image": "https://images.unsplash.com/photo-1529900748604-07564a03e7a6?q=80&w=400&auto=format&fit=crop",
+      "bg": "bg-blue-800",
+      "route": "/shop/malang",
       "isLarge": false
     }
   ]

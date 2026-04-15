@@ -30,37 +30,39 @@ export function Interactive3DBackground() {
   const rotate = useTransform(scrollYProgress, [0, 1], [0, 180]);
 
   return (
-    <div ref={containerRef} className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden select-none bg-slate-50 dark:bg-[#0a0a0a]">
+    <div ref={containerRef} className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden select-none bg-slate-50" style={{ transform: 'translateZ(0)' }}>
       {/* Interactive Mesh Blobs */}
-      <div className="absolute inset-0 filter blur-[120px] opacity-40 dark:opacity-30">
+      <div className="absolute inset-0 filter blur-[80px] opacity-25">
         
-        {/* Blob 1 - Accent Pink */}
+        {/* Blob 1 - GAKHA Orange */}
         <motion.div 
           style={{ 
             x: useTransform(springX, (v) => v * 1.5),
             y: useTransform(y1, (v) => v + (mouseY.get() * 1.2)),
             rotate 
           }}
-          className="absolute top-[10%] left-[10%] w-[500px] h-[500px] rounded-full bg-[var(--accent)] opacity-40"
+          className="absolute top-[10%] left-[10%] w-[500px] h-[500px] rounded-full bg-[#2e7d32] opacity-30 blur-[20px]"
+          style={{ willChange: 'transform' }}
         />
 
-        {/* Blob 2 - Soft Mint */}
+        {/* Blob 2 - GAKHA Red */}
         <motion.div 
           style={{ 
             x: useTransform(springX, (v) => -v * 2),
             y: useTransform(y2, (v) => v - (mouseY.get() * 1)),
             rotate: useTransform(rotate, (v) => -v)
           }}
-          className="absolute bottom-[10%] right-[10%] w-[600px] h-[600px] rounded-full bg-[#A8E6CF] opacity-30"
+          className="absolute bottom-[10%] right-[10%] w-[600px] h-[600px] rounded-full bg-[#4caf50] opacity-20 blur-[20px]"
+          style={{ willChange: 'transform' }}
         />
 
-        {/* Blob 3 - Sky Blue */}
+        {/* Blob 3 - GAKHA Grey/Silver */}
         <motion.div 
           style={{ 
             x: useTransform(springX, (v) => v * 0.8),
             y: useTransform(y1, (v) => v * 0.5 + 200),
           }}
-          className="absolute top-[40%] left-[50%] w-[450px] h-[450px] rounded-full bg-[#B4D7F1] opacity-30"
+          className="absolute top-[40%] left-[50%] w-[450px] h-[450px] rounded-full bg-[#333333] opacity-25"
         />
       </div>
 

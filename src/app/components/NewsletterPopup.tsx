@@ -70,7 +70,7 @@ export function NewsletterPopup() {
             </button>
 
             {/* Left side: Image/Graphic */}
-            <div className="md:w-5/12 bg-gradient-to-br from-pink-100 to-amber-100 relative overflow-hidden flex items-center justify-center p-12">
+            <div className="md:w-5/12 bg-gradient-to-br from-[#e8f5e9] to-white relative overflow-hidden flex items-center justify-center p-12">
                <div className="absolute top-10 left-10 w-24 h-24 bg-white/30 rounded-full blur-2xl" />
                <div className="absolute bottom-10 right-10 w-32 h-32 bg-amber-200/40 rounded-full blur-3xl" />
                <motion.div
@@ -100,10 +100,10 @@ export function NewsletterPopup() {
                     >
                        <div>
                           <h2 className="text-3xl font-black text-gray-900 tracking-tight leading-tight mb-2">
-                             {config.newsletterPopup.title || 'Dapatkan Voucher Diskon Pertama!'}
+                             {config.newsletterPopup.title || 'Join the GAKHA Squad!'}
                           </h2>
                           <p className="text-gray-500 text-sm leading-relaxed">
-                             {config.newsletterPopup.description || 'Daftar newsletter Gakha Kids dan dapatkan akses eksklusif ke koleksi terbaru serta promo-promo menarik setiap harinya.'}
+                             {config.newsletterPopup.description || 'Daftar newsletter GAKHA dan dapatkan akses eksklusif ke koleksi terbaru serta promo-promo menarik setiap harinya.'}
                           </p>
                        </div>
 

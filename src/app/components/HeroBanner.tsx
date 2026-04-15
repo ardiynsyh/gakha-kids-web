@@ -1,178 +1,181 @@
+import { useRef, useMemo } from 'react';
 import { Link } from 'react-router';
-import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
-import { useRef } from 'react';
-import { useStore } from '../context/StoreContext';
+import { motion, useScroll, useTransform } from 'framer-motion';
+
+// ── Deterministic rain drops (stable across renders, no Math.random) ──────────
+function useRainDrops(count: number) {
+  return useMemo(() =>
+    Array.from({ length: count }, (_, i) => ({
+      id: i,
+      left: `${((i * 100) / count).toFixed(2)}%`,
+      height: `${30 + (i * 37) % 90}px`,
+      duration: `${(0.45 + (i * 0.068) % 1.25).toFixed(2)}s`,
+      delay: `${(i * 0.053) % 4}s`,
+      opacity: (0.06 + (i * 0.004) % 0.22).toFixed(3),
+      width: i % 4 === 0 ? '1.5px' : '1px',
+    })),
+  [count]);
+}
 
 export function HeroBanner() {
-  const { config } = useStore();
-  const ref = useRef<HTMLDivElement>(null);
-  
-  // Backwards compatibility if config not loaded
-  const hero = config?.hero || { headingLine1: 'Gaya Nyaman &', headingLine2: 'Keren', description: 'Membuat sikecil senang' };
+  const containerRef = useRef<HTMLDivElement>(null);
+  const rainDrops = useRainDrops(80);
 
-  // Mouse tracking for 3D Tilt
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  const mouseXSpring = useSpring(x);
-  const mouseYSpring = useSpring(y);
-
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    const xPct = mouseX / width - 0.5;
-    const yPct = mouseY / height - 0.5;
-    x.set(xPct);
-    y.set(yPct);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
-
-  // Setup Parallax
   const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"]
+    target: containerRef,
+    offset: ['start start', 'end start'],
   });
 
-  const bgY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
-  const textY = useTransform(scrollYProgress, [0, 1], ['0%', '60%']);
-  const planetY = useTransform(scrollYProgress, [0, 1], ['0%', '-50%']);
-  const modelY = useTransform(scrollYProgress, [0, 1], ['0%', '15%']);
+  // ── Scroll-driven transforms ──────────────────────────────────────────────
+  const videoY       = useTransform(scrollYProgress, [0, 1], ['0%', '28%']);
+  const heroOpacity  = useTransform(scrollYProgress, [0, 0.65], [1, 0]);
+  const textY        = useTransform(scrollYProgress, [0, 1], ['0%', '22%']);
+  const scrollFadeOut= useTransform(scrollYProgress, [0, 0.18], [1, 0]);
+
+  // ── Scroll-driven glitch (intensifies as user scrolls) ────────────────────
+  const glitchX      = useTransform(scrollYProgress, [0.04, 0.08, 0.13, 0.18], [0, -12, 16, 0]);
+  const glitchXNeg   = useTransform(glitchX, (v) => -v * 0.65);
+  const glitchScale  = useTransform(scrollYProgress, [0.04, 0.14], [1, 1.025]);
 
   return (
-    <div 
-      className="w-full px-[clamp(1rem,5vw,4rem)] max-w-[1800px] mx-auto pt-1 sm:pt-6 pb-6 font-sans perspective-1000" 
-      ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+    <div
+      ref={containerRef}
+      className="relative w-full h-[65vh] overflow-hidden"
+      style={{ marginBottom: 0 }}
+      id="hero"
     >
-      <motion.div 
-        style={{ 
-          rotateX, 
-          rotateY,
-          transformStyle: "preserve-3d"
-        }}
-        className="relative w-full rounded-[clamp(1.5rem,4vw,2.5rem)] bg-gradient-to-br from-[#1e3c72] via-[#2a5298] to-[#1e3c72] h-[clamp(450px,70vh,700px)] overflow-hidden flex items-center shadow-2xl transition-all duration-200 ease-out"
-      >
-        
-        {/* Interactive Mesh Gradient inside Hero */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <motion.div 
-               animate={{ 
-                 scale: [1, 1.2, 1],
-                 rotate: [0, 90, 0],
-                 x: [-20, 20, -20]
-               }}
-               transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-               className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] bg-[#fb246a]/20 blur-[100px] rounded-full"
-            />
-            <motion.div 
-               animate={{ 
-                 scale: [1.2, 1, 1.2],
-                 rotate: [90, 0, 90],
-                 x: [20, -20, 20]
-               }}
-               transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-               className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] bg-[#3e6b8c]/40 blur-[120px] rounded-full"
-            />
-        </div>
-
-        {/* Parallax Background Cover */}
-        <motion.div style={{ y: bgY }} className="absolute inset-0 w-full h-[130%] bg-gradient-to-r from-[#3e6b8c] to-[#4b80a6] -z-10 mix-blend-overlay opacity-60"></motion.div>
-
-        {/* 3D Floating Elements */}
-        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-            {/* Dynamic Interactive Shapes */}
-            <motion.div 
-               animate={{ 
-                 x: [0, 20, 0], 
-                 y: [0, -20, 0],
-                 rotate: [0, 10, 0] 
-               }}
-               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-               className="absolute top-[15%] left-[5%] w-32 h-32 rounded-full bg-gradient-to-tr from-white/20 to-transparent blur-xl"
-            />
-            <motion.div 
-               animate={{ 
-                 x: [0, -30, 0], 
-                 y: [0, 15, 0],
-                 rotate: [0, -15, 0] 
-               }}
-               transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-               className="absolute bottom-[20%] right-[15%] w-48 h-48 rounded-full bg-gradient-to-bl from-pink-500/20 to-transparent blur-2xl"
-            />
-            
-            {/* Parallax Stars */}
-            <motion.div style={{ y: planetY }} className="absolute inset-0 opacity-90 h-[150%]">
-                <div className="absolute top-[10%] left-[8%] text-yellow-300 text-2xl drop-shadow-[0_0_10px_rgba(253,224,71,0.8)]">✨</div>
-                <div className="absolute top-[35%] right-[25%] text-yellow-300 text-3xl drop-shadow-[0_0_15px_rgba(253,224,71,0.8)] opacity-60">✨</div>
-                <div className="absolute bottom-[25%] left-[30%] text-yellow-300 text-xl drop-shadow-[0_0_10px_rgba(253,224,71,0.8)]">★</div>
-                
-                <div className="absolute top-[8%] left-[10%] w-24 h-24 bg-gradient-to-br from-[#fcb045] to-[#fd1d1d] rounded-full blur-[1px] shadow-[inset_-5px_-5px_15px_rgba(0,0,0,0.3)] opacity-40"></div>
-                <div className="absolute bottom-[15%] right-[10%] w-32 h-32 bg-gradient-to-br from-[#8E2DE2] to-[#4A00E0] rounded-full blur-[1px] shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.5)] opacity-40"></div>
-            </motion.div>
-        </div>
-
-        {/* Text Content */}
-        <div className="relative z-20 w-full md:w-[60%] px-[clamp(1.5rem,8vw,4rem)] text-center md:text-left flex flex-col items-center md:items-start text-white" style={{ transform: "translateZ(50px)" }}>
-           <motion.div style={{ y: textY }} className="relative">
-              <div className="absolute inset-[-40px] bg-[#325b7a] blur-[80px] rounded-full -z-10 opacity-60 mix-blend-multiply"></div>
-              
-              <motion.h1 
-                initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8 }}
-                className="text-[clamp(2.2rem,8vw,5rem)] font-black leading-[1.1] mb-2 font-serif text-white drop-shadow-[0_5px_15px_rgba(0,0,0,0.3)]"
-              >
-                 {hero.headingLine1}<br/>
-                 <span className="text-[var(--accent)] drop-shadow-[0_0_10px_rgba(251,36,106,0.5)]"> {hero.headingLine2}</span>
-              </motion.h1>
-              
-              <motion.p 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.9 }}
-                transition={{ delay: 0.4 }}
-                className="text-[clamp(0.9rem,2vw,1.1rem)] max-w-lg mb-8 font-medium leading-relaxed opacity-90"
-              >
-                {hero.description}
-              </motion.p>
-           </motion.div>
-           
-           <motion.div
-             whileHover={{ scale: 1.05, translateZ: "20px" }}
-             whileTap={{ scale: 0.95 }}
-             className="relative z-30"
-           >
-             <Link to="/shop/all" className="bg-[var(--accent)] text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest text-xs shadow-[0_10px_30px_rgba(251,36,106,0.4)] block hover:bg-white hover:text-[var(--accent)] transition-all duration-300">
-                {hero.primaryButton || 'Jelajahi Koleksi'}
-             </Link>
-           </motion.div>
-        </div>
-
-        {/* Model Kid (Interactive Position) */}
-        <motion.div 
-          style={{ y: modelY, translateZ: "100px" }} 
-          className="absolute bottom-[-5%] right-[0%] w-[80%] sm:w-[55%] lg:w-[50%] h-[110%] flex items-end justify-center z-10 opacity-80 md:opacity-100 transition-opacity"
-        >
-           <img 
-               src={hero.backgroundImage} 
-               alt="Gakha Kids Premium Collection" 
-               className="h-full w-auto object-cover object-bottom drop-shadow-[0_10px_50px_rgba(0,0,0,0.6)]"
-               style={{ WebkitMaskImage: 'linear-gradient(to top, transparent 0%, black 15%)' }}
-           />
-        </motion.div>
-        
+      {/* ── Solid Forest Green Background ─────────────────────────────────────── */}
+      <motion.div className="absolute inset-0 z-0 bg-[#003300] shadow-inner" style={{ y: videoY }}>
+        {/* Subtle radial shine for depth */}
+        <div 
+          className="absolute inset-0"
+          style={{ 
+            background: 'radial-gradient(circle at center, rgba(46, 125, 50, 0.2) 0%, transparent 80%)'
+          }} 
+        />
       </motion.div>
+
+      {/* ── Rain drops removed as per solid theme request ── */}
+
+      {/* ── Grain Film Overlay ────────────────────────────────────────────── */}
+      <svg
+        className="absolute inset-0 w-full h-full z-[6] pointer-events-none opacity-[0.07] mix-blend-overlay"
+        style={{ position: 'absolute' }}
+      >
+        <filter id="heroGrain">
+          <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="4" stitchTiles="stitch" />
+        </filter>
+        <rect width="100%" height="100%" filter="url(#heroGrain)" />
+      </svg>
+
+      {/* ── Hero Content ─────────────────────────────────────────────────── */}
+      <motion.div
+        className="absolute inset-0 z-[20] flex flex-col items-center justify-center px-4"
+        style={{ opacity: heroOpacity, y: textY }}
+      >
+        {/* ── GAKHA Logo (Synced with Nav) ── */}
+        <motion.svg
+          width="64" height="48" viewBox="0 0 100 80"
+          className="fill-white mb-6"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1, delay: 0.6 }}
+        >
+          <path d="M50 70 C 20 70 10 40 10 20 C 20 25 30 20 35 10 C 35 30 25 45 45 60 C 48 50 45 40 40 30 C 50 35 55 45 55 60 C 75 45 65 30 65 10 C 70 20 80 25 90 20 C 90 40 80 70 50 70 Z" />
+        </motion.svg>
+
+        {/* ── GAKHA Title with Scroll-Driven Glitch ─────────────────────── */}
+        <div className="relative text-center">
+          {/* ── Chromatic layers removed for maximum sharpness ── */}
+          {/* Forest green bloom glow */}
+          <h1
+            className="absolute inset-0 text-[#2e7d32] select-none pointer-events-none"
+            style={{
+              fontFamily: "'Bebas Neue', Impact, sans-serif",
+              fontSize: 'clamp(4rem, 15vw, 14rem)',
+              fontWeight: 900,
+              lineHeight: 1,
+              letterSpacing: '0.06em',
+              filter: 'blur(35px)',
+              opacity: 0.5,
+            }}
+          >
+            GAKHA
+          </h1>
+
+          {/* ── Main GAKHA text — Crisp White ────────────────── */}
+          <motion.h1
+            className="relative text-white"
+            style={{
+              fontFamily: "'Bebas Neue', Impact, sans-serif",
+              fontSize: 'clamp(4rem, 15vw, 14rem)',
+              fontWeight: 900,
+              lineHeight: 1,
+              letterSpacing: '0.06em',
+              textShadow: '0 10px 40px rgba(0,0,0,0.3)',
+            }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.45 }}
+          >
+            GAKHA
+          </motion.h1>
+        </div>
+
+        {/* Tagline */}
+        <motion.p
+          className="text-white uppercase tracking-[0.55em] text-[10px] md:text-[12px] mt-7 text-center font-bold"
+          style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, delay: 1.2 }}
+        >
+          Football Culture&nbsp;&nbsp;·&nbsp;&nbsp;Supporter Identity&nbsp;&nbsp;·&nbsp;&nbsp;Terrace Wear
+        </motion.p>
+
+        {/* ── CTA Buttons ─────────────────────────────────────────────────── */}
+        <motion.div
+          className="flex flex-col sm:flex-row items-center gap-4 mt-12"
+          initial={{ opacity: 0, y: 28 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, delay: 2.1 }}
+        >
+          {/* Primary — "Heavy hover" slow expansion */}
+          <motion.div whileHover="hovered">
+            <Link
+              to="/shop/all"
+              id="hero-cta-shop"
+              className="relative overflow-hidden inline-flex items-center justify-center bg-[#2e7d32] border border-white/20 text-white px-10 py-4 text-[10px] font-bold tracking-[0.4em] uppercase shadow-lg shadow-black/20"
+              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+            >
+              <motion.div
+                className="absolute inset-0 bg-[#2e7d32]"
+                initial={{ scaleX: 0 }}
+                style={{ originX: '0%' }}
+                variants={{
+                  hovered: {
+                    scaleX: 1,
+                    transition: { duration: 0.72, ease: [0.77, 0, 0.175, 1] },
+                  },
+                }}
+              />
+              <span className="relative z-10">Explore Collection</span>
+            </Link>
+          </motion.div>
+
+          {/* Ghost button */}
+          <Link
+            to="/#regional-series"
+            id="hero-cta-regions"
+            className="inline-flex items-center gap-3 text-white/70 hover:text-white px-7 py-4 text-[10px] font-bold tracking-[0.4em] uppercase border border-white/20 hover:border-white/40 transition-all duration-700"
+            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+          >
+            <span>Regional Series</span>
+            <span className="text-white/30">→</span>
+          </Link>
+        </motion.div>
+      </motion.div>
+
     </div>
   );
 }

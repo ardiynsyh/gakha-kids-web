@@ -85,7 +85,7 @@ export function TrackOrderPage() {
     <div className="max-w-[1200px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-20 min-h-[70vh]">
       <SEO 
         title="Lacak Pesanan & Bantuan" 
-        description="Pantau status pengiriman paket dan ajukan bantuan/pengembalian dana Gakha Kids secara real-time." 
+        description="Pantau status pengiriman paket dan ajukan bantuan/pengembalian dana GAKHA secara real-time." 
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -100,7 +100,7 @@ export function TrackOrderPage() {
           </h1>
           
           <p className="text-[var(--text-secondary)] text-lg leading-relaxed">
-            Paket Gakha Kids Anda sedang dalam perjalanan! Masukkan nomor resi yang Anda terima untuk memantau status pengiriman secara langsung.
+            Paket GAKHA Anda sedang dalam perjalanan! Masukkan nomor resi yang Anda terima untuk memantau status pengiriman secara langsung.
           </p>
 
           <div className="grid grid-cols-2 gap-4">

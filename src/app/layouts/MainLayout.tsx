@@ -13,22 +13,37 @@ export function MainLayout() {
       <Toaster position="top-center" richColors />
       <NewsletterPopup />
       <NavigationBar />
-      
+
+      {/* ── Fade-to-Forest-Green Page Wipe ─────────────────────────────── */}
+      <AnimatePresence>
+        <motion.div
+          key={`wipe-${location.pathname}`}
+          className="fixed inset-0 z-[500] pointer-events-none"
+          style={{ background: '#ffffff' }}
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.55, ease: [0.77, 0, 0.175, 1], delay: 0.08 }}
+        />
+      </AnimatePresence>
+
       <main className="flex-1 pt-[240px] lg:pt-[280px]">
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
-            initial={{ opacity: 0, y: 15, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ type: "spring", stiffness: 400, damping: 30, mass: 0.8 }}
-            className="w-full h-full transform-gpu origin-top"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="w-full"
           >
             <Outlet />
           </motion.div>
         </AnimatePresence>
       </main>
-      
+
       <Footer />
     </div>
   );
 }
+

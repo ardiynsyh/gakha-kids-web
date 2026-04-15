@@ -26,15 +26,22 @@ export function AdminDashboard() {
     announcement: { isEnabled: true, text: '' },
     productCategories: [
       { id: 'all', name: 'SEMUA KATEGORI' },
-      { id: 'born', name: 'NEW BORN' },
-      { id: '0-6', name: '0-6 BULAN' },
-      { id: '6-12', name: '6-12 BULAN' },
-      { id: '1-5', name: '1-5 TAHUN' },
-      { id: '5-12', name: '5-12 TAHUN' },
-      { id: 'boys', name: 'ANAK LAKI-LAKI' },
-      { id: 'girls', name: 'ANAK PEREMPUAN' },
-      { id: 'baby', name: 'BAYI' },
-      { id: 'toddler', name: 'TODDLER' }
+      { id: 'new', name: 'NEW DROP' },
+      { id: 'sale', name: 'PENAWARAN SPESIAL' },
+      { id: 'casuals', name: 'KOLEKSI CASUALS' },
+      { id: 'terrace', name: 'TERRACE WEAR' },
+      { id: 'accessories', name: 'AKSESORIS/SCARF' },
+      { id: 'jakarta', name: 'CITY: JAKARTA' },
+      { id: 'bandung', name: 'CITY: BANDUNG' },
+      { id: 'surabaya', name: 'CITY: SURABAYA' },
+      { id: 'malang', name: 'CITY: MALANG' },
+      { id: 'bali', name: 'CITY: BALI' },
+      { id: 'sleman', name: 'CITY: SLEMAN' },
+      { id: 'solo', name: 'CITY: SOLO' },
+      { id: 'semarang', name: 'CITY: SEMARANG' },
+      { id: 'medan', name: 'CITY: MEDAN' },
+      { id: 'jayapura', name: 'CITY: JAYAPURA' },
+      { id: 'samarinda', name: 'CITY: SAMARINDA' }
     ],
     socialMedia: { instagram: '', resellerWhatsApp: '' },
     hero: { headingLine1: '', headingLine2: '', description: '', backgroundImage: '' }
@@ -150,7 +157,7 @@ export function AdminDashboard() {
       price: "150000",
       originalPrice: "",
       image: "https://images.unsplash.com/photo-1540855513560-112df639c947?auto=format&fit=crop&q=80&w=300",
-      categories: [selectedCategory === 'all' ? 'born' : selectedCategory],
+      categories: [selectedCategory === 'all' ? 'new' : selectedCategory],
       sizes: ["S", "M", "L"],
       inventory: { "S": 10, "M": 10, "L": 10 },
       weight: 200
@@ -175,7 +182,7 @@ export function AdminDashboard() {
       printWindow.document.write(`
         <html>
           <head>
-            <title>Invoice Label - Gakha Kids</title>
+            <title>Invoice Label - GAKHA</title>
             <style>
               body { font-family: monospace; padding: 20px; color: #000; }
               .label { border: 3px solid #000; padding: 20px; border-radius: 12px; max-width: 400px; margin: 0 auto; }
@@ -190,7 +197,7 @@ export function AdminDashboard() {
           </head>
           <body>
             <div class="label">
-              <div class="header">GAKHA KIDS<br/><span style="font-size: 12px; font-weight: normal;">SHIPPING LABEL</span></div>
+              <div class="header">GAKHA<br/><span style="font-size: 12px; font-weight: normal;">SHIPPING LABEL</span></div>
                <div style="font-size: 10px; text-align: right; margin-bottom: 10px;">ID: #${order.id.toString().slice(-8)}</div>
               <div class="section">
                 <div class="title">PENERIMA</div>
@@ -665,7 +672,7 @@ export function AdminDashboard() {
                           setSelectedOrder(null);
                           toast.success("AWB Disimpan!");
                           // Otomatis WA
-                          const msg = `Halo Kak ${selectedOrder.customer_name},\n\nTerima kasih sudah belanja di Gakha Kids. Pesanan Kakak sedang dalam pengiriman.\n\nKurir: *Cek Status Resi*\nNo Resi (AWB): *${a}*\n\nDitunggu kedatangan paketnya ya!`;
+                          const msg = `Halo Kak ${selectedOrder.customer_name},\n\nTerima kasih sudah belanja di GAKHA. Pesanan Kakak sedang dalam pengiriman.\n\nKurir: *Cek Status Resi*\nNo Resi (AWB): *${a}*\n\nDitunggu kedatangan paketnya ya!`;
                           window.open(`https://wa.me/${selectedOrder.whatsapp}?text=${encodeURIComponent(msg)}`);
                         });
                       }

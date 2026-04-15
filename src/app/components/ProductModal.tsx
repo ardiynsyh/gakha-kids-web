@@ -47,7 +47,7 @@ export function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
           <SEO 
             title={product.seoTitle || product.name}
-            description={product.seoDescription || `Beli ${product.name} di Gakha Kids. Fashion bayi premium, lembut, dan modern.`}
+            description={product.seoDescription || `Beli ${product.name} di GAKHA. Koleksi streetwear premium budaya supporter.`}
             image={product.image}
           />
           <motion.div 

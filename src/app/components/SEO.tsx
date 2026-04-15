@@ -10,13 +10,13 @@ interface SEOProps {
 
 export function SEO({ 
   title, 
-  description = "Gakha Kids - Spesialis fashion bayi dan balita premium. Pakaian berkualitas tinggi, lembut, dan modern untuk buah hati Anda.", 
-  keywords = "pakaian bayi, baju balita, fashion bayi premium, gakha kids, perlengkapan bayi modern", 
+  description = "GAKHA - Modern Terrace Wear & Indonesian Football Culture. Koleksi streetwear premium yang terinspirasi dari semangat supporter dan budaya stadion.", 
+  keywords = "streetwear indonesia, terrace wear, football culture, gakha, apparel supporter, fashion stadion", 
   image = "/logo.png",
-  url = "https://gakhakids.online"
+  url = "https://gakha.store"
 }: SEOProps) {
-  const siteTitle = "Gakha Kids";
-  const fullTitle = title ? `${title} | ${siteTitle}` : `${siteTitle} | Pakaian Anak Premium`;
+  const siteTitle = "GAKHA";
+  const fullTitle = title ? `${title} | ${siteTitle}` : `${siteTitle} | Modern Terrace Wear`;
 
   return (
     <Helmet>

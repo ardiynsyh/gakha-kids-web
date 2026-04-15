@@ -48,8 +48,8 @@ export function AdminLogin() {
           <div className="w-16 h-16 bg-gray-900 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
              <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Gakha Kids Cloud Admin</h1>
-          <p className="text-gray-500 text-sm mt-2">Login Cloud (Pastikan Restart Server & Clear Cache)</p>
+          <h1 className="text-2xl font-bold text-gray-900">GAKHA Cloud Admin</h1>
+          <p className="text-gray-500 text-sm mt-2">Login Cloud Management System</p>
         </div>
         
         <form onSubmit={handleLogin} className="space-y-5">

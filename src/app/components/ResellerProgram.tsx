@@ -15,7 +15,7 @@ export function ResellerProgram() {
     {
       icon: <ShieldCheck className="w-8 h-8 text-blue-500" />,
       title: "Kualitas Premium",
-      description: "Produk Gakha Kids menggunakan bahan katun organik yang aman untuk kulit bayi."
+      description: "Produk GAKHA menggunakan bahan pilihan yang awet dan nyaman untuk penggunaan sehari-hari."
     },
     {
       icon: <Zap className="w-8 h-8 text-yellow-500" />,
@@ -48,10 +48,10 @@ export function ResellerProgram() {
           animate={{ opacity: 1, y: 0 }}
           className="text-[clamp(1.5rem,4vw,2.5rem)] font-black text-[var(--text-primary)] leading-tight"
         >
-          Tumbuh Bersama <span className="text-[var(--accent)]">Gakha Kids</span>
+          Tumbuh Bersama <span className="text-[var(--accent)]">GAKHA</span>
         </motion.h2>
         <p className="text-lg text-[var(--text-secondary)] leading-relaxed max-w-2xl mx-auto">
-          Bergabunglah dengan program kemitraan kami dan mulai bisnis fashion bayi Anda sendiri dengan merk yang sudah dipercaya ribuan ibu di Indonesia.
+          Bergabunglah dengan program kemitraan kami dan mulai bisnis fashion stadion Anda sendiri dengan merk yang sudah dipercaya pecinta sepak bola di Indonesia.
         </p>
       </section>
 
@@ -94,7 +94,7 @@ export function ResellerProgram() {
             Klik tombol di bawah ini untuk mendaftar via WhatsApp. Tim kami akan menghubungi Anda dalam 1x24 jam.
           </p>
           <a 
-            href={`https://wa.me/${resellerNumber}?text=Halo%20Gakha%20Kids,%20saya%20tertarik%20bergabung%20menjadi%20reseller`} 
+            href={`https://wa.me/${resellerNumber}?text=Halo%20GAKHA,%20saya%20tertarik%20bergabung%20menjadi%20reseller`} 
             target="_blank" 
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 bg-[var(--accent)] text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest text-sm hover:scale-105 transition-all shadow-xl"

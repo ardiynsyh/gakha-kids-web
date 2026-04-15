@@ -1,147 +1,112 @@
 [
   {
     "id": 1,
-    "name": "Setelan Updated Olahraga Pelangi",
-    "price": "Rp 150.000",
-    "image": "https://images.unsplash.com/photo-1632232963035-bc14755747c9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxraWRzJTIwY2xvdGhpbmclMjBmYXNoaW9uJTIwcHJvZHVjdHN8ZW58MXx8fHwxNzc1MzYxMTY2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    "tag": "Baru",
-    "color": "#A8E6CF",
-    "categories": [
-      "boys",
-      "girls",
-      "new",
-      "sale"
-    ],
-    "details": "Setelan olahraga berbahan katun yang lembut untuk kulit si kecil.",
-    "linktreeUrl": "https://linktr.ee/yourstore"
+    "name": "Jaket Casual Jakmania — Edition Merah Betawi",
+    "price": "Rp 385.000",
+    "image": "https://images.unsplash.com/photo-1520975954732-35dd22299614?q=80&w=600&auto=format&fit=crop",
+    "tag": "New Drop",
+    "color": "#CC0000",
+    "categories": ["casuals", "jakarta", "new"],
+    "details": "Jaket casual tebal dengan motif batik Betawi dan identitas supporter Jakarta. Limited edition. Bahan fleece premium 300gsm, sablon discharge tahan lama.",
+    "linktreeUrl": "https://linktr.ee/ultrasid"
   },
   {
     "id": 2,
-    "name": "Setelan Santai Nyaman",
-    "price": "Rp 165.000",
-    "image": "https://images.unsplash.com/photo-1632232963236-9846f0503a90?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwyfHxraWRzJTIwY2xvdGhpbmclMjBmYXNoaW9uJTIwcHJvZHVjdHN8ZW58MXx8fHwxNzc1MzYxMTY2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    "tag": "Tren",
-    "color": "#B4D7F1",
-    "categories": [
-      "boys",
-      "new"
-    ],
-    "details": "Setelan santai dengan desain modern dan bahan sejuk.",
-    "linktreeUrl": "https://linktr.ee/yourstore"
+    "name": "Hoodie Ultraviolent — Bobotoh Edition",
+    "price": "Rp 425.000",
+    "originalPrice": "Rp 500.000",
+    "image": "https://images.unsplash.com/photo-1556821840-3a63f15732ce?q=80&w=600&auto=format&fit=crop",
+    "tag": "Diskon 15%",
+    "color": "#003087",
+    "categories": ["hooligans", "bandung", "new", "sale"],
+    "details": "Hoodie tebal dengan grafis tribal Sunda dan identitas Bobotoh. Bahan cotton fleece 350gsm, potongan oversized, cocok untuk tribun dan jalanan.",
+    "linktreeUrl": "https://linktr.ee/ultrasid"
   },
   {
     "id": 3,
-    "name": "Gaun Pesta Ungu",
-    "price": "Rp 185.000",
-    "originalPrice": "Rp 250.000",
-    "image": "https://images.unsplash.com/photo-1637161066165-e263bed16a94?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw3fHxraWRzJTIwY2xvdGhpbmclMjBmYXNoaW9uJTIwcHJvZHVjdHN8ZW58MXx8fHwxNzc1MzYxMTY2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    "tag": "Diskon",
-    "color": "#E0BBE4",
-    "categories": [
-      "girls",
-      "sale"
-    ],
-    "details": "Gaun cantik warna ungu cocok untuk pergi ke pesta.",
-    "linktreeUrl": "https://linktr.ee/yourstore"
+    "name": "Bomber Jacket — Singo Edan Aremania",
+    "price": "Rp 545.000",
+    "image": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=600&auto=format&fit=crop",
+    "tag": "Eksklusif",
+    "color": "#1E4DB7",
+    "categories": ["casuals", "malang", "new"],
+    "details": "Bomber jacket premium dengan sulaman logo Arema dan elemen grafis tribal Jawa Timur. Bahan twill water-resistant.",
+    "linktreeUrl": "https://linktr.ee/ultrasid"
   },
   {
     "id": 4,
-    "name": "Setelan Sporty Duo",
-    "price": "Rp 195.000",
-    "image": "https://images.unsplash.com/photo-1632232962967-0740a757380d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw0fHxraWRzJTIwY2xvdGhpbmclMjBmYXNoaW9uJTIwcHJvZHVjdHN8ZW58MXx8fHwxNzc1MzYxMTY2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    "tag": "Baru",
-    "color": "#FFF9B0",
-    "categories": [
-      "boys",
-      "new"
-    ],
-    "details": "Setelan olahraga dengan kombinasi dua warna.",
-    "linktreeUrl": "https://linktr.ee/yourstore"
+    "name": "Crewneck Ultras — LA Mania Makasar",
+    "price": "Rp 315.000",
+    "image": "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?q=80&w=600&auto=format&fit=crop",
+    "tag": "Hot",
+    "color": "#E31837",
+    "categories": ["casuals", "sulawesi", "sale"],
+    "details": "Crewneck oversized dengan grafis batik Makassar. Simbol persatuan supporter Sulawesi Selatan. Cotton combed 30s premium.",
+    "linktreeUrl": "https://linktr.ee/ultrasid"
   },
   {
     "id": 5,
-    "name": "Setelan Kasual Keren",
-    "price": "Rp 140.000",
-    "image": "https://images.unsplash.com/photo-1632232963262-0e5cd712d44c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw1fHxraWRzJTIwY2xvdGhpbmclMjBmYXNoaW9uJTIwcHJvZHVjdHN8ZW58MXx8fHwxNzc1MzYxMTY2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    "color": "#A8E6CF",
-    "categories": [
-      "boys",
-      "sale"
-    ],
-    "details": "Tampil keren di mana saja dengan pakaian santai yang gaya.",
-    "linktreeUrl": "https://linktr.ee/yourstore"
+    "name": "Cargo Pants — Street Hooligan Series",
+    "price": "Rp 385.000",
+    "image": "https://images.unsplash.com/photo-1542272454315-4c01d7abdf4a?q=80&w=600&auto=format&fit=crop",
+    "color": "#1a1a1a",
+    "categories": ["hooligans", "new"],
+    "details": "Celana cargo tactical dengan bahan ripstop kuat. Desain fungsional dengan banyak kantong. Inspirasi dari kultur hooligan Inggris.",
+    "linktreeUrl": "https://linktr.ee/ultrasid"
   },
   {
     "id": 6,
-    "name": "Penjelajah Akhir Pekan",
-    "price": "Rp 170.000",
-    "image": "https://images.unsplash.com/photo-1632232963030-b5d9dd08a1f8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw5fHxraWRzJTIwY2xvdGhpbmclMjBmYXNoaW9uJTIwcHJvZHVjdHN8ZW58MXx8fHwxNzc1MzYxMTY2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    "color": "#FFD1DC",
-    "categories": [
-      "boys",
-      "girls"
-    ],
-    "details": "Cocok untuk aktivitas bermain luar di akhir pekan.",
-    "linktreeUrl": "https://linktr.ee/yourstore"
+    "name": "Tee Oversized — Tribal Minang Semen Padang",
+    "price": "Rp 220.000",
+    "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=600&auto=format&fit=crop",
+    "color": "#FFD700",
+    "categories": ["casuals", "sumatra", "new"],
+    "details": "Kaos oversized dengan motif tenun Minangkabau dipadukan identitas supporter Semen Padang. Bahan cotton bambu 200gsm.",
+    "linktreeUrl": "https://linktr.ee/ultrasid"
   },
   {
     "id": 7,
-    "name": "Setelan Kuning Cerah",
-    "price": "Rp 155.000",
-    "image": "https://images.unsplash.com/photo-1710425805333-906c53afa4bc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHw4fHxoYXBweSUyMGNoaWxkcmVuJTIwd2VhcmluZyUyMHN0eWxpc2glMjBjbG90aGVzJTIwZmFzaGlvbnxlbnwxfHx8fDE3NzUzNjExNjZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+    "name": "Track Jacket — PSPS Pekanbaru Pride",
+    "price": "Rp 465.000",
+    "image": "https://images.unsplash.com/photo-1594938298603-21023e2aa3b4?q=80&w=600&auto=format&fit=crop",
     "tag": "Populer",
-    "color": "#FFF9B0",
-    "categories": [
-      "girls",
-      "new",
-      "sale"
-    ],
-    "details": "Mencerahkan hari anak dengan gaya dominan warna kuning.",
-    "linktreeUrl": "https://linktr.ee/yourstore"
+    "color": "#E60026",
+    "categories": ["casuals", "sumatra"],
+    "details": "Track jacket retro dengan aksen motif melayu dan identitas supporter Riau. Bahan polyester milky berkualitas dengan bordir premium.",
+    "linktreeUrl": "https://linktr.ee/ultrasid"
   },
   {
     "id": 8,
-    "name": "Klasik Bisbol",
-    "price": "Rp 135.000",
-    "image": "https://images.unsplash.com/photo-1759313560190-d160c3567170?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoYXBweSUyMGNoaWxkcmVuJTIwd2VhcmluZyUyMHN0eWxpc2glMjBjbG90aGVzJTIwZmFzaGlvbnxlbnwxfHx8fDE3NzUzNjExNjZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
-    "color": "#B4D7F1",
-    "categories": [
-      "boys"
-    ],
-    "details": "Setelan dengan tema jaket baseball klasik.",
-    "linktreeUrl": "https://linktr.ee/yourstore"
+    "name": "Coach Jacket — Suporter Bali United",
+    "price": "Rp 495.000",
+    "image": "https://images.unsplash.com/photo-1601063467369-5c3ad86f600c?q=80&w=600&auto=format&fit=crop",
+    "tag": "Baru",
+    "color": "#FF4500",
+    "categories": ["casuals", "bali", "new"],
+    "details": "Coach jacket dengan ukiran motif Barong Bali dipadukan identitas supporter Bali United. Water resistant, vivid print sublimasi.",
+    "linktreeUrl": "https://linktr.ee/ultrasid"
   },
   {
-    "id": 1775388427303,
-    "name": "test",
-    "price": "Rp 100.000",
-    "image": "https://images.unsplash.com/photo-1632232963035-bc14755747c9?auto=format&fit=crop&w=500&q=60",
-    "color": "#cccccc",
-    "linktreeUrl": "https://linktr.ee/",
-    "categories": [
-      "new"
-    ]
+    "id": 9,
+    "name": "Parka Hoodie — Persebaya Green Force",
+    "price": "Rp 575.000",
+    "originalPrice": "Rp 650.000",
+    "image": "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?q=80&w=600&auto=format&fit=crop",
+    "tag": "Diskon 12%",
+    "color": "#00AA00",
+    "categories": ["hooligans", "jawa", "sale"],
+    "details": "Parka hoodie tebal dengan grafis batik Surabaya dan elemen Green Force Bonek. Bahan canvas premium waterproof.",
+    "linktreeUrl": "https://linktr.ee/ultrasid"
   },
   {
-    "id": 1775392168072,
-    "name": "test1",
-    "price": "Rp 200000",
-    "image": "https://images.unsplash.com/photo-1632232963035-bc14755747c9?auto=format&fit=crop&w=500&q=60",
-    "color": "#cccccc",
-    "linktreeUrl": "https://linktr.ee/",
-    "categories": [
-      "toddler"
-    ]
-  },
-  {
-    "id": 1775392189902,
-    "name": "Produk Baru",
-    "price": "Rp 150000",
-    "image": "https://images.unsplash.com/photo-1632232963035-bc14755747c9?auto=format&fit=crop&w=500&q=60",
-    "color": "#cccccc",
-    "linktreeUrl": "https://linktr.ee/",
-    "categories": [
-      "baby"
-    ]
+    "id": 10,
+    "name": "Bucket Hat — Casual Ultras Series",
+    "price": "Rp 165.000",
+    "image": "https://images.unsplash.com/photo-1534215754734-18e55d13e346?q=80&w=600&auto=format&fit=crop",
+    "tag": "Aksesoris",
+    "color": "#333333",
+    "categories": ["casuals", "accessories", "new"],
+    "details": "Bucket hat dengan embroidery skema supporter Indonesia. Bahan canvas 6-panel, adjustable strap.",
+    "linktreeUrl": "https://linktr.ee/ultrasid"
   }
 ]

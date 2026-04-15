@@ -76,7 +76,7 @@ export function InfoPage() {
         return (
           <>
             <p className="text-lg leading-relaxed text-[var(--text-secondary)] mb-8">
-              Selamat datang di Jurnal <strong>Gakha Kids</strong>. Sebuah sudut literasi di mana kami berbagi pandangan seputar pola asuh cerdas, memilih material ramah anak, serta merangkum tren pakaian yang nyaman dan tidak membatasi ruang gerak.
+              Selamat datang di Jurnal <strong>GAKHA</strong>. Sudut pandang kami seputar kultur sepak bola, fashion stadion, dan cerita di balik setiap koleksi yang kami luncurkan.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
               {blogPosts.map((post) => (
@@ -106,11 +106,11 @@ export function InfoPage() {
         return (
           <>
             <div className="w-full relative rounded-3xl overflow-hidden mb-12 h-[350px] shadow-lg group">
-              <img src="https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=1600&auto=format&fit=crop" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt="Tentang Gakha Kids" />
+              <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1600&auto=format&fit=crop" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt="Tentang GAKHA" />
               <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent flex items-end justify-start p-10">
                  <div className="max-w-2xl text-left">
-                   <h2 className="text-white text-[clamp(2rem,4vw,3.5rem)] font-black tracking-tight leading-none mb-4 drop-shadow-xl font-serif italic">Merajut Cerita<br/>Sejak 2024</h2>
-                   <p className="text-white/90 text-lg font-medium drop-shadow-md">Mengantarkan senyum di setiap jahitan pakaian pertama si buah hati.</p>
+                   <h2 className="text-white text-[clamp(2rem,4vw,3.5rem)] font-black tracking-tight leading-none mb-4 drop-shadow-xl font-serif italic">Identity of the Terrace<br/>Since 2024</h2>
+                   <p className="text-white/90 text-lg font-medium drop-shadow-md">Membangun kebanggaan di setiap detak jantung kultur sepak bola.</p>
                  </div>
               </div>
             </div>
@@ -122,7 +122,7 @@ export function InfoPage() {
                    <h3 className="text-2xl font-black text-[var(--text-primary)] m-0">Titik Mula Kami</h3>
                 </div>
                 <p className="text-lg text-[var(--text-secondary)] leading-relaxed">
-                  Gakha Kids tidak lahir dari sekadar ambisi bisnis korporat. Perjalanan ini bermula dari kerisauan nyata seorang ibu muda di lorong panti asuhan pinggiran kota, yang kesulitan mencari pakaian sumbangan yang bukan sekadar 'murah', namun layak pakai, dan terbuat dari katun yang tidak menyakiti kulit sensitif bayi-bayi di sana. 
+                  <strong>GAKHA</strong> lahir dari kecintaan yang mendalam terhadap sepak bola dan subkultur tribun yang mengelilinginya. Kami percaya bahwa apa yang Anda kenakan di stadion adalah pernyataan identitas, sejarah, dan kesetiaan tanpa syarat.
                 </p>
               </section>
 
@@ -132,7 +132,7 @@ export function InfoPage() {
                   Apabila Anda adalah seniman rajut lokal, distributor kapas organik, atau sekadar ibu yang ingin membagikan kisahnya kepada audiens kami, kanal komunikasi kami selalu terbuka secara profesional.
                  </p>
                  <a 
-                    href={`https://wa.me/${resellerNumber}?text=Halo%20Gakha%20Kids,%20saya%20tertarik%20untuk%20menjalin%20kolaborasi%20bisnis.`} 
+                    href={`https://wa.me/${resellerNumber}?text=Halo%20GAKHA,%20saya%20tertarik%20untuk%20menjalin%20kolaborasi%20bisnis.`} 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     className="inline-flex items-center gap-2 bg-[var(--text-primary)] text-[var(--bg-primary)] font-bold px-6 py-3 rounded-xl hover:bg-[var(--accent)] transition-colors"
