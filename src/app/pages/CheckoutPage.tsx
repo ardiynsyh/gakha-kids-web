@@ -61,30 +61,77 @@ export function CheckoutPage() {
       });
   }, []);
 
+  // ─── Flat-rate fallback per wilayah (dipakai jika RajaOngkir gagal) ──────
+  const getFlatRateOptions = (cityId: string) => {
+    const city = cities.find(c => c.city_id === cityId);
+    const pid = city?.province_id || '9';
+
+    const JAVA   = ['6','9','3','10','7','11'];
+    const BALI   = ['2','22','23'];
+    const SUMATRA = ['1','4','5','8','18','19','26','32','33','34'];
+    const KALIMANTAN = ['13','14','15','16','36'];
+    const SULAWESI   = ['27','28','29','30','31','35'];
+    const PAPUA      = ['20','21','24','25'];
+
+    let base = 25000; let etd = '4-7';
+    if (pid === '6')                     { base = 12000; etd = '1-2'; } // DKI
+    else if (JAVA.includes(pid))          { base = 18000; etd = '2-4'; }
+    else if (BALI.includes(pid))          { base = 28000; etd = '4-7'; }
+    else if (SUMATRA.includes(pid))       { base = 32000; etd = '4-7'; }
+    else if (KALIMANTAN.includes(pid))    { base = 38000; etd = '5-8'; }
+    else if (SULAWESI.includes(pid))      { base = 42000; etd = '5-9'; }
+    else if (PAPUA.includes(pid))         { base = 55000; etd = '7-14'; }
+
+    // Biaya tambahan tiap 500g di atas 1kg
+    const extra = Math.max(0, Math.ceil((totalWeight - 1000) / 500));
+    const jne  = base + extra * 3000;
+    const tiki = Math.round(base * 1.1) + extra * 3000;
+    const pos  = Math.round(base * 0.9) + extra * 2500;
+
+    return [
+      { service:'REG',  description:'Layanan Reguler (Estimasi)',   cost:[{value:jne,  etd, note:'*Estimasi'}], courier_name:'JNE',  courier_code:'jne',  isEstimate:true },
+      { service:'REG',  description:'Layanan Reguler (Estimasi)',   cost:[{value:tiki, etd, note:'*Estimasi'}], courier_name:'TIKI', courier_code:'tiki', isEstimate:true },
+      { service:'PKH',  description:'Paket Kilat Khusus (Estimasi)', cost:[{value:pos,  etd, note:'*Estimasi'}], courier_name:'POS',  courier_code:'pos',  isEstimate:true },
+    ];
+  };
+
   // Fetch Shipping Costs when City/Weight changes
   useEffect(() => {
-    if (selectedCityId && totalWeight > 0) {
-      setIsFetchingShipping(true);
-      fetch('/api/shipping', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          origin: '152', // Jakarta Pusat
-          destination: selectedCityId,
-          weight: totalWeight,
-          courier: 'jne'
-        })
+    if (!selectedCityId || totalWeight <= 0) return;
+
+    setIsFetchingShipping(true);
+    setShippingOptions([]);
+    setSelectedShipping(null);
+
+    fetch('/api/shipping', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        origin: '152', // Jakarta Pusat
+        destination: selectedCityId,
+        weight: totalWeight,
       })
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          setShippingOptions(data);
-          if (data.length > 0) setSelectedShipping(data[0]); 
-        }
-      })
-      .catch(err => console.error("Error fetching shipping:", err))
-      .finally(() => setIsFetchingShipping(false));
-    }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (Array.isArray(data) && data.length > 0) {
+        // RajaOngkir berhasil → pakai data live
+        setShippingOptions(data);
+        setSelectedShipping(data[0]);
+      } else {
+        // API kembali tapi tidak ada data → fallback
+        const fallback = getFlatRateOptions(selectedCityId);
+        setShippingOptions(fallback);
+        setSelectedShipping(fallback[0]);
+      }
+    })
+    .catch(() => {
+      // API gagal total → gunakan flat-rate regional
+      const fallback = getFlatRateOptions(selectedCityId);
+      setShippingOptions(fallback);
+      setSelectedShipping(fallback[0]);
+    })
+    .finally(() => setIsFetchingShipping(false));
   }, [selectedCityId, totalWeight]);
 
   const handleApplyCoupon = async () => {
@@ -341,10 +388,16 @@ export function CheckoutPage() {
                     </select>
                   </div>
 
+
                   {shippingOptions.length > 0 && (
                     <div className="md:col-span-2 space-y-2 bg-blue-50/50 p-6 rounded-3xl border border-blue-100">
                       <label className="text-[10px] font-black uppercase text-blue-500 tracking-widest ml-1 flex items-center gap-2">
                         <Truck className="w-4 h-4" /> Pilih Layanan Pengiriman
+                        {shippingOptions[0]?.isEstimate && (
+                          <span className="ml-auto bg-amber-100 text-amber-600 px-2 py-0.5 rounded-full text-[9px] font-black normal-case tracking-normal">
+                            ⚡ Harga Perkiraan Regional
+                          </span>
+                        )}
                       </label>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
                         {shippingOptions.map((opt, idx) => (
@@ -364,14 +417,22 @@ export function CheckoutPage() {
                               <p className="text-[9px] text-gray-400 font-bold leading-tight">{opt.description}</p>
                             </div>
                             <div className="mt-4">
-                              <p className="text-sm font-black text-blue-600">Rp {opt.cost?.[0]?.value?.toLocaleString() || '0'}</p>
+                              <p className="text-sm font-black text-blue-600">
+                                {opt.isEstimate ? '~' : ''}Rp {opt.cost?.[0]?.value?.toLocaleString() || '0'}
+                              </p>
                               <p className="text-[9px] text-gray-400 font-medium">Estimasi: {opt.cost?.[0]?.etd || '-'} Hari</p>
                             </div>
                           </button>
                         ))}
                       </div>
+                      {shippingOptions[0]?.isEstimate && (
+                        <p className="text-[9px] text-amber-600 font-bold mt-3 ml-1">
+                          * Harga di atas adalah estimasi berdasarkan wilayah. Ongkir final akan dikonfirmasi via WhatsApp setelah order.
+                        </p>
+                      )}
                     </div>
                   )}
+
 
                   {isFetchingShipping && (
                     <div className="md:col-span-2 text-center py-4 text-blue-400 font-bold text-xs animate-pulse">
