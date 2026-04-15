@@ -31,36 +31,41 @@ function ProductGrid({ products }: { products: Record<string, any>[] }) {
       {products.map((p) => (
         <motion.div
           key={String(p.id)}
-          className="flex flex-col bg-white border border-[#1b5e20]/5 group"
+          className="flex flex-col bg-white border border-gray-100 group relative transition-all duration-500 rounded-[2.5rem] overflow-hidden shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_40px_80px_-20px_rgba(0,51,0,0.12)]"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
+          whileHover={{ y: -12 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
           <div className="relative aspect-[3/4] overflow-hidden">
             <ImageWithFallback
               src={String(p.image ?? '')}
               alt={String(p.name ?? '')}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
             />
-            <div className="absolute inset-0 bg-[#003300]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            {/* Soft gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#003300]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           </div>
           
-          <div className="p-5 flex flex-col items-center text-center">
-            <span className="text-[#2e7d32] text-[8px] font-black tracking-[0.4em] uppercase mb-2">
+          <div className="p-8 flex flex-col items-center text-center relative z-10 bg-white">
+            <span className="text-[#2e7d32] text-[8px] font-black tracking-[0.4em] uppercase mb-3 px-3 py-1 bg-green-50 rounded-full">
               {p.categories?.[0] || 'GAKHA CURATED'}
             </span>
-            <h4 className="text-sm font-bold text-[#001a00] mb-1 uppercase tracking-wider line-clamp-1">
+            <h4 className="text-sm font-bold text-[#001a00] mb-2 uppercase tracking-tighter line-clamp-1 group-hover:text-[#2e7d32] transition-colors">
               {String(p.name ?? '')}
             </h4>
-            <p className="text-sm font-black text-[#2e7d32] mb-5">
+            <p className="text-lg font-black text-[#001a00] mb-6">
                Rp {typeof p.price === 'number' ? p.price.toLocaleString('id-ID') : p.price}
             </p>
             
-            <button className="w-full bg-[#003300] text-white py-3.5 text-[9px] font-bold tracking-[0.3em] uppercase hover:bg-[#2e7d32] transition-all flex items-center justify-center gap-2">
-              <ShoppingBag className="w-3.5 h-3.5" />
+            <motion.button 
+              whileTap={{ scale: 0.95 }}
+              className="w-full bg-[#003300] text-white py-4 text-[10px] font-black tracking-[0.3em] uppercase hover:bg-[#2e7d32] transition-all flex items-center justify-center gap-2 rounded-2xl shadow-xl shadow-green-900/10 hover:shadow-green-900/30"
+            >
+              <ShoppingBag className="w-4 h-4" />
               Beli Sekarang
-            </button>
+            </motion.button>
           </div>
         </motion.div>
       ))}

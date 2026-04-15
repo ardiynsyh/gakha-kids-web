@@ -135,44 +135,43 @@ export function HeroBanner() {
 
         {/* ── CTA Buttons ─────────────────────────────────────────────────── */}
         <motion.div
-          className="flex flex-col sm:flex-row items-center gap-4 mt-12"
+          className="flex flex-col sm:flex-row items-center gap-6 mt-16"
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, delay: 2.1 }}
         >
           {/* Primary — "Heavy hover" slow expansion */}
-          <motion.div whileHover="hovered">
+          <motion.div 
+            whileHover={{ scale: 1.05, y: -5 }}
+            whileTap={{ scale: 0.98 }}
+            className="group"
+          >
             <Link
               to="/shop/all"
               id="hero-cta-shop"
-              className="relative overflow-hidden inline-flex items-center justify-center bg-[#2e7d32] border border-white/20 text-white px-10 py-4 text-[10px] font-bold tracking-[0.4em] uppercase shadow-lg shadow-black/20"
+              className="relative overflow-hidden inline-flex items-center justify-center bg-[#2e7d32] text-white px-12 py-5 text-[10px] font-black tracking-[0.4em] uppercase shadow-[0_20px_50px_-10px_rgba(0,0,0,0.4)] hover:shadow-[0_40px_80px_-15px_rgba(46,125,50,0.5)] transition-all rounded-2xl"
               style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             >
-              <motion.div
-                className="absolute inset-0 bg-[#2e7d32]"
-                initial={{ scaleX: 0 }}
-                style={{ originX: '0%' }}
-                variants={{
-                  hovered: {
-                    scaleX: 1,
-                    transition: { duration: 0.72, ease: [0.77, 0, 0.175, 1] },
-                  },
-                }}
-              />
               <span className="relative z-10">Explore Collection</span>
+              <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             </Link>
           </motion.div>
 
           {/* Ghost button */}
-          <Link
-            to="/#regional-series"
-            id="hero-cta-regions"
-            className="inline-flex items-center gap-3 text-white/70 hover:text-white px-7 py-4 text-[10px] font-bold tracking-[0.4em] uppercase border border-white/20 hover:border-white/40 transition-all duration-700"
-            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+          <motion.div 
+            whileHover={{ scale: 1.05, y: -5 }}
+            whileTap={{ scale: 0.98 }}
           >
-            <span>Regional Series</span>
-            <span className="text-white/30">→</span>
-          </Link>
+            <Link
+              to="/#regional-series"
+              id="hero-cta-regions"
+              className="inline-flex items-center gap-4 text-white px-8 py-5 text-[10px] font-black tracking-[0.4em] uppercase border-2 border-white/20 hover:border-white/50 hover:bg-white/5 transition-all rounded-2xl backdrop-blur-sm shadow-xl"
+              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+            >
+              <span>Regional Series</span>
+              <span className="text-white/40 group-hover:translate-x-1 transition-transform">→</span>
+            </Link>
+          </motion.div>
         </motion.div>
       </motion.div>
 
