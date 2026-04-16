@@ -31,6 +31,12 @@ export function AdminDashboard() {
       { id: 'new', name: 'NEW DROP' },
       { id: 'football', name: 'FOOTBALL CULTURE' },
       { id: 'regional', name: 'REGIONAL SERIES' },
+      { id: 'jakarta', name: 'JAKARTA' },
+      { id: 'bandung', name: 'BANDUNG' },
+      { id: 'malang', name: 'MALANG' },
+      { id: 'surabaya', name: 'SURABAYA' },
+      { id: 'bali', name: 'BALI' },
+      { id: 'solo', name: 'SOLO' },
       { id: 'sale', name: 'PENAWARAN SPESIAL' },
       { id: 'accessories', name: 'AKSESORIS' }
     ],
