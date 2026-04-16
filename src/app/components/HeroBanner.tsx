@@ -1,6 +1,7 @@
 import { useRef, useMemo } from 'react';
 import { Link } from 'react-router';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { LogoGakha } from './LogoGakha';
 
 // ── Deterministic rain drops (stable across renders, no Math.random) ──────────
 function useRainDrops(count: number) {
@@ -74,14 +75,14 @@ export function HeroBanner() {
         style={{ opacity: heroOpacity, y: textY }}
       >
         {/* ── GAKHA Logo (Synced with Nav) ── */}
-        <motion.img
-          src="/logo-white.png"
-          alt="GAKHA Logo"
-          className="h-20 md:h-24 w-auto mb-6 relative z-10"
+        <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.6 }}
-        />
+          className="mb-8"
+        >
+          <LogoGakha className="h-24 md:h-28 w-auto" color="white" />
+        </motion.div>
 
         {/* ── GAKHA Title with Scroll-Driven Glitch ─────────────────────── */}
         <div className="relative text-center">

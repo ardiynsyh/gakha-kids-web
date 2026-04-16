@@ -3,6 +3,7 @@ import { ChevronDown, ShoppingBag } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useCart } from '../context/CartContext';
+import { LogoGakha } from './LogoGakha';
 
 export function NavigationBar() {
   const { cart } = useCart();
@@ -41,12 +42,8 @@ export function NavigationBar() {
         <div className="max-w-[1600px] mx-auto px-8 flex items-center justify-between">
 
         {/* ── LOGO ── */}
-        <Link to="/" className="flex items-center gap-3 group cursor-pointer">
-          <img 
-            src="/logo-green.png" 
-            alt="GAKHA Logo" 
-            className="h-10 md:h-12 w-auto group-hover:scale-105 transition-transform duration-500"
-          />
+        <Link to="/" className="group cursor-pointer">
+          <LogoGakha className="h-12 md:h-14 w-auto" color="#013220" />
         </Link>
 
         {/* ── Center Nav Links ── */}
