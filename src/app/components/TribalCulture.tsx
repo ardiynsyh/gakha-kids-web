@@ -4,17 +4,19 @@ import { motion } from 'framer-motion';
 const TRIBES = [
   {
     city: 'JAKARTA',
+    tribe: 'THE JAK',
     tagline: 'Merah Betawi, Jiwa Jakarta',
     color: '#CC0000',
     colorSecondary: '#FF6B6B',
     route: '/shop/jakarta',
     image: '/cities/jakarta.png',
     symbol: '🔴',
-    founded: 'est. 1970',
+    founded: 'est. 1928',
     desc: 'Koleksi terinspirasi batik Betawi dan kultur supporter Jakarta. Identitas merah membara.'
   },
   {
     city: 'BANDUNG',
+    tribe: 'VIKING',
     tagline: 'Biru Viking Tatar Sunda',
     color: '#003087',
     colorSecondary: '#4A90D9',
@@ -26,6 +28,7 @@ const TRIBES = [
   },
   {
     city: 'MALANG',
+    tribe: 'AREMA',
     tagline: 'Singo Edan Malang Raya',
     color: '#1A5C99',
     colorSecondary: '#6BB3E0',
@@ -37,6 +40,7 @@ const TRIBES = [
   },
   {
     city: 'SURABAYA',
+    tribe: 'BONEK',
     tagline: 'Modal Nekat Arek Surabaya',
     color: '#00AA00',
     colorSecondary: '#66CC66',
@@ -48,6 +52,7 @@ const TRIBES = [
   },
   {
     city: 'MAKASSAR',
+    tribe: 'JUKU EJA',
     tagline: 'Juku Eja Sulawesi Selatan',
     color: '#E31837',
     colorSecondary: '#FF5060',
@@ -59,6 +64,7 @@ const TRIBES = [
   },
   {
     city: 'BALI',
+    tribe: 'SERDADU TRIDATU',
     tagline: 'Pulau Surga Sepak Bola',
     color: '#FF4500',
     colorSecondary: '#FF8C00',

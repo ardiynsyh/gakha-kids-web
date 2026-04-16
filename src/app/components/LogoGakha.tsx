@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 
 export function LogoGakha({ className = "", color = "#013220", showText = true }: { className?: string; color?: string; showText?: boolean }) {
   return (

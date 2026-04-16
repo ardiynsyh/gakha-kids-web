@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Zap } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Zap } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 
 export function FlashSaleTimer() {

@@ -39,10 +39,10 @@ export function Interactive3DBackground() {
           style={{ 
             x: useTransform(springX, (v) => v * 1.5),
             y: useTransform(y1, (v) => v + (mouseY.get() * 1.2)),
-            rotate 
+            rotate,
+            willChange: 'transform'
           }}
           className="absolute top-[10%] left-[10%] w-[500px] h-[500px] rounded-full bg-[#2e7d32] opacity-30 blur-[20px]"
-          style={{ willChange: 'transform' }}
         />
 
         {/* Blob 2 - GAKHA Red */}
@@ -50,10 +50,10 @@ export function Interactive3DBackground() {
           style={{ 
             x: useTransform(springX, (v) => -v * 2),
             y: useTransform(y2, (v) => v - (mouseY.get() * 1)),
-            rotate: useTransform(rotate, (v) => -v)
+            rotate: useTransform(rotate, (v) => -v),
+            willChange: 'transform'
           }}
           className="absolute bottom-[10%] right-[10%] w-[600px] h-[600px] rounded-full bg-[#4caf50] opacity-20 blur-[20px]"
-          style={{ willChange: 'transform' }}
         />
 
         {/* Blob 3 - GAKHA Grey/Silver */}

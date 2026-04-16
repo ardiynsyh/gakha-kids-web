@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ShoppingBag, Heart, Play, Ruler, Share2, ArrowRight } from 'lucide-react';
+import { X, ShoppingBag, Heart, Play, Share2, ArrowRight } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useWishlist } from '../context/WishlistContext';
 import { calculateDiscountBadge } from './ui/utils';
