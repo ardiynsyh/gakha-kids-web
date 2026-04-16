@@ -433,87 +433,116 @@ export function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="p-6 lg:p-12 space-y-6 flex-1">
-                {filteredProducts.length === 0 && (
-                  <div className="text-center py-20 opacity-50">
-                    <Package className="w-16 h-16 mx-auto mb-4" />
-                    <p className="font-bold uppercase tracking-widest text-xs">Belum ada produk di kategori ini</p>
-                  </div>
-                )}
-
-                {filteredProducts.map(p => {
-                  // Logic Diskon Stempel
-                  const priceNum = parseInt(p.price?.replace(/[^0-9]/g, '')) || 0;
-                  const origNum = parseInt(p.originalPrice?.replace(/[^0-9]/g, '') || '0');
-                  const disc = origNum > priceNum ? Math.round(((origNum - priceNum) / origNum) * 100) : 0;
+              <div className="p-6 lg:p-12 space-y-12 flex-1">
+                {(selectedCategory === 'all' 
+                  ? config.productCategories.filter((c: any) => c.id !== 'all') 
+                  : config.productCategories.filter((c: any) => c.id === selectedCategory)
+                ).map((cat: any) => {
+                  const catProducts = products.filter(p => p.categories?.includes(cat.id));
+                  
+                  // Don't show empty categories when in "All" view, 
+                  // but show "Empty" message if a specific category is selected
+                  if (catProducts.length === 0 && selectedCategory === 'all') return null;
 
                   return (
-                    <div key={p.id} className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col xl:flex-row items-center gap-8 relative group">
-
-                      {/* Gambar Produk */}
-                      <div className="relative w-32 h-32 flex-shrink-0 group/img">
-                        <img src={p.image} className="w-full h-full rounded-[1.8rem] object-cover shadow-inner bg-gray-50" />
-                        <label className="absolute inset-0 bg-black/60 rounded-[1.8rem] flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity cursor-pointer backdrop-blur-sm">
-                          <input type="file" className="hidden" accept="image/*" onChange={(e) => {
-                            if (e.target.files?.[0]) handleUploadImage(e.target.files[0], (url) => handleUpdateProduct(p.id, 'image', url));
-                          }} />
-                          <Camera className="w-8 h-8 text-white" />
-                        </label>
-                        {disc > 0 && <div className="absolute -top-3 -right-3 bg-[#003300] text-white w-12 h-12 rounded-full flex items-center justify-center font-black text-[11px] shadow-lg border-[3px] border-white rotate-12">-{disc}%</div>}
-                      </div>
-
-                      {/* Input Info Produk (Rapi/Compact) */}
-                      <div className="flex-1 space-y-4 w-full">
-                        <input value={p.name} onChange={(e) => handleUpdateProduct(p.id, 'name', e.target.value)} className="w-full font-black text-xl outline-none bg-transparent hover:bg-gray-50 focus:bg-gray-50 p-2 rounded-xl transition-colors border border-transparent focus:border-gray-200" placeholder="Nama Produk" />
-
-                        <div className="flex flex-col md:flex-row gap-4">
-                          <div className="flex-1 bg-gray-50 p-3 rounded-2xl border border-gray-100">
-                            <label className="text-[9px] font-black text-gray-400 uppercase block mb-1">Harga Jual</label>
-                            <input value={p.price} onChange={(e) => handleUpdateProduct(p.id, 'price', e.target.value)} className="w-full text-blue-600 font-bold text-sm bg-transparent outline-none" placeholder="Rp 150000" />
-                          </div>
-                          <div className="flex-1 bg-red-50/50 p-3 rounded-2xl border border-red-50/50">
-                            <label className="text-[9px] font-black text-red-300 uppercase block mb-1">Harga Coret</label>
-                            <input value={p.originalPrice} onChange={(e) => handleUpdateProduct(p.id, 'originalPrice', e.target.value)} className="w-full text-red-400 font-bold text-sm bg-transparent outline-none line-through" placeholder="(Opsional)" />
-                          </div>
-                          <div className="flex-1 bg-pink-50 p-3 rounded-2xl border border-pink-100">
-                            <label className="text-[9px] font-black text-[var(--accent)]/50 uppercase block mb-1 flex items-center gap-1"><Tag className="w-3 h-3" /> Kategori</label>
-                            <select value={p.categories?.[0] || 'all'} onChange={(e) => handleUpdateProduct(p.id, 'categories', [e.target.value])} className="w-full text-[10px] font-black uppercase text-[var(--accent)] bg-transparent outline-none cursor-pointer">
-                              {config.productCategories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                            </select>
-                          </div>
-                          <div className="flex-1 bg-gray-50 p-3 rounded-2xl border border-gray-100">
-                             <label className="text-[9px] font-black text-gray-400 uppercase block mb-1">Berat (Gram)</label>
-                             <input type="number" value={p.weight || 200} onChange={(e) => handleUpdateProduct(p.id, 'weight', parseInt(e.target.value) || 0)} className="w-full font-bold text-sm bg-transparent outline-none" placeholder="Misal: 200" />
-                          </div>
+                    <div key={cat.id} className="space-y-6">
+                      {/* Category Title Header */}
+                      <div className="flex items-center gap-6">
+                        <div className="flex flex-col">
+                          <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-gray-900 flex items-center gap-3">
+                            <span className="w-2 h-2 rounded-full bg-[#2e7d32]"></span>
+                            {cat.name}
+                          </h3>
+                          <p className="text-[9px] text-gray-400 font-bold uppercase mt-1 tracking-widest">{catProducts.length} Produk Tersedia</p>
                         </div>
+                        <div className="h-[1px] flex-1 bg-gray-200"></div>
                       </div>
 
-                      {/* Ukuran & Stok Horizontal */}
-                      <div className="flex-shrink-0 flex items-center gap-2 overflow-x-auto custom-scrollbar pb-2 max-w-[300px]">
-                        {p.sizes?.map((s: string) => (
-                          <div key={s} className="bg-gray-950 text-white rounded-[1.5rem] p-3 text-center relative shadow-md group/sz w-[65px] flex-shrink-0 border border-gray-800">
-                            <button onClick={() => {
-                              if (!confirm('Hapus ukuran ini?')) return;
-                              const ns = p.sizes.filter((sz: string) => sz !== s);
-                              const ni = { ...p.inventory }; delete ni[s];
-                              handleUpdateProduct(p.id, 'sizes', ns);
-                              handleUpdateProduct(p.id, 'inventory', ni);
-                            }} className="absolute -top-1 -right-1 bg-red-500 w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover/sz:opacity-100 transition-opacity z-10"><X className="w-3 h-3 text-white" /></button>
-                            <p className="text-[9px] font-black text-gray-400 mb-1 uppercase tracking-widest">{s}</p>
-                            <input type="number" value={p.inventory?.[s] || 0} onChange={(e) => {
-                              const inv = { ...(p.inventory || {}), [s]: parseInt(e.target.value) || 0 };
-                              handleUpdateProduct(p.id, 'inventory', inv);
-                            }} className="w-full bg-transparent text-center font-black text-sm outline-none text-[var(--accent)]" />
-                          </div>
-                        ))}
-                        <button onClick={() => setIsAddingSize(p.id)} className="w-[65px] h-[72px] border-2 border-dashed border-gray-300 rounded-[1.5rem] flex items-center justify-center text-gray-400 hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-pink-50 transition-all flex-shrink-0"><Plus className="w-6 h-6" /></button>
-                      </div>
+                      {catProducts.length === 0 ? (
+                        <div className="bg-white/50 border-2 border-dashed border-gray-200 rounded-[2.5rem] p-20 text-center">
+                          <Package className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                          <p className="font-bold uppercase tracking-widest text-[10px] text-gray-400">Belum ada produk di kategori {cat.name}</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-6">
+                          {catProducts.map(p => {
+                            // Logic Diskon Stempel
+                            const priceNum = parseInt(p.price?.replace(/[^0-9]/g, '')) || 0;
+                            const origNum = parseInt(p.originalPrice?.replace(/[^0-9]/g, '') || '0');
+                            const disc = origNum > priceNum ? Math.round(((origNum - priceNum) / origNum) * 100) : 0;
 
-                      <div className="flex-shrink-0">
-                        <button onClick={() => { if (confirm('Hapus Produk Permanen?')) { supabase.from('products').delete().eq('id', p.id).then(() => fetchData()); } }} className="w-12 h-12 flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-2xl transition-all shadow-sm active:scale-95"><Trash className="w-5 h-5" /></button>
-                      </div>
+                            return (
+                              <div key={`${cat.id}-${p.id}`} className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col xl:flex-row items-center gap-8 relative group">
+
+                                {/* Gambar Produk */}
+                                <div className="relative w-32 h-32 flex-shrink-0 group/img">
+                                  <img src={p.image} className="w-full h-full rounded-[1.8rem] object-cover shadow-inner bg-gray-50" />
+                                  <label className="absolute inset-0 bg-black/60 rounded-[1.8rem] flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity cursor-pointer backdrop-blur-sm">
+                                    <input type="file" className="hidden" accept="image/*" onChange={(e) => {
+                                      if (e.target.files?.[0]) handleUploadImage(e.target.files[0], (url) => handleUpdateProduct(p.id, 'image', url));
+                                    }} />
+                                    <Camera className="w-8 h-8 text-white" />
+                                  </label>
+                                  {disc > 0 && <div className="absolute -top-3 -right-3 bg-[#003300] text-white w-12 h-12 rounded-full flex items-center justify-center font-black text-[11px] shadow-lg border-[3px] border-white rotate-12">-{disc}%</div>}
+                                </div>
+
+                                {/* Input Info Produk (Rapi/Compact) */}
+                                <div className="flex-1 space-y-4 w-full">
+                                  <input value={p.name} onChange={(e) => handleUpdateProduct(p.id, 'name', e.target.value)} className="w-full font-black text-xl outline-none bg-transparent hover:bg-gray-50 focus:bg-gray-50 p-2 rounded-xl transition-colors border border-transparent focus:border-gray-200" placeholder="Nama Produk" />
+
+                                  <div className="flex flex-col md:flex-row gap-4">
+                                    <div className="flex-1 bg-gray-50 p-3 rounded-2xl border border-gray-100">
+                                      <label className="text-[9px] font-black text-gray-400 uppercase block mb-1">Harga Jual</label>
+                                      <input value={p.price} onChange={(e) => handleUpdateProduct(p.id, 'price', e.target.value)} className="w-full text-blue-600 font-bold text-sm bg-transparent outline-none" placeholder="Rp 150000" />
+                                    </div>
+                                    <div className="flex-1 bg-red-50/50 p-3 rounded-2xl border border-red-50/50">
+                                      <label className="text-[9px] font-black text-red-300 uppercase block mb-1">Harga Coret</label>
+                                      <input value={p.originalPrice} onChange={(e) => handleUpdateProduct(p.id, 'originalPrice', e.target.value)} className="w-full text-red-400 font-bold text-sm bg-transparent outline-none line-through" placeholder="(Opsional)" />
+                                    </div>
+                                    <div className="flex-1 bg-pink-50 p-3 rounded-2xl border border-pink-100">
+                                      <label className="text-[9px] font-black text-[var(--accent)]/50 uppercase block mb-1 flex items-center gap-1"><Tag className="w-3 h-3" /> Kategori</label>
+                                      <select value={p.categories?.[0] || 'all'} onChange={(e) => handleUpdateProduct(p.id, 'categories', [e.target.value])} className="w-full text-[10px] font-black uppercase text-[var(--accent)] bg-transparent outline-none cursor-pointer">
+                                        {config.productCategories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                      </select>
+                                    </div>
+                                    <div className="flex-1 bg-gray-50 p-3 rounded-2xl border border-gray-100">
+                                       <label className="text-[9px] font-black text-gray-400 uppercase block mb-1">Berat (Gram)</label>
+                                       <input type="number" value={p.weight || 200} onChange={(e) => handleUpdateProduct(p.id, 'weight', parseInt(e.target.value) || 0)} className="w-full font-bold text-sm bg-transparent outline-none" placeholder="Misal: 200" />
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Ukuran & Stok Horizontal */}
+                                <div className="flex-shrink-0 flex items-center gap-2 overflow-x-auto custom-scrollbar pb-2 max-w-[300px]">
+                                  {p.sizes?.map((s: string) => (
+                                    <div key={s} className="bg-gray-950 text-white rounded-[1.5rem] p-3 text-center relative shadow-md group/sz w-[65px] flex-shrink-0 border border-gray-800">
+                                      <button onClick={() => {
+                                        if (!confirm('Hapus ukuran ini?')) return;
+                                        const ns = p.sizes.filter((sz: string) => sz !== s);
+                                        const ni = { ...p.inventory }; delete ni[s];
+                                        handleUpdateProduct(p.id, 'sizes', ns);
+                                        handleUpdateProduct(p.id, 'inventory', ni);
+                                      }} className="absolute -top-1 -right-1 bg-red-500 w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover/sz:opacity-100 transition-opacity z-10"><X className="w-3 h-3 text-white" /></button>
+                                      <p className="text-[9px] font-black text-gray-400 mb-1 uppercase tracking-widest">{s}</p>
+                                      <input type="number" value={p.inventory?.[s] || 0} onChange={(e) => {
+                                        const inv = { ...(p.inventory || {}), [s]: parseInt(e.target.value) || 0 };
+                                        handleUpdateProduct(p.id, 'inventory', inv);
+                                      }} className="w-full bg-transparent text-center font-black text-sm outline-none text-[var(--accent)]" />
+                                    </div>
+                                  ))}
+                                  <button onClick={() => setIsAddingSize(p.id)} className="w-[65px] h-[72px] border-2 border-dashed border-gray-300 rounded-[1.5rem] flex items-center justify-center text-gray-400 hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-pink-50 transition-all flex-shrink-0"><Plus className="w-6 h-6" /></button>
+                                </div>
+
+                                <div className="flex-shrink-0">
+                                  <button onClick={() => { if (confirm('Hapus Produk Permanen?')) { supabase.from('products').delete().eq('id', p.id).then(() => fetchData()); } }} className="w-12 h-12 flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-2xl transition-all shadow-sm active:scale-95"><Trash className="w-5 h-5" /></button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
-                  )
+                  );
                 })}
               </div>
             </motion.div>
