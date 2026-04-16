@@ -74,15 +74,14 @@ export function HeroBanner() {
         style={{ opacity: heroOpacity, y: textY }}
       >
         {/* ── GAKHA Logo (Synced with Nav) ── */}
-        <motion.svg
-          width="64" height="48" viewBox="0 0 100 80"
-          className="fill-white mb-6"
+        <motion.img
+          src="/logo-white.png"
+          alt="GAKHA Logo"
+          className="h-20 md:h-24 w-auto mb-6 relative z-10"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.6 }}
-        >
-          <path d="M50 70 C 20 70 10 40 10 20 C 20 25 30 20 35 10 C 35 30 25 45 45 60 C 48 50 45 40 40 30 C 50 35 55 45 55 60 C 75 45 65 30 65 10 C 70 20 80 25 90 20 C 90 40 80 70 50 70 Z" />
-        </motion.svg>
+        />
 
         {/* ── GAKHA Title with Scroll-Driven Glitch ─────────────────────── */}
         <div className="relative text-center">

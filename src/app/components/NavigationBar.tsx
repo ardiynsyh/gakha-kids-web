@@ -41,19 +41,12 @@ export function NavigationBar() {
         <div className="max-w-[1600px] mx-auto px-8 flex items-center justify-between">
 
         {/* ── LOGO ── */}
-        <Link to="/" className="flex flex-col items-center group cursor-pointer">
-          <svg
-            width="32" height="24" viewBox="0 0 100 80"
-            className="mb-0.5 group-hover:scale-110 transition-all duration-500 fill-[#003300]"
-          >
-            <path d="M50 70 C 20 70 10 40 10 20 C 20 25 30 20 35 10 C 35 30 25 45 45 60 C 48 50 45 40 40 30 C 50 35 55 45 55 60 C 75 45 65 30 65 10 C 70 20 80 25 90 20 C 90 40 80 70 50 70 Z" />
-          </svg>
-          <span
-            className="text-[#001a00] text-[1.7rem] md:text-3xl font-black tracking-widest leading-none uppercase drop-shadow-sm"
-            style={{ fontFamily: "'Bebas Neue', serif" }}
-          >
-            GAKHA
-          </span>
+        <Link to="/" className="flex items-center gap-3 group cursor-pointer">
+          <img 
+            src="/logo-green.png" 
+            alt="GAKHA Logo" 
+            className="h-10 md:h-12 w-auto group-hover:scale-105 transition-transform duration-500"
+          />
         </Link>
 
         {/* ── Center Nav Links ── */}
