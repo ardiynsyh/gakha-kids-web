@@ -2,11 +2,12 @@ import { motion } from 'framer-motion';
 
 export function LogoGakha({ className = "", color = "#013220", showText = true }: { className?: string; color?: string; showText?: boolean }) {
   return (
-    <div className={`flex flex-col items-center gap-1 ${className}`}>
-      <div className="w-full aspect-square flex items-center justify-center">
+    <div className={`flex flex-col items-center justify-center gap-1.5 ${className}`}>
+      {/* Icon Container */}
+      <div className={`${showText ? 'h-[70%]' : 'h-full'} aspect-square flex items-center justify-center`}>
         <svg
           viewBox="0 0 100 100"
-          className="w-[110%] h-[110%]" // Scales up the icon slightly
+          className="w-full h-full"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -50,8 +51,8 @@ export function LogoGakha({ className = "", color = "#013220", showText = true }
           className="text-current font-black tracking-tighter uppercase leading-none"
           style={{ 
             fontFamily: "'Inter', sans-serif", 
-            fontSize: '0.85em', // Reduced from 1.2em to make icon feel larger
-            transform: 'scaleY(1.3)', 
+            fontSize: '0.7em', // Relative size
+            transform: 'scaleY(1.5)', 
             color: color
           }}
         >

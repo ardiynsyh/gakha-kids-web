@@ -79,9 +79,9 @@ export function HeroBanner() {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.6 }}
-          className="mb-8"
+          className="mb-12 relative z-10"
         >
-          <LogoGakha className="h-24 md:h-28 w-auto" color="white" showText={false} />
+          <LogoGakha className="h-20 md:h-24 w-20 md:w-24" color="white" showText={false} />
         </motion.div>
 
         {/* ── GAKHA Title with Scroll-Driven Glitch ─────────────────────── */}

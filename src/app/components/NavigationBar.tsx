@@ -43,7 +43,7 @@ export function NavigationBar() {
 
         {/* ── LOGO ── */}
         <Link to="/" className="group cursor-pointer">
-          <LogoGakha className="h-12 md:h-14 w-auto" color="#013220" />
+          <LogoGakha className="h-14 md:h-16 w-14 md:w-16" color="#013220" />
         </Link>
 
         {/* ── Center Nav Links ── */}
