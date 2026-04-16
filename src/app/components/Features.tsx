@@ -193,11 +193,21 @@ export function Features() {
 
   return (
     <section
-      className="py-28 bg-[#f3f7f3] w-full border-t border-white relative overflow-hidden"
+      className="py-28 bg-[#003300] w-full border-t border-white/5 relative overflow-hidden"
       id="regional-series"
     >
-      {/* Ambient glow */}
-      <div className="absolute top-1/2 left-1/2 w-[700px] h-[700px] rounded-full bg-[#e8f5e9] blur-[180px] opacity-40 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+      {/* Ambient glow (adjusted for dark background) */}
+      <div className="absolute top-1/2 left-1/2 w-[700px] h-[700px] rounded-full bg-[#2e7d32] blur-[180px] opacity-20 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+
+      {/* ── Grain Film Overlay (Consistent with Banner) ────────────────── */}
+      <svg
+        className="absolute inset-0 w-full h-full z-0 pointer-events-none opacity-[0.05] mix-blend-overlay"
+      >
+        <filter id="regionalGrain">
+          <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="4" stitchTiles="stitch" />
+        </filter>
+        <rect width="100%" height="100%" filter="url(#regionalGrain)" />
+      </svg>
 
       <div className="max-w-[1600px] mx-auto px-6 lg:px-12 relative z-10">
 
@@ -210,19 +220,19 @@ export function Features() {
           transition={{ duration: 0.9 }}
         >
           <span
-            className="text-[#2e7d32] text-[10px] font-black tracking-[0.5em] uppercase mb-3"
+            className="text-[#4caf50] text-[10px] font-black tracking-[0.5em] uppercase mb-3"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             The Core Collection
           </span>
           <h2
-            className="text-[clamp(3rem,8vw,6rem)] font-black text-[#001a00] leading-none tracking-tight drop-shadow-sm"
+            className="text-[clamp(3rem,8vw,6rem)] font-black text-white leading-none tracking-tight drop-shadow-sm"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             REGIONAL<br />SERIES
           </h2>
           <p
-            className="max-w-lg text-[#001a00] text-sm mt-5 leading-relaxed font-medium"
+            className="max-w-lg text-white/70 text-sm mt-5 leading-relaxed font-medium"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             Kekuatan tribun dari setiap sudut daerah. Diwarna ulang dengan tone cerah
@@ -371,7 +381,7 @@ export function Features() {
 
         {/* ── Footer note ────────────────────────────────────────────────── */}
         <motion.p
-          className="text-white/15 text-[10px] uppercase tracking-[0.4em] mt-4 text-center"
+          className="text-white/30 text-[10px] uppercase tracking-[0.4em] mt-8 text-center"
           style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
