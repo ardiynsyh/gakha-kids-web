@@ -192,8 +192,8 @@ export function AdminDashboard() {
       }
       toast.success("Daftar Produk Berhasil Tersimpan!", { id: tid });
     } catch (e: any) { 
-      console.error(e);
-      toast.error(`Sync Gagal: ${e.message}`, { id: tid }); 
+      console.error("SYNC ERROR:", e);
+      toast.error(`Sync Gagal: ${e.message || 'Error 400 - Cek Kolom Database'}`, { id: tid }); 
     }
     setIsLoading(false);
   };
