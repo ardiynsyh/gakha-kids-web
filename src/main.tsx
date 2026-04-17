@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { HashRouter, Routes, Route, Navigate } from "react-router";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import { MainLayout } from "./app/layouts/MainLayout";
 import { HomePage } from "./app/pages/HomePage";
 import { ShopPage } from "./app/pages/ShopPage";
@@ -15,13 +15,15 @@ import { ThemeProvider } from "./app/context/ThemeContext";
 import { StoreProvider } from "./app/context/StoreContext";
 import { CartProvider } from "./app/context/CartContext";
 import { HelmetProvider } from "react-helmet-async";
+import { AdminDashboard } from "./app/admin/AdminDashboard";
+import { AdminLogin } from "./app/admin/AdminLogin";
 import "./styles/index.css";
 
 function App() {
   return (
     <StrictMode>
       <HelmetProvider>
-        <HashRouter>
+        <BrowserRouter>
           <ThemeProvider>
             <StoreProvider>
               <WishlistProvider>
@@ -38,12 +40,15 @@ function App() {
                       <Route path="checkout" element={<CheckoutPage />} />
                       <Route path="*" element={<Navigate to="/" replace />} />
                     </Route>
+                    <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
+                    <Route path="/admin/login" element={<AdminLogin />} />
+                    <Route path="/admin/dashboard" element={<AdminDashboard />} />
                   </Routes>
                 </CartProvider>
               </WishlistProvider>
             </StoreProvider>
           </ThemeProvider>
-        </HashRouter>
+        </BrowserRouter>
       </HelmetProvider>
     </StrictMode>
   );
