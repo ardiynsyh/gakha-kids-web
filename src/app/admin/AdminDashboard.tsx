@@ -85,11 +85,22 @@ export function AdminDashboard() {
       })
       .subscribe();
 
-    // 2. Realtime Stock Updates
+    // 2. Realtime Stock & Data Updates
     const productSubscription = supabase
       .channel('products-realtime')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'products' }, (payload) => {
         setProducts(current => current.map(p => p.id === payload.new.id ? payload.new : p));
+      })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'products' }, (payload) => {
+        setProducts(current => current.filter(p => p.id !== payload.old.id));
+      })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'products' }, (payload) => {
+        setProducts(current => {
+          if (!current.find(p => p.id === payload.new.id)) {
+            return [payload.new, ...current];
+          }
+          return current;
+        });
       })
       .subscribe();
 
