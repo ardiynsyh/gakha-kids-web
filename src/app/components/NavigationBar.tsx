@@ -1,4 +1,3 @@
-import { Link } from 'react-router';
 import { Link, useNavigate } from 'react-router';
 import { ChevronDown, ShoppingBag, Menu, X, Search } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -59,9 +58,7 @@ export function NavigationBar() {
   ];
 
   return (
-    <header
-      className={`fixed top-0 left-0 w-full z-[200] transition-all duration-500 font-sans opacity-100 translate-y-0`}
-    >
+    <header className={`fixed top-0 left-0 w-full z-[200] transition-all duration-500 font-sans`}>
       {/* Announcement Bar */}
       <div className="bg-[#1b5e20] text-white py-2.5 px-4 text-center relative z-[210] border-b border-white/10">
         <div className="max-w-[1600px] mx-auto overflow-hidden">
@@ -73,58 +70,35 @@ export function NavigationBar() {
         </div>
       </div>
 
-      <div className={`transition-all duration-500 bg-white/95 backdrop-blur-md border-b border-[#1b5e20]/10 ${
-        isScrolled ? 'py-3' : 'py-5'
-      }`}>
+      <div className={`transition-all duration-500 bg-white/95 backdrop-blur-md border-b border-[#1b5e20]/10 ${isScrolled ? 'py-3' : 'py-5'}`}>
         <div className="max-w-[1600px] mx-auto px-4 md:px-8 flex items-center justify-between">
           
-          {/* ── Left: Hamburger & Search (Mobile Only Toggle) ── */}
+          {/* Mobile hamburger & search */}
           <div className="flex items-center gap-2 md:hidden">
-            <button 
-              className="p-2 text-[#001a00] hover:text-[#2e7d32] transition-colors"
-              onClick={() => setIsMobileMenuOpen(true)}
-              aria-label="Open Menu"
-            >
+            <button className="p-2 text-[#001a00]" onClick={() => setIsMobileMenuOpen(true)}>
               <Menu className="w-6 h-6" />
             </button>
-            <button 
-              className="p-2 text-[#001a00] hover:text-[#2e7d32] transition-colors"
-              onClick={() => setIsSearchVisible(!isSearchVisible)}
-            >
+            <button className="p-2 text-[#001a00]" onClick={() => setIsSearchVisible(!isSearchVisible)}>
               <Search className="w-5 h-5" />
             </button>
           </div>
 
-          {/* ── Center/Left: LOGO ── */}
           <Link to="/" className="group cursor-pointer">
             <LogoGakha className="h-12 md:h-16 w-12 md:w-16" color="#013220" />
           </Link>
 
-          {/* ── Center: Desktop Nav Links ── */}
-          <div className="hidden md:flex items-center gap-8 lg:gap-10">
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center gap-5 lg:gap-8">
+            {/* Football Culture Dropdown */}
             <div className="relative group/dropdown">
-              <Link 
-                to="/shop/all"
-                className="flex items-center gap-1.5 py-4 cursor-pointer"
-              >
-                <span
-                  className="text-[#001a00] group-hover/dropdown:text-[#2e7d32] font-bold text-[10px] tracking-[0.35em] uppercase transition-colors duration-500"
-                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                >
-                  Football Culture
-                </span>
-                <ChevronDown className="w-3 h-3 text-[#001a00]/40 group-hover/dropdown:text-[#2e7d32] group-hover/dropdown:rotate-180 transition-all duration-500" />
+              <Link to="/shop/all" className="flex items-center gap-1 py-4">
+                <span className="text-[#001a00] group-hover/dropdown:text-[#2e7d32] font-bold text-[9px] lg:text-[11px] tracking-widest uppercase transition-colors">Football Culture</span>
+                <ChevronDown className="w-3 h-3 opacity-40 group-hover/dropdown:rotate-180 transition-transform" />
               </Link>
-
-              <div className="absolute top-full left-0 pt-2 opacity-0 translate-y-2 pointer-events-none group-hover/dropdown:opacity-100 group-hover/dropdown:translate-y-0 group-hover/dropdown:pointer-events-auto transition-all duration-500">
-                <div className="bg-white border border-[#1b5e20]/10 shadow-2xl p-6 min-w-[240px] flex flex-col gap-4">
-                  {footballLinks.map((item) => (
-                    <Link
-                      key={item.id}
-                      to={`/shop/${item.id}`}
-                      className="text-[#003300]/60 hover:text-[#2e7d32] text-[10px] font-bold uppercase tracking-widest transition-colors flex items-center justify-between group/link"
-                      style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                    >
+              <div className="absolute top-full left-0 pt-2 opacity-0 translate-y-2 pointer-events-none group-hover/dropdown:opacity-100 group-hover/dropdown:translate-y-0 group-hover/dropdown:pointer-events-auto transition-all">
+                <div className="bg-white border border-gray-100 shadow-xl p-5 min-w-[220px] rounded-xl flex flex-col gap-3">
+                  {footballLinks.map(item => (
+                    <Link key={item.id} to={`/shop/${item.id}`} className="text-[#003300]/60 hover:text-[#2e7d32] text-[10px] font-bold uppercase tracking-widest transition-colors flex justify-between group/link">
                       <span>{item.label}</span>
                       <span className="opacity-0 group-hover/link:opacity-100 transition-opacity">→</span>
                     </Link>
@@ -133,40 +107,22 @@ export function NavigationBar() {
               </div>
             </div>
 
-            {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                to={link.to}
-                className="text-[#001a00] hover:text-[#2e7d32] font-bold text-[10px] tracking-[0.35em] uppercase transition-colors duration-500 py-4 flex items-center h-full"
-                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-              >
+            {navLinks.map(link => (
+              <Link key={link.label} to={link.to} className="text-[#001a00] hover:text-[#2e7d32] font-bold text-[9px] lg:text-[11px] tracking-widest uppercase transition-colors py-4">
                 {link.label}
               </Link>
             ))}
 
+            {/* Regional Dropdown */}
             <div className="relative group/regional">
-              <Link
-                to="/shop/all"
-                className="flex items-center gap-1.5 py-4 cursor-pointer"
-              >
-                <span
-                  className="text-[#001a00] group-hover/regional:text-[#2e7d32] font-bold text-[10px] tracking-[0.35em] uppercase transition-colors duration-500"
-                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                >
-                  Regional Series
-                </span>
-                <ChevronDown className="w-3 h-3 text-[#001a00]/40 group-hover/regional:text-[#2e7d32] group-hover/regional:rotate-180 transition-all duration-500" />
+              <Link to="/shop/all" className="flex items-center gap-1 py-4">
+                <span className="text-[#001a00] group-hover/regional:text-[#2e7d32] font-bold text-[9px] lg:text-[11px] tracking-widest uppercase transition-colors">Regional Series</span>
+                <ChevronDown className="w-3 h-3 opacity-40 group-hover/regional:rotate-180 transition-transform" />
               </Link>
-
-              <div className="absolute top-full left-0 pt-2 opacity-0 translate-y-2 pointer-events-none group-hover/regional:opacity-100 group-hover/regional:translate-y-0 group-hover/regional:pointer-events-auto transition-all duration-500">
-                <div className="bg-white border border-[#1b5e20]/10 shadow-2xl p-6 min-w-[340px] grid grid-cols-2 gap-x-8 gap-y-4">
-                  {regionalCities.map((city) => (
-                    <Link
-                      key={city.id}
-                      to={`/shop/${city.id}`}
-                      className="text-[#003300]/60 hover:text-[#2e7d32] text-[9px] font-black uppercase tracking-widest transition-colors flex items-center justify-between group/link"
-                      style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                    >
+              <div className="absolute top-full left-0 pt-2 opacity-0 translate-y-2 pointer-events-none group-hover/regional:opacity-100 group-hover/regional:translate-y-0 group-hover/regional:pointer-events-auto transition-all">
+                <div className="bg-white border border-gray-100 shadow-xl p-5 min-w-[340px] rounded-xl grid grid-cols-2 gap-x-8 gap-y-3">
+                  {regionalCities.map(city => (
+                    <Link key={city.id} to={`/shop/${city.id}`} className="text-[#003300]/60 hover:text-[#2e7d32] text-[9px] font-bold uppercase tracking-widest transition-colors flex justify-between group/link">
                       <span>{city.label}</span>
                       <span className="opacity-0 group-hover/link:opacity-100 transition-opacity">→</span>
                     </Link>
@@ -176,158 +132,69 @@ export function NavigationBar() {
             </div>
           </div>
 
-          {/* ── Right: Search & Cart & CTA ── */}
-          <div className="flex items-center gap-3 lg:gap-6">
-            {/* Desktop Search */}
-            <form onSubmit={handleSearch} className="hidden lg:flex items-center relative group">
-              <input 
-                type="text"
-                placeholder="Cari produk..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-gray-100/50 border border-transparent focus:border-[#2e7d32]/30 focus:bg-white rounded-full py-2 pl-4 pr-10 text-[10px] font-bold uppercase tracking-wider transition-all w-[180px] focus:w-[240px] outline-none"
-              />
-              <button type="submit" className="absolute right-3 text-[#001a00]/40 hover:text-[#2e7d32] transition-colors">
-                <Search className="w-3.5 h-3.5" />
-              </button>
+          {/* Right Actions */}
+          <div className="flex items-center gap-2 lg:gap-4">
+            <form onSubmit={handleSearch} className="hidden xl:flex items-center relative">
+              <input type="text" placeholder="Cari..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="bg-gray-100/80 rounded-full py-2 pl-4 pr-10 text-[10px] font-bold uppercase tracking-widest w-[120px] focus:w-[180px] transition-all outline-none" />
+              <button type="submit" className="absolute right-3 text-gray-400"><Search className="w-3.5 h-3.5" /></button>
             </form>
+            
+            <button className="hidden md:flex xl:hidden p-2 text-[#001a00]" onClick={() => setIsSearchVisible(!isSearchVisible)}>
+              <Search className="w-5 h-5" />
+            </button>
 
-            <Link
-              to="/checkout"
-              className="relative p-2 text-[#001a00] hover:text-[#2e7d32] transition-all duration-300"
-              aria-label="View Cart"
-            >
-              <ShoppingBag className="w-5 h-5 md:w-6 md:h-6" />
-              {cart.length > 0 && (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  key={cart.length}
-                  className="absolute -top-1 -right-1 bg-[#2e7d32] text-white text-[8px] md:text-[9px] font-black w-4 h-4 md:w-5 md:h-5 flex items-center justify-center rounded-full border-2 border-white"
-                >
-                  {cart.reduce((acc, item) => acc + item.quantity, 0)}
-                </motion.span>
-              )}
+            <Link to="/checkout" className="relative p-2 text-[#001a00]">
+              <ShoppingBag className="w-5 h-5 lg:w-6 lg:h-6" />
+              {cart.length > 0 && <span className="absolute -top-1 -right-1 bg-[#2e7d32] text-white text-[9px] font-black w-4 h-4 lg:w-5 lg:h-5 flex items-center justify-center rounded-full border-2 border-white">{cart.reduce((a,b)=>a+b.quantity,0)}</span>}
             </Link>
 
-            <Link
-              to="/shop/all"
-              className="hidden lg:inline-flex relative overflow-hidden items-center gap-2.5 bg-[#003300] border border-[#1b5e20]/50 text-white px-7 py-3 text-[10px] font-bold tracking-[0.3em] uppercase group/btn transition-all hover:bg-[#2e7d32]"
-              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-            >
-              <span className="relative z-10">Shop Now</span>
-            </Link>
+            <Link to="/shop/all" className="hidden lg:inline-flex bg-[#003300] text-white px-6 py-2.5 text-[10px] font-bold tracking-widest uppercase rounded-sm hover:bg-[#2e7d32] transition-colors">Shop Now</Link>
           </div>
         </div>
 
         {/* Mobile Search Bar Expansion */}
         <AnimatePresence>
           {isSearchVisible && (
-            <motion.div 
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="md:hidden px-4 py-3 bg-white border-t border-gray-50 overflow-hidden"
-            >
+            <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="md:hidden px-4 py-3 bg-white border-t border-gray-100 overflow-hidden">
               <form onSubmit={handleSearch} className="relative">
-                <input 
-                  type="text"
-                  placeholder="Cari produk Gakha..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  autoFocus
-                  className="w-full bg-gray-50 border-none rounded-xl py-4 pl-5 pr-12 text-sm font-bold uppercase tracking-widest outline-none ring-1 ring-gray-100 focus:ring-[#2e7d32]/20"
-                />
-                <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 text-[#2e7d32]">
-                  <Search className="w-5 h-5" />
-                </button>
+                <input type="text" placeholder="Cari produk..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} autoFocus className="w-full bg-gray-50 rounded-xl py-3.5 pl-5 pr-12 text-xs font-bold uppercase tracking-widest outline-none" />
+                <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 text-[#2e7d32]"><Search className="w-5 h-5" /></button>
               </form>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* ── Mobile Sidebar Menu ── */}
+      {/* Mobile Sidebar */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 bg-[#001a00]/60 backdrop-blur-sm z-[250]"
-            />
-            <motion.div 
-              initial={{ x: '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 left-0 h-full w-[85%] max-w-[320px] bg-white z-[260] shadow-2xl flex flex-col"
-            >
-              <div className="p-6 flex items-center justify-between border-b border-[#1b5e20]/10">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsMobileMenuOpen(false)} className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[250]" />
+            <motion.div initial={{ x: '-100%' }} animate={{ x: 0 }} exit={{ x: '-100%' }} className="fixed top-0 left-0 h-full w-[85%] max-w-[320px] bg-white z-[260] shadow-2xl flex flex-col">
+              <div className="p-6 flex justify-between items-center border-b border-gray-100">
                 <LogoGakha className="h-10 w-10" color="#013220" />
-                <button onClick={() => setIsMobileMenuOpen(false)} className="p-2">
-                  <X className="w-6 h-6 text-[#001a00]" />
-                </button>
+                <button onClick={() => setIsMobileMenuOpen(false)}><X className="w-6 h-6" /></button>
               </div>
-
-              <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-8">
-                <div className="flex flex-col gap-4">
-                  <p className="text-[#001a00]/40 text-[9px] font-black tracking-[0.2em] uppercase">Navigation</p>
-                  {navLinks.map(link => (
-                    <Link 
-                      key={link.to} 
-                      to={link.to} 
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="text-[#001a00] text-lg font-bold"
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
+              <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                <div className="space-y-4">
+                  <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest">Navigation</p>
+                  {navLinks.map(l => <Link key={l.to} to={l.to} onClick={()=>setIsMobileMenuOpen(false)} className="block text-lg font-bold text-[#001a00]">{l.label}</Link>)}
                 </div>
-
-                <div className="flex flex-col gap-4">
-                  <p className="text-[#001a00]/40 text-[9px] font-black tracking-[0.2em] uppercase">Football Culture</p>
-                  <div className="grid grid-cols-1 gap-3">
-                    {footballLinks.map(item => (
-                      <Link 
-                        key={item.id} 
-                        to={`/shop/${item.id}`} 
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="text-[#003300]/70 text-sm font-bold"
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
+                <div className="space-y-4">
+                  <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest">Culture</p>
+                  <div className="space-y-3">
+                    {footballLinks.map(i => <Link key={i.id} to={`/shop/${i.id}`} onClick={()=>setIsMobileMenuOpen(false)} className="block text-sm font-bold text-[#003300]/70 uppercase">{i.label}</Link>)}
                   </div>
                 </div>
-
-                <div className="flex flex-col gap-4">
-                  <p className="text-[#001a00]/40 text-[9px] font-black tracking-[0.2em] uppercase">Regional Series</p>
+                <div className="space-y-4">
+                  <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest">Regional</p>
                   <div className="grid grid-cols-2 gap-3">
-                    {regionalCities.slice(0, 10).map(city => (
-                      <Link 
-                        key={city.id} 
-                        to={`/shop/${city.id}`} 
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="text-[#003300]/70 text-[11px] font-bold uppercase"
-                      >
-                        {city.label}
-                      </Link>
-                    ))}
+                    {regionalCities.slice(0, 10).map(c => <Link key={c.id} to={`/shop/${c.id}`} onClick={()=>setIsMobileMenuOpen(false)} className="block text-[11px] font-bold text-[#003300]/70 uppercase">{c.label}</Link>)}
                   </div>
                 </div>
               </div>
-
-              <div className="p-6 border-t border-[#1b5e20]/10 bg-gray-50">
-                <Link 
-                  to="/shop/all" 
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full bg-[#003300] text-white py-4 text-center block font-bold text-xs tracking-widest rounded-sm"
-                >
-                  SHOP ALL COLLECTIONS
-                </Link>
+              <div className="p-6 bg-gray-50">
+                <Link to="/shop/all" onClick={()=>setIsMobileMenuOpen(false)} className="block w-full bg-[#003300] text-white py-4 text-center font-bold text-xs rounded-sm">SHOP ALL</Link>
               </div>
             </motion.div>
           </>
