@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router";
+import { HashRouter, Routes, Route, Navigate } from "react-router";
 import { MainLayout } from "./app/layouts/MainLayout";
 import { HomePage } from "./app/pages/HomePage";
 import { ShopPage } from "./app/pages/ShopPage";
@@ -22,7 +22,7 @@ import "./styles/index.css";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <HelmetProvider>
-      <BrowserRouter>
+      <HashRouter>
         <ThemeProvider>
           <StoreProvider>
             <WishlistProvider>
@@ -47,7 +47,7 @@ createRoot(document.getElementById("root")!).render(
             </WishlistProvider>
           </StoreProvider>
         </ThemeProvider>
-      </BrowserRouter>
+      </HashRouter>
     </HelmetProvider>
   </StrictMode>
 );
