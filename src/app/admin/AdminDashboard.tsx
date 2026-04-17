@@ -194,17 +194,32 @@ export function AdminDashboard() {
 
   const handlePushAllToCloud = async () => {
     setIsLoading(true);
-    const tid = toast.loading("Sinkronisasi Produk ke Cloud...");
+    const tid = toast.loading("Sinkronisasi Penuh ke Cloud...");
     try {
-      // Hanya sinkron produk
+      // 1. Dapatkan semua ID produk di Supabase
+      const { data: remoteProducts } = await supabase.from('products').select('id');
+      const remoteIds = remoteProducts?.map(p => p.id) || [];
+      const localIds = products.map(p => p.id);
+
+      // 2. Cari ID yang ada di Supabase tapi TIDAK ada di lokal (untuk dihapus)
+      const idsToDelete = remoteIds.filter(id => !localIds.includes(id));
+      
+      if (idsToDelete.length > 0) {
+        const { error: delError } = await supabase.from('products').delete().in('id', idsToDelete);
+        if (delError) throw delError;
+      }
+
+      // 3. Upsert semua produk lokal
       for (const product of products) {
         const { error } = await supabase.from('products').upsert(product, { onConflict: 'id' });
         if (error) throw error;
       }
-      toast.success("Daftar Produk Berhasil Tersimpan!", { id: tid });
+
+      toast.success(`Daftar Produk Sinkron! (${products.length} Aktif, ${idsToDelete.length} Dihapus)`, { id: tid });
+      await fetchData(); // Refresh ulang
     } catch (e: any) { 
       console.error("SYNC ERROR:", e);
-      toast.error(`Sync Gagal: ${e.message || 'Error 400 - Cek Kolom Database'}`, { id: tid }); 
+      toast.error(`Sync Gagal: ${e.message}`, { id: tid }); 
     }
     setIsLoading(false);
   };
