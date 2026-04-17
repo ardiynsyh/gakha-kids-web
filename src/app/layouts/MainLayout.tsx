@@ -1,12 +1,14 @@
 import { NavigationBar } from '../components/NavigationBar';
 import { Footer } from '../components/Footer';
 import { Outlet } from 'react-router';
+import { Toaster } from 'sonner';
 
 export function MainLayout() {
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="min-h-screen bg-white flex flex-col">
+      <Toaster position="top-center" richColors />
       <NavigationBar />
-      <main style={{ flex: 1, paddingTop: '160px' }}>
+      <main className="flex-1 pt-[160px]">
         <Outlet />
       </main>
       <Footer />
