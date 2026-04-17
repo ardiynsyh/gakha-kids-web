@@ -4,8 +4,8 @@ import { supabase } from '../../lib/supabase';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { ShoppingBag } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
+import { ProductModal } from './ProductModal';
 
-// ── Fallback products ────────────────────────────────────────────────────────
 const FALLBACK: Record<string, any>[] = [
   {
     id: 'f1', name: 'GAKHA Signature Hoodie', price: 425000,
@@ -25,24 +25,25 @@ const FALLBACK: Record<string, any>[] = [
   },
 ];
 
-function ProductGrid({ products }: { products: Record<string, any>[] }) {
+function ProductGrid({ products, onProductClick }: { products: Record<string, any>[], onProductClick: (p: any) => void }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
       {products.map((p) => (
         <motion.div
           key={String(p.id)}
-          className="flex flex-col bg-white border border-gray-100 group relative transition-all duration-500 rounded-[2.5rem] overflow-hidden shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_40px_80px_-20px_rgba(0,51,0,0.12)]"
+          className="flex flex-col bg-white border border-gray-100 group relative transition-all duration-500 rounded-[2.5rem] overflow-hidden shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_40px_80px_-20px_rgba(0,51,0,0.12)] cursor-pointer"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           whileHover={{ y: -12 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          onClick={() => onProductClick(p)}
         >
           <div className="relative aspect-[3/4] overflow-hidden">
             <ImageWithFallback
               src={String(p.image ?? '')}
               alt={String(p.name ?? '')}
-              className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+              className="w-full h-full object-contain p-4 transition-transform duration-1000 group-hover:scale-110"
             />
             {/* Soft gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-[#003300]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -61,7 +62,8 @@ function ProductGrid({ products }: { products: Record<string, any>[] }) {
             
             <motion.button 
               whileTap={{ scale: 0.95 }}
-              className="w-full bg-[#003300] text-white py-4 text-[10px] font-black tracking-[0.3em] uppercase hover:bg-[#2e7d32] transition-all flex items-center justify-center gap-2 rounded-2xl shadow-xl shadow-green-900/10 hover:shadow-green-900/30"
+              onClick={(e) => { e.stopPropagation(); onProductClick(p); }}
+              className="w-full bg-[#003300] text-white py-4 text-[10px] font-black tracking-[0.3em] uppercase hover:bg-[#2e7d32] transition-all flex items-center justify-center gap-2 rounded-2xl shadow-xl shadow-green-900/10 hover:shadow-green-900/30 font-sans"
             >
               <ShoppingBag className="w-4 h-4" />
               Beli Sekarang
@@ -77,6 +79,7 @@ export function NewArrivals() {
   const { config } = useStore();
   const [products, setProducts] = useState<Record<string, any>[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
   useEffect(() => {
     async function fetchFeatured() {
@@ -111,6 +114,13 @@ export function NewArrivals() {
 
   return (
     <section className="py-36 bg-white relative overflow-hidden font-sans border-t border-[#e2e8f0]" id="curated-collection">
+      {/* Product Modal */}
+      <ProductModal 
+        product={selectedProduct} 
+        isOpen={!!selectedProduct} 
+        onClose={() => setSelectedProduct(null)} 
+      />
+
       <div className="absolute top-1/2 left-1/2 w-[900px] h-[900px] rounded-full bg-[#e8f5e9] blur-[220px] opacity-40 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
 
       <div className="max-w-[1600px] mx-auto px-6 lg:px-12 relative z-20">
@@ -137,7 +147,7 @@ export function NewArrivals() {
         </motion.div>
 
         {isLoaded ? (
-          <ProductGrid products={products.slice(0, 4)} />
+          <ProductGrid products={products.slice(0, 4)} onProductClick={setSelectedProduct} />
         ) : (
           <div className="flex justify-center items-center h-[400px]">
             <motion.div className="w-8 h-8 border-2 border-[#2e7d32] border-t-transparent rounded-full" animate={{ rotate: 360 }} transition={{ duration: 0.9, repeat: Infinity, ease: 'linear' }} />

@@ -1,5 +1,6 @@
 import { Link } from 'react-router';
-import { ChevronDown, ShoppingBag, Menu, X } from 'lucide-react';
+import { Link, useNavigate } from 'react-router';
+import { ChevronDown, ShoppingBag, Menu, X, Search } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
@@ -9,8 +10,20 @@ import { LogoGakha } from './LogoGakha';
 export function NavigationBar() {
   const { cart } = useCart();
   const { config } = useStore();
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/shop/all?q=${encodeURIComponent(searchQuery.trim())}`);
+      setIsSearchVisible(false);
+      setSearchQuery('');
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 80);
@@ -66,14 +79,22 @@ export function NavigationBar() {
       }`}>
         <div className="max-w-[1600px] mx-auto px-4 md:px-8 flex items-center justify-between">
           
-          {/* ── Left: Hamburger (Mobile Only) ── */}
-          <button 
-            className="md:hidden p-2 text-[#001a00] hover:text-[#2e7d32] transition-colors"
-            onClick={() => setIsMobileMenuOpen(true)}
-            aria-label="Open Menu"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
+          {/* ── Left: Hamburger & Search (Mobile Only Toggle) ── */}
+          <div className="flex items-center gap-2 md:hidden">
+            <button 
+              className="p-2 text-[#001a00] hover:text-[#2e7d32] transition-colors"
+              onClick={() => setIsMobileMenuOpen(true)}
+              aria-label="Open Menu"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+            <button 
+              className="p-2 text-[#001a00] hover:text-[#2e7d32] transition-colors"
+              onClick={() => setIsSearchVisible(!isSearchVisible)}
+            >
+              <Search className="w-5 h-5" />
+            </button>
+          </div>
 
           {/* ── Center/Left: LOGO ── */}
           <Link to="/" className="group cursor-pointer">
@@ -81,7 +102,7 @@ export function NavigationBar() {
           </Link>
 
           {/* ── Center: Desktop Nav Links ── */}
-          <div className="hidden md:flex items-center gap-10">
+          <div className="hidden md:flex items-center gap-8 lg:gap-10">
             <div className="relative group/dropdown">
               <Link 
                 to="/shop/all"
@@ -156,8 +177,22 @@ export function NavigationBar() {
             </div>
           </div>
 
-          {/* ── Right: Cart & CTA ── */}
-          <div className="flex items-center gap-3 md:gap-6">
+          {/* ── Right: Search & Cart & CTA ── */}
+          <div className="flex items-center gap-3 lg:gap-6">
+            {/* Desktop Search */}
+            <form onSubmit={handleSearch} className="hidden lg:flex items-center relative group">
+              <input 
+                type="text"
+                placeholder="Cari produk..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="bg-gray-100/50 border border-transparent focus:border-[#2e7d32]/30 focus:bg-white rounded-full py-2 pl-4 pr-10 text-[10px] font-bold uppercase tracking-wider transition-all w-[180px] focus:w-[240px] outline-none"
+              />
+              <button type="submit" className="absolute right-3 text-[#001a00]/40 hover:text-[#2e7d32] transition-colors">
+                <Search className="w-3.5 h-3.5" />
+              </button>
+            </form>
+
             <Link
               to="/checkout"
               className="relative p-2 text-[#001a00] hover:text-[#2e7d32] transition-all duration-300"
@@ -178,13 +213,39 @@ export function NavigationBar() {
 
             <Link
               to="/shop/all"
-              className="hidden sm:inline-flex relative overflow-hidden items-center gap-2.5 bg-[#003300] border border-[#1b5e20]/50 text-white px-5 md:px-7 py-2.5 md:py-3.5 text-[9px] md:text-[10px] font-bold tracking-[0.3em] uppercase group/btn"
+              className="hidden lg:inline-flex relative overflow-hidden items-center gap-2.5 bg-[#003300] border border-[#1b5e20]/50 text-white px-7 py-3 text-[10px] font-bold tracking-[0.3em] uppercase group/btn transition-all hover:bg-[#2e7d32]"
               style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             >
               <span className="relative z-10">Shop Now</span>
             </Link>
           </div>
         </div>
+
+        {/* Mobile Search Bar Expansion */}
+        <AnimatePresence>
+          {isSearchVisible && (
+            <motion.div 
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="md:hidden px-4 py-3 bg-white border-t border-gray-50 overflow-hidden"
+            >
+              <form onSubmit={handleSearch} className="relative">
+                <input 
+                  type="text"
+                  placeholder="Cari produk Gakha..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  autoFocus
+                  className="w-full bg-gray-50 border-none rounded-xl py-4 pl-5 pr-12 text-sm font-bold uppercase tracking-widest outline-none ring-1 ring-gray-100 focus:ring-[#2e7d32]/20"
+                />
+                <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 text-[#2e7d32]">
+                  <Search className="w-5 h-5" />
+                </button>
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* ── Mobile Sidebar Menu ── */}

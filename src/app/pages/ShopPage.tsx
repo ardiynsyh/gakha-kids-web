@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router';
+import { useSearchParams, useParams } from 'react-router';
 import { Heart, ShoppingBag } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { useWishlist } from '../context/WishlistContext';
@@ -11,6 +11,9 @@ import { ProductModal } from '../components/ProductModal';
 
 export function ShopPage() {
   const { categoryId } = useParams();
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get('q')?.toLowerCase() || '';
+  
   const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
@@ -34,6 +37,10 @@ export function ShopPage() {
           }
         }
         
+        if (searchQuery) {
+          query = query.ilike('name', `%${searchQuery}%`);
+        }
+        
         const { data, error } = await query;
         if (error) throw error;
         if (data) setProducts(data);
@@ -44,9 +51,10 @@ export function ShopPage() {
       }
     }
     fetchProducts();
-  }, [categoryId, config?.productCategories]);
+  }, [categoryId, config?.productCategories, searchQuery]);
 
   const getTitle = () => {
+    if (searchQuery) return `Hasil pencarian: "${searchQuery}"`;
     const dynamicCat = config?.productCategories?.find((c: any) => c.id === categoryId);
     if (dynamicCat) return dynamicCat.name;
 
