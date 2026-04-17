@@ -6,14 +6,19 @@ import { Testimonials } from '../components/Testimonials';
 import { TribalCulture } from '../components/TribalCulture';
 import { SEO } from '../components/SEO';
 
+import { useStore } from '../context/StoreContext';
+
 // ── Manifesto Section ─────────────────────────────────────────────────────────
 function Manifesto() {
-  const words = [
+  const { config } = useStore();
+  const defaultWords = [
     'Untuk yang pernah berdiri',
     'di bawah guyuran hujan,',
     'menyanyikan nama',
     'yang kamu cintai.',
   ];
+  const words = config.manifesto?.lines || defaultWords;
+  const bottomText = config.manifesto?.bottomText || '— This is for the Terrace';
 
   return (
     <section className="relative py-40 bg-white overflow-hidden">
@@ -81,7 +86,7 @@ function Manifesto() {
           viewport={{ once: true }}
           transition={{ duration: 1, delay: 1 }}
         >
-          — This is for the Terrace
+          {bottomText}
         </motion.p>
 
         {/* Bottom vertical line */}

@@ -116,11 +116,11 @@ export function NewArrivals() {
           transition={{ duration: 1 }}
         >
           <h2 className="text-[clamp(1.5rem,8vw,7rem)] font-black text-[#001a00]/[0.03] leading-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap pointer-events-none select-none uppercase">
-            CURATED SELECTION
+            {config.curatedBgText || 'CURATED SELECTION'}
           </h2>
 
           <span className="text-[#2e7d32] text-[10px] font-black tracking-[0.5em] uppercase block mb-3">
-             Your Terrace Identity
+             {config.curatedBadge || 'Your Terrace Identity'}
           </span>
           <h3 className="text-[clamp(2.5rem,6vw,4.5rem)] font-black text-[#001a00] leading-tight tracking-tight relative z-10 mt-6">
             {config.featuredTitle || 'Pilihan Koleksi Utama'}

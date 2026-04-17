@@ -3,10 +3,12 @@ import { ChevronDown, ShoppingBag, Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
+import { useStore } from '../context/StoreContext';
 import { LogoGakha } from './LogoGakha';
 
 export function NavigationBar() {
   const { cart } = useCart();
+  const { config } = useStore();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -56,10 +58,8 @@ export function NavigationBar() {
           <p className="text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-4 whitespace-nowrap">
             <span className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse" />
-              FLASH SALE: DISCOUNT UP TO 50% FOR ALL NEW DROPS
+              {config.announcement?.text || 'FLASH SALE: DISCOUNT UP TO 50% FOR ALL NEW DROPS | USE CODE: GAKHA2024'}
             </span>
-            <span className="hidden sm:inline opacity-30">|</span>
-            <span className="hidden sm:inline">USE CODE: GAKHA2024</span>
           </p>
         </div>
       </div>

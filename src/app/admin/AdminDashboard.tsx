@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import {
   Package, Plus, Trash, Settings,
   Image as ImageIcon, LogOut, ShoppingBag, Zap,
-  Eye, X, Phone, MapPin, Camera,
+  Eye, X, Phone, MapPin, Camera, Monitor,
   Sparkles, Tag, RefreshCw, Printer, TrendingUp, BarChart3, MessageSquare, Filter, Layout, Bell, CheckCircle, Truck
 } from 'lucide-react';
 import { useNavigate } from 'react-router';
@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export function AdminDashboard() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'analytics' | 'products' | 'orders' | 'coupons' | 'settings'>('analytics');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'products' | 'orders' | 'coupons' | 'content'>('analytics');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [products, setProducts] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
@@ -44,7 +44,18 @@ export function AdminDashboard() {
     featuredTitle: 'Pilihan Koleksi Utama',
     featuredDescription: 'Kurasi produk terbaik GAKHA Market pilihan tim kami. Mulai dari Football Culture hingga Regional Series.',
     socialMedia: { instagram: 'gakha.official', resellerWhatsApp: '628123456789' },
-    hero: { headingLine1: 'GAKHA', headingLine2: 'FOOTBALL CULTURE', description: 'Premium Terrace Wear for the Culture', backgroundImage: '' }
+    hero: { headingLine1: 'GAKHA', headingLine2: 'FOOTBALL CULTURE', description: 'Premium Terrace Wear for the Culture', backgroundImage: '' },
+    manifesto: {
+      lines: [
+        'Untuk yang pernah berdiri',
+        'di bawah guyuran hujan,',
+        'menyanyikan nama',
+        'yang kamu cintai.'
+      ],
+      bottomText: '— This is for the Terrace'
+    },
+    curatedBadge: 'Your Terrace Identity',
+    curatedBgText: 'CURATED SELECTION'
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isSyncing, setIsSyncing] = useState(true);
@@ -331,7 +342,7 @@ export function AdminDashboard() {
             { id: 'products', label: 'Produk & Stok', icon: <Package className="w-5 h-5" /> },
             { id: 'orders', label: 'Penjualan', icon: <ShoppingBag className="w-5 h-5" /> },
             { id: 'coupons', label: 'Kode Kupon', icon: <Zap className="w-5 h-5" /> },
-            { id: 'settings', label: 'Seting Toko', icon: <Settings className="w-5 h-5" /> },
+            { id: 'content', label: 'Kustomisasi Web', icon: <Monitor className="w-5 h-5" /> },
           ].map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id as any)} className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all relative group ${activeTab === tab.id ? 'bg-[#2e7d32] text-white shadow-lg' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}>
               {tab.icon} <span className="font-bold text-[11px] uppercase tracking-widest hidden lg:block">{tab.label}</span>
@@ -685,78 +696,154 @@ export function AdminDashboard() {
             </motion.div>
           )}
 
-          {/* TAB: PENGATURAN TOKO */}
-          {activeTab === 'settings' && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="settings" className="p-8 lg:p-12 max-w-4xl space-y-8">
-              <div className="bg-gray-950 text-white p-10 rounded-[3rem] shadow-xl flex justify-between items-center relative overflow-hidden">
-                <div className="relative z-10">
-                  <h1 className="text-3xl font-black italic uppercase tracking-tighter mb-1">Konfigurasi Toko</h1>
-                  <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest">Atur Tampilan Halaman Utama</p>
+          {/* TAB: KUSTOMISASI WEB */}
+          {activeTab === 'content' && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key="content" className="p-8 lg:p-12 max-w-6xl mx-auto space-y-12">
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div>
+                  <h1 className="text-5xl font-black italic uppercase tracking-tighter leading-none mb-3">Editor Konten</h1>
+                  <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                    <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" /> Kustomisasi 3 Bagian Utama Toko
+                  </p>
                 </div>
-                <div className="flex gap-4 relative z-10">
-                   <button onClick={applyGakhaBranding} className="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-6 py-4 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all ring-1 ring-white/10">Sinkronisasi Branding GAKHA</button>
-                   <button onClick={handleSaveConfig} className="bg-[var(--accent)] text-white px-8 py-4 rounded-xl font-black text-[11px] uppercase tracking-widest shadow-lg hover:scale-105 transition-all">Simpan Pengaturan</button>
+                <div className="flex gap-4">
+                   <button onClick={applyGakhaBranding} className="bg-gray-200 hover:bg-gray-300 text-gray-900 px-6 py-4 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all">Format Default</button>
+                   <button onClick={handleSaveConfig} className="bg-[#2e7d32] text-white px-10 py-4 rounded-xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-green-900/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 pr-6">
+                     <CheckCircle className="w-4 h-4" /> Simpan Perubahan
+                   </button>
                 </div>
-                <Settings className="absolute -bottom-10 -right-4 w-40 h-40 opacity-5 rotate-12" />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 space-y-5 shadow-sm">
-                  <p className="text-[11px] font-black text-gray-900 uppercase tracking-widest italic flex items-center gap-2"><Layout className="w-4 h-4 text-blue-500" /> Teks Hero Display</p>
-                  <input value={config.hero?.headingLine1} onChange={(e) => setConfig({ ...config, hero: { ...config.hero, headingLine1: e.target.value } })} className="w-full bg-gray-50/50 border border-gray-200 p-4 rounded-xl outline-none font-bold" placeholder="Teks Baris 1" />
-                  <input value={config.hero?.headingLine2} onChange={(e) => setConfig({ ...config, hero: { ...config.hero, headingLine2: e.target.value } })} className="w-full bg-pink-50/50 border border-pink-100 p-4 rounded-xl font-black text-[var(--accent)] outline-none" placeholder="Teks Aksen" />
-                </div>
-                <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 space-y-5 shadow-sm">
-                  <p className="text-[11px] font-black text-gray-900 uppercase tracking-widest italic flex items-center gap-2"><Phone className="w-4 h-4 text-green-500" /> Link Social & CS</p>
-                  <input value={config.socialMedia?.instagram} onChange={(e) => setConfig({ ...config, socialMedia: { ...config.socialMedia, instagram: e.target.value } })} className="w-full bg-gray-50/50 border border-gray-200 p-4 rounded-xl outline-none font-bold text-sm" placeholder="URL Instagram" />
-                  <input value={config.socialMedia?.resellerWhatsApp} onChange={(e) => setConfig({ ...config, socialMedia: { ...config.socialMedia, resellerWhatsApp: e.target.value } })} className="w-full bg-green-50/50 border border-green-100 p-4 rounded-xl outline-none font-black text-green-600 text-sm" placeholder="Nomor WA (Mulai dari 628...)" />
-                </div>
-              </div>
-              <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 space-y-5 shadow-sm text-center">
-                <p className="text-[11px] font-black text-gray-900 uppercase tracking-widest italic flex items-center justify-center gap-2"><Bell className="w-4 h-4 text-orange-400" /> Teks Bar Pengumuman Atas</p>
-                <input value={config.announcement?.text} onChange={(e) => setConfig({ ...config, announcement: { ...config.announcement, text: e.target.value } })} className="w-full max-w-2xl mx-auto bg-orange-50/50 border border-orange-200 p-5 rounded-2xl font-black text-orange-600 text-center outline-none" placeholder="Contoh: PROMO FREE ONGKIR" />
-              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-              {/* FEATURED PRODUCTS SELECTION */}
-              <div className="bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm">
-                <div className="flex justify-between items-center mb-8">
+                {/* SECTION 1: ANNOUNCEMENT BAR */}
+                <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-sm space-y-8 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
+                    <Bell className="w-32 h-32" />
+                  </div>
                   <div>
-                    <p className="text-[11px] font-black text-gray-900 uppercase tracking-widest italic flex items-center gap-2"><Sparkles className="w-4 h-4 text-amber-500" /> Kurasi Produk Beranda</p>
-                    <p className="text-[9px] text-gray-400 font-bold uppercase mt-1 tracking-widest">Pilih Produk yang akan tampil di Section Unggulan</p>
+                    <span className="bg-green-50 text-[#2e7d32] px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest inline-block mb-4">Bagian 1: Header Bar</span>
+                    <h3 className="text-2xl font-black uppercase tracking-tight italic">Bar Pengumuman</h3>
                   </div>
-                  <span className="bg-amber-100 text-amber-600 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">{config.featuredProducts?.length || 0} Terpilih</span>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Judul Seksi Kurasi</label>
-                    <input value={config.featuredTitle} onChange={(e) => setConfig({ ...config, featuredTitle: e.target.value })} className="w-full bg-gray-50 border border-gray-100 p-4 rounded-xl font-black text-[#003300] outline-none" placeholder="Contoh: UNGGULAN MINGGU INI" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Deskripsi Seksi</label>
-                    <input value={config.featuredDescription} onChange={(e) => setConfig({ ...config, featuredDescription: e.target.value })} className="w-full bg-gray-50 border border-gray-100 p-4 rounded-xl font-bold text-gray-500 text-sm outline-none" placeholder="Kalimat ajakan beli..." />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 overflow-y-auto max-h-[400px] p-2 custom-scrollbar">
-                  {products.map(p => {
-                    const isFeatured = config.featuredProducts?.includes(p.id);
-                    return (
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between px-2">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Status Aktif</label>
                       <button 
-                        key={p.id} 
-                        onClick={() => {
-                          const current = config.featuredProducts || [];
-                          const next = isFeatured ? current.filter((id: any) => id !== p.id) : [...current, p.id];
-                          setConfig({ ...config, featuredProducts: next });
-                        }}
-                        className={`p-3 rounded-2xl border-2 transition-all text-left flex flex-col gap-3 relative ${isFeatured ? 'border-[#2e7d32] bg-green-50 shadow-md' : 'border-gray-100 bg-white hover:border-gray-200'}`}
+                        onClick={() => setConfig({ ...config, announcement: { ...config.announcement, isEnabled: !config.announcement?.isEnabled } })}
+                        className={`w-12 h-6 rounded-full transition-all relative ${config.announcement?.isEnabled ? 'bg-[#2e7d32]' : 'bg-gray-200'}`}
                       >
-                        <img src={p.image} className="w-full h-24 object-cover rounded-xl grayscale hover:grayscale-0" />
-                        <p className="text-[9px] font-black uppercase truncate">{p.name}</p>
-                        {isFeatured && <div className="absolute top-2 right-2 bg-[#2e7d32] text-white p-1 rounded-full"><CheckCircle className="w-3 h-3" /></div>}
+                        <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${config.announcement?.isEnabled ? 'left-7' : 'left-1'}`} />
                       </button>
-                    )
-                  })}
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Teks Promosi (Gunakan | untuk pemisah)</label>
+                      <textarea 
+                        value={config.announcement?.text} 
+                        onChange={(e) => setConfig({ ...config, announcement: { ...config.announcement, text: e.target.value } })} 
+                        className="w-full bg-gray-50 border border-gray-100 p-5 rounded-2xl font-black text-sm text-[#003300] outline-none min-h-[100px] resize-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+
+
+
+
+
+
+
+                {/* SECTION 2: MANIFESTO QUOTE */}
+                <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-sm space-y-8 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
+                    <MessageSquare className="w-32 h-32" />
+                  </div>
+                  <div>
+                    <span className="bg-purple-50 text-purple-600 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest inline-block mb-4">Bagian 2: Quote Section</span>
+                    <h3 className="text-2xl font-black uppercase tracking-tight italic">Teks Manifesto</h3>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 gap-3">
+                      {(config.manifesto?.lines || ['', '', '', '']).map((line: string, idx: number) => (
+                        <div key={idx} className="relative">
+                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-300">{idx + 1}</span>
+                          <input 
+                            value={line} 
+                            onChange={(e) => {
+                              const newLines = [...(config.manifesto?.lines || ['', '', '', ''])];
+                              newLines[idx] = e.target.value;
+                              setConfig({ ...config, manifesto: { ...config.manifesto, lines: newLines } });
+                            }}
+                            className="w-full bg-gray-50 border border-gray-100 p-4 pl-10 rounded-xl outline-none font-bold text-sm"
+                            placeholder={`Baris ke-${idx + 1}`}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Kredit / Teks Bawah</label>
+                      <input 
+                        value={config.manifesto?.bottomText} 
+                        onChange={(e) => setConfig({ ...config, manifesto: { ...config.manifesto, bottomText: e.target.value } })} 
+                        className="w-full bg-gray-50 border border-gray-100 p-4 rounded-xl font-bold italic text-center text-sm outline-none"
+                        placeholder="— This is for the Terrace"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* SECTION 3: CURATED SELECTION */}
+                <div className="bg-white rounded-[3rem] p-10 border border-gray-100 shadow-sm space-y-8 lg:col-span-2 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
+                    <Sparkles className="w-48 h-48" />
+                  </div>
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                      <span className="bg-amber-50 text-amber-600 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest inline-block mb-4">Bagian 3: Featured Grid</span>
+                      <h3 className="text-2xl font-black uppercase tracking-tight italic">Koleksi Pilihan (Curated)</h3>
+                    </div>
+                    <div className="flex gap-2">
+                       <input value={config.curatedBadge} onChange={(e) => setConfig({ ...config, curatedBadge: e.target.value })} className="bg-gray-50 p-3 rounded-xl font-black text-[9px] uppercase text-[#2e7d32] outline-none border border-gray-100" placeholder="Badge" />
+                       <input value={config.curatedBgText} onChange={(e) => setConfig({ ...config, curatedBgText: e.target.value })} className="bg-gray-50 p-3 rounded-xl font-black text-[9px] uppercase text-gray-400 outline-none border border-gray-100" placeholder="Bg Text" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                     <div className="space-y-4">
+                        <input value={config.featuredTitle} onChange={(e) => setConfig({ ...config, featuredTitle: e.target.value })} className="w-full bg-gray-50 border border-gray-100 p-4 rounded-xl font-black text-xl outline-none" />
+                        <textarea value={config.featuredDescription} onChange={(e) => setConfig({ ...config, featuredDescription: e.target.value })} className="w-full bg-gray-50 border border-gray-100 p-4 rounded-xl font-bold text-sm text-gray-500 outline-none min-h-[80px] resize-none" />
+                     </div>
+                     <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2 overflow-y-auto max-h-[200px] p-2 bg-gray-50 rounded-2xl border border-gray-100 custom-scrollbar">
+                        {products.map(p => {
+                          const isFeatured = config.featuredProducts?.includes(p.id);
+                          return (
+                            <button key={p.id} onClick={() => {
+                              const current = config.featuredProducts || [];
+                              const next = isFeatured ? current.filter((id: any) => id !== p.id) : [...current, p.id];
+                              setConfig({ ...config, featuredProducts: next });
+                            }} className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${isFeatured ? 'border-[#2e7d32] scale-90' : 'border-transparent opacity-60'}`}>
+                              <img src={p.image} className="w-full h-full object-cover" />
+                              {isFeatured && <div className="absolute inset-0 bg-[#2e7d32]/20 flex items-center justify-center"><CheckCircle className="w-4 h-4 text-white" /></div>}
+                            </button>
+                          );
+                        })}
+                     </div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-950 text-white rounded-[3rem] p-10 shadow-2xl lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-10">
+                   <div className="space-y-4">
+                      <p className="text-[10px] font-black uppercase text-gray-500">Banner Hero</p>
+                      <input value={config.hero?.headingLine1} onChange={(e) => setConfig({ ...config, hero: { ...config.hero, headingLine1: e.target.value } })} className="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none font-bold text-sm" />
+                      <input value={config.hero?.headingLine2} onChange={(e) => setConfig({ ...config, hero: { ...config.hero, headingLine2: e.target.value } })} className="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none font-black text-pink-500 text-sm" />
+                   </div>
+                   <div className="space-y-4">
+                      <p className="text-[10px] font-black uppercase text-gray-500">Koneksi Toko</p>
+                      <input value={config.socialMedia?.instagram} onChange={(e) => setConfig({ ...config, socialMedia: { ...config.socialMedia, instagram: e.target.value } })} className="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none font-bold text-sm" />
+                      <input value={config.socialMedia?.resellerWhatsApp} onChange={(e) => setConfig({ ...config, socialMedia: { ...config.socialMedia, resellerWhatsApp: e.target.value } })} className="w-full bg-green-500/10 border border-green-500/20 p-4 rounded-xl outline-none font-black text-green-400 text-sm" />
+                   </div>
                 </div>
               </div>
             </motion.div>
