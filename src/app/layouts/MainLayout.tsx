@@ -27,7 +27,7 @@ export function MainLayout() {
         />
       </AnimatePresence>
 
-      <main className="flex-1 pt-[240px] lg:pt-[280px]">
+      <main className="flex-1 pt-[160px] lg:pt-[180px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}

@@ -85,8 +85,11 @@ export function NavigationBar() {
 
           {/* ── Center: Desktop Nav Links ── */}
           <div className="hidden md:flex items-center gap-10">
-            <div className="relative group/dropdown py-4">
-              <div className="flex items-center gap-1.5 cursor-pointer">
+            <div className="relative group/dropdown">
+              <Link 
+                to="/shop/all"
+                className="flex items-center gap-1.5 py-4 cursor-pointer"
+              >
                 <span
                   className="text-[#001a00] group-hover/dropdown:text-[#2e7d32] font-bold text-[10px] tracking-[0.35em] uppercase transition-colors duration-500"
                   style={{ fontFamily: "'Space Grotesk', sans-serif" }}
@@ -94,7 +97,7 @@ export function NavigationBar() {
                   Football Culture
                 </span>
                 <ChevronDown className="w-3 h-3 text-[#001a00]/40 group-hover/dropdown:text-[#2e7d32] group-hover/dropdown:rotate-180 transition-all duration-500" />
-              </div>
+              </Link>
 
               <div className="absolute top-full left-0 pt-2 opacity-0 translate-y-2 pointer-events-none group-hover/dropdown:opacity-100 group-hover/dropdown:translate-y-0 group-hover/dropdown:pointer-events-auto transition-all duration-500">
                 <div className="bg-white border border-[#1b5e20]/10 shadow-2xl p-6 min-w-[240px] flex flex-col gap-4">
@@ -117,15 +120,18 @@ export function NavigationBar() {
               <Link
                 key={link.label}
                 to={link.to}
-                className="text-[#001a00] hover:text-[#2e7d32] font-bold text-[10px] tracking-[0.35em] uppercase transition-colors duration-500"
+                className="text-[#001a00] hover:text-[#2e7d32] font-bold text-[10px] tracking-[0.35em] uppercase transition-colors duration-500 py-4 flex items-center h-full"
                 style={{ fontFamily: "'Space Grotesk', sans-serif" }}
               >
                 {link.label}
               </Link>
             ))}
 
-            <div className="relative group/regional py-4">
-              <div className="flex items-center gap-1.5 cursor-pointer">
+            <div className="relative group/regional">
+              <Link
+                to="/shop/all"
+                className="flex items-center gap-1.5 py-4 cursor-pointer"
+              >
                 <span
                   className="text-[#001a00] group-hover/regional:text-[#2e7d32] font-bold text-[10px] tracking-[0.35em] uppercase transition-colors duration-500"
                   style={{ fontFamily: "'Space Grotesk', sans-serif" }}
@@ -133,7 +139,7 @@ export function NavigationBar() {
                   Regional Series
                 </span>
                 <ChevronDown className="w-3 h-3 text-[#001a00]/40 group-hover/regional:text-[#2e7d32] group-hover/regional:rotate-180 transition-all duration-500" />
-              </div>
+              </Link>
 
               <div className="absolute top-full left-0 pt-2 opacity-0 translate-y-2 pointer-events-none group-hover/regional:opacity-100 group-hover/regional:translate-y-0 group-hover/regional:pointer-events-auto transition-all duration-500">
                 <div className="bg-white border border-[#1b5e20]/10 shadow-2xl p-6 min-w-[340px] grid grid-cols-2 gap-x-8 gap-y-4">

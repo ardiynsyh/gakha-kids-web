@@ -16,15 +16,21 @@ export function InfoPage() {
   useEffect(() => {
     async function fetchPage() {
       setIsLoading(true);
-      const { data } = await supabase
-        .from('info_pages')
-        .select('*')
-        .eq('id', id)
-        .single();
-      
-      if (data) setCloudPage(data);
-      else setCloudPage(null);
-      setIsLoading(false);
+      try {
+        const { data, error } = await supabase
+          .from('info_pages')
+          .select('*')
+          .eq('id', id)
+          .single();
+        
+        if (data) setCloudPage(data);
+        else setCloudPage(null);
+      } catch (err) {
+        console.error("Fetch page error:", err);
+        setCloudPage(null);
+      } finally {
+        setIsLoading(false);
+      }
     }
     fetchPage();
   }, [id]);
@@ -154,7 +160,7 @@ export function InfoPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-32 min-h-[50vh]">
+    <div className="max-w-4xl mx-auto px-4 py-12 min-h-[50vh]">
       <h1 className="text-[clamp(1.5rem,5vw,3rem)] font-black text-[var(--text-primary)] mb-8 text-center">{getTitle()}</h1>
       <div className="prose prose-lg max-w-none text-[var(--text-secondary)] bg-[var(--bg-primary)] p-[clamp(1rem,5vw,3rem)] rounded-[2.5rem] border border-[var(--border-color)] shadow-xl leading-relaxed antialiased">
         {getContent()}
