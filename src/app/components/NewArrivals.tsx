@@ -82,19 +82,25 @@ export function NewArrivals() {
     async function fetchFeatured() {
       try {
         const featuredIds = config.featuredProducts || [];
-        
-        let query = supabase.from('products').select('*');
-        
         if (featuredIds.length > 0) {
-          query = query.in('id', featuredIds);
+          // Fetch exactly the selected products
+          let { data, error } = await supabase.from('products').select('*').in('id', featuredIds);
+          
+          if (data && data.length > 0) {
+            // Re-order results to match the order in featuredIds
+            const ordered = featuredIds.map(id => data?.find(p => p.id === id)).filter(Boolean);
+            setProducts(ordered as any[]);
+          } else {
+            console.warn("Featured products not found in DB, using fallback", error);
+            setProducts(FALLBACK);
+          }
         } else {
-          // Default fallback to show something from DB
-          query = query.contains('categories', ['Football Culture']).limit(4);
+          // Fallback: Latest 4 products
+          const { data } = await supabase.from('products').select('*').order('id', { ascending: false }).limit(4);
+          setProducts(data && data.length > 0 ? data : FALLBACK);
         }
-
-        const { data } = await query;
-        setProducts(data && data.length > 0 ? data : FALLBACK);
-      } catch {
+      } catch (err) {
+        console.error('Error fetching curated:', err);
         setProducts(FALLBACK);
       } finally {
         setIsLoaded(true);

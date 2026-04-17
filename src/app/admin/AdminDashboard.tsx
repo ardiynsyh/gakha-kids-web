@@ -811,24 +811,69 @@ export function AdminDashboard() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                     <div className="space-y-4">
-                        <input value={config.featuredTitle} onChange={(e) => setConfig({ ...config, featuredTitle: e.target.value })} className="w-full bg-gray-50 border border-gray-100 p-4 rounded-xl font-black text-xl outline-none" />
-                        <textarea value={config.featuredDescription} onChange={(e) => setConfig({ ...config, featuredDescription: e.target.value })} className="w-full bg-gray-50 border border-gray-100 p-4 rounded-xl font-bold text-sm text-gray-500 outline-none min-h-[80px] resize-none" />
+                     <div className="space-y-6">
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Judul & Deskripsi</label>
+                          <input value={config.featuredTitle} onChange={(e) => setConfig({ ...config, featuredTitle: e.target.value })} className="w-full bg-gray-50 border border-gray-100 p-4 rounded-xl font-black text-xl outline-none" placeholder="Judul Seksi" />
+                          <textarea value={config.featuredDescription} onChange={(e) => setConfig({ ...config, featuredDescription: e.target.value })} className="w-full bg-gray-50 border border-gray-100 p-4 rounded-xl font-bold text-sm text-gray-500 outline-none min-h-[80px] resize-none" placeholder="Deskripsi Seksi" />
+                        </div>
+                        
+                        <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100">
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Urutan Produk Terpilih</p>
+                          <div className="space-y-2">
+                            {(config.featuredProducts || []).map((pid: any, idx: number) => {
+                              const p = products.find(prod => prod.id === pid);
+                              return (
+                                <div key={pid} className="flex items-center gap-3 bg-white p-2 rounded-xl border border-gray-100 shadow-sm">
+                                  <span className="w-5 h-5 bg-gray-900 text-white rounded-full flex items-center justify-center text-[9px] font-black">{idx + 1}</span>
+                                  <img src={p?.image} className="w-8 h-8 rounded-lg object-cover" />
+                                  <p className="flex-1 text-[10px] font-black uppercase truncate">{p?.name || 'Produk Tidak Ditemukan'}</p>
+                                  <button onClick={() => setConfig({ ...config, featuredProducts: config.featuredProducts.filter((id: any) => id !== pid) })} className="p-2 text-red-500 hover:bg-red-50 rounded-lg">
+                                    <Trash className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              );
+                            })}
+                            {(!config.featuredProducts || config.featuredProducts.length === 0) && (
+                              <p className="text-[9px] text-gray-400 font-bold uppercase text-center py-4">Belum ada produk dipilih</p>
+                            )}
+                          </div>
+                        </div>
                      </div>
-                     <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2 overflow-y-auto max-h-[200px] p-2 bg-gray-50 rounded-2xl border border-gray-100 custom-scrollbar">
-                        {products.map(p => {
-                          const isFeatured = config.featuredProducts?.includes(p.id);
-                          return (
-                            <button key={p.id} onClick={() => {
-                              const current = config.featuredProducts || [];
-                              const next = isFeatured ? current.filter((id: any) => id !== p.id) : [...current, p.id];
-                              setConfig({ ...config, featuredProducts: next });
-                            }} className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${isFeatured ? 'border-[#2e7d32] scale-90' : 'border-transparent opacity-60'}`}>
-                              <img src={p.image} className="w-full h-full object-cover" />
-                              {isFeatured && <div className="absolute inset-0 bg-[#2e7d32]/20 flex items-center justify-center"><CheckCircle className="w-4 h-4 text-white" /></div>}
-                            </button>
-                          );
-                        })}
+                     
+                     <div className="space-y-4">
+                        <div className="flex justify-between items-center bg-gray-50 p-2 pl-4 rounded-2xl border border-gray-100 focus-within:ring-2 ring-green-500/20 transition-all">
+                           <input type="text" placeholder="CARI PRODUK UNTUK DITAMBAHKAN..." className="bg-transparent outline-none text-[10px] font-black uppercase flex-1" id="product-search" />
+                           <div className="p-2 bg-white rounded-xl shadow-sm"><Filter className="w-3 h-3 text-gray-400" /></div>
+                        </div>
+                        
+                        <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 overflow-y-auto max-h-[300px] p-2 bg-gray-50 rounded-2xl border border-gray-100 custom-scrollbar">
+                           {products.map(p => {
+                             const isFeatured = config.featuredProducts?.includes(p.id);
+                             return (
+                               <button 
+                                 key={p.id} 
+                                 title={p.name}
+                                 onClick={() => {
+                                   const current = config.featuredProducts || [];
+                                   const next = isFeatured ? current.filter((id: any) => id !== p.id) : [...current, p.id];
+                                   setConfig({ ...config, featuredProducts: next });
+                                 }} 
+                                 className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${isFeatured ? 'border-[#2e7d32] scale-90 shadow-lg' : 'border-transparent grayscale opacity-50 hover:grayscale-0 hover:opacity-100'}`}
+                               >
+                                 <img src={p.image} className="w-full h-full object-cover" />
+                                 {isFeatured && (
+                                   <div className="absolute inset-0 bg-[#2e7d32]/20 flex items-center justify-center">
+                                      <div className="bg-[#2e7d32] text-white p-1 rounded-full shadow-lg">
+                                        <CheckCircle className="w-3 h-3" />
+                                      </div>
+                                   </div>
+                                 )}
+                               </button>
+                             );
+                           })}
+                        </div>
+                        <p className="text-[8px] text-center text-gray-400 font-black uppercase tracking-widest">Klik pada gambar untuk menambah/menghapus produk</p>
                      </div>
                   </div>
                 </div>
