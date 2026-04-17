@@ -92,12 +92,12 @@ export function ShopPage() {
             
             return (
               <div key={product.id} className="group">
-                <div className="relative mb-4 overflow-hidden rounded-3xl bg-[var(--card-bg)] border border-[var(--border-color)] shadow-sm group-hover:shadow-md transition-shadow">
-                  <div className="aspect-[3/4] relative">
+                <div className="relative mb-4 overflow-hidden rounded-3xl bg-white border border-[var(--border-color)] shadow-sm group-hover:shadow-md transition-shadow">
+                  <div className="aspect-[3/4] relative bg-white">
                     <ImageWithFallback
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-500"
                     />
                     {tag && (
                       <div className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-bold text-white shadow-md backdrop-blur-sm ${tag.includes('%') ? 'bg-red-500' : 'bg-[#ffb000]'}`}>
