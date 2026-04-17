@@ -67,7 +67,6 @@ export function NavigationBar() {
         <div className="max-w-[1600px] mx-auto overflow-hidden">
           <p className="text-[10px] font-black uppercase tracking-[0.3em] flex items-center justify-center gap-4 whitespace-nowrap">
             <span className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse" />
               {config.announcement?.text || 'FLASH SALE: DISCOUNT UP TO 50% FOR ALL NEW DROPS | USE CODE: GAKHA2024'}
             </span>
           </p>
