@@ -74,7 +74,7 @@ export function NavigationBar() {
         <div className="max-w-[1600px] mx-auto px-4 md:px-8 flex items-center justify-between">
           
           {/* Mobile hamburger & search */}
-          <div className="flex items-center gap-2 md:hidden">
+          <div className="flex items-center gap-2 md:hidden min-w-[80px]">
             <button className="p-2 text-[#001a00]" onClick={() => setIsMobileMenuOpen(true)}>
               <Menu className="w-6 h-6" />
             </button>
@@ -83,7 +83,7 @@ export function NavigationBar() {
             </button>
           </div>
 
-          <Link to="/" className="group cursor-pointer">
+          <Link to="/" className="group cursor-pointer md:relative md:left-0 md:translate-x-0 absolute left-1/2 -translate-x-1/2">
             <LogoGakha className="h-12 md:h-16 w-12 md:w-16" color="#013220" />
           </Link>
 
@@ -133,7 +133,7 @@ export function NavigationBar() {
           </div>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-2 lg:gap-4">
+          <div className="flex items-center gap-2 lg:gap-4 md:min-w-0 min-w-[80px] justify-end">
             <form onSubmit={handleSearch} className="hidden xl:flex items-center relative">
               <input type="text" placeholder="Cari..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="bg-gray-100/80 rounded-full py-2 pl-4 pr-10 text-[10px] font-bold uppercase tracking-widest w-[120px] focus:w-[180px] transition-all outline-none" />
               <button type="submit" className="absolute right-3 text-gray-400"><Search className="w-3.5 h-3.5" /></button>
