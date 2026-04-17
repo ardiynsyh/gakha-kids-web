@@ -225,11 +225,23 @@ export function AdminDashboard() {
     const tid = toast.loading("Mengunggah Gambar...");
     try {
       const fileName = `gakha-${Date.now()}.${file.name.split('.').pop()}`;
-      await supabase.storage.from('products').upload(fileName, file);
+      const { data: uploadData, error: uploadError } = await supabase.storage.from('products').upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+      
+      if (uploadError) {
+        console.error("UPLOAD ERROR DETAILS:", uploadError);
+        throw new Error(uploadError.message);
+      }
+      
       const { data } = supabase.storage.from('products').getPublicUrl(fileName);
       callback(data.publicUrl);
       toast.success("Gambar Terpasang!", { id: tid });
-    } catch (e: any) { toast.error(e.message, { id: tid }); }
+    } catch (e: any) { 
+        console.error("FULL UPLOAD ERROR:", e);
+        toast.error(`Gagal Unggah: ${e.message}`, { id: tid }); 
+    }
   };
 
   const handlePrintInvoice = (order: any) => {
