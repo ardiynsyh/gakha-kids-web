@@ -192,10 +192,14 @@ export function AdminDashboard() {
       price: "150000",
       originalPrice: "",
       image: "https://images.unsplash.com/photo-1540855513560-112df639c947?auto=format&fit=crop&q=80&w=300",
+      image2: "",
+      image3: "",
+      image4: "",
       categories: [selectedCategory === 'all' ? 'new' : selectedCategory],
       sizes: ["S", "M", "L", "XL", "XXL"],
       inventory: { "S": 10, "M": 10, "L": 10, "XL": 10, "XXL": 10 },
-      weight: 200
+      weight: 200,
+      color: "Default"
     };
     setProducts([newProduct, ...products]);
   };
@@ -480,16 +484,41 @@ export function AdminDashboard() {
                             return (
                               <div key={`${cat.id}-${p.id}`} className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col xl:flex-row items-center gap-8 relative group">
 
-                                {/* Gambar Produk */}
-                                <div className="relative w-32 h-32 flex-shrink-0 group/img">
-                                  <img src={p.image} className="w-full h-full rounded-[1.8rem] object-cover shadow-inner bg-gray-50" />
-                                  <label className="absolute inset-0 bg-black/60 rounded-[1.8rem] flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity cursor-pointer backdrop-blur-sm">
-                                    <input type="file" className="hidden" accept="image/*" onChange={(e) => {
-                                      if (e.target.files?.[0]) handleUploadImage(e.target.files[0], (url) => handleUpdateProduct(p.id, 'image', url));
-                                    }} />
-                                    <Camera className="w-8 h-8 text-white" />
-                                  </label>
-                                  {disc > 0 && <div className="absolute -top-3 -right-3 bg-[#003300] text-white w-12 h-12 rounded-full flex items-center justify-center font-black text-[11px] shadow-lg border-[3px] border-white rotate-12">-{disc}%</div>}
+                                {/* Gambar Produk (4 Slots) */}
+                                <div className="flex flex-col gap-2 flex-shrink-0">
+                                  <div className="relative w-32 h-32 group/img">
+                                    <img src={p.image || "https://placehold.co/400x500?text=Utama"} className="w-full h-full rounded-[1.8rem] object-cover shadow-inner bg-gray-50 border border-gray-100" />
+                                    <label className="absolute inset-0 bg-black/60 rounded-[1.8rem] flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity cursor-pointer backdrop-blur-sm">
+                                      <input type="file" className="hidden" accept="image/*" onChange={(e) => {
+                                        if (e.target.files?.[0]) handleUploadImage(e.target.files[0], (url) => handleUpdateProduct(p.id, 'image', url));
+                                      }} />
+                                      <Camera className="w-6 h-6 text-white" />
+                                    </label>
+                                    {disc > 0 && <div className="absolute -top-3 -right-3 bg-[#003300] text-white w-10 h-10 rounded-full flex items-center justify-center font-black text-[9px] shadow-lg border-[3px] border-white rotate-12">-{disc}%</div>}
+                                    <div className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/50 text-[7px] text-white px-2 py-0.5 rounded-full font-black uppercase tracking-tighter">Utama</div>
+                                  </div>
+                                  
+                                  <div className="flex gap-1.5 justify-between">
+                                    {[2, 3, 4].map(num => (
+                                      <div key={num} className="relative w-9 h-9 group/subimg">
+                                        <img src={p[`image${num}` as keyof typeof p] || "https://placehold.co/100?text=+"} className="w-full h-full rounded-lg object-cover shadow-sm bg-gray-50 border border-gray-200" />
+                                        <label className="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center opacity-0 group-hover/subimg:opacity-100 transition-opacity cursor-pointer">
+                                          <input type="file" className="hidden" accept="image/*" onChange={(e) => {
+                                            if (e.target.files?.[0]) handleUploadImage(e.target.files[0], (url) => handleUpdateProduct(p.id, `image${num}`, url));
+                                          }} />
+                                          <Plus className="w-4 h-4 text-white" />
+                                        </label>
+                                        {p[`image${num}` as keyof typeof p] && (
+                                          <button 
+                                            onClick={() => handleUpdateProduct(p.id, `image${num}`, "")}
+                                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover/subimg:opacity-100 transition-opacity"
+                                          >
+                                            <X className="w-2 h-2" />
+                                          </button>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
 
                                 {/* Input Info Produk (Rapi/Compact) */}

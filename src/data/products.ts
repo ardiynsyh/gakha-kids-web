@@ -6,6 +6,9 @@ export interface Product {
   price: string;
   originalPrice?: string;
   image: string;
+  image2?: string;
+  image3?: string;
+  image4?: string;
   tag?: string;
   color: string;
   categories?: string[];
@@ -13,6 +16,10 @@ export interface Product {
   linktreeUrl?: string;
   rating?: number;
   reviews?: number;
+  sizes?: string[];
+  inventory?: Record<string, number>;
+  weight?: number;
+  sold?: number;
 }
 
 export const products: Product[] = productsData as Product[];

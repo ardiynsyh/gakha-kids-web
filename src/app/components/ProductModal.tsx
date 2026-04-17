@@ -21,6 +21,11 @@ export function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const { addToCart } = useCart();
   const [selectedSize, setSelectedSize] = useState<string>('');
+  const [selectedImage, setSelectedImage] = useState<string>(product.image);
+
+  useEffect(() => {
+    setSelectedImage(product.image);
+  }, [product]);
 
   useEffect(() => {
     if (isOpen && product?.bundleIds?.length > 0) {
@@ -40,6 +45,7 @@ export function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
   if (!product) return null;
 
   const discount = calculateDiscountBadge(product.price, product.originalPrice);
+  const galleryImages = [product.image, product.image2, product.image3, product.image4].filter(Boolean);
 
   return (
     <AnimatePresence>
@@ -70,58 +76,75 @@ export function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
             </button>
 
             {/* Left Portion: Media (Image/Video) */}
-            <div className="lg:w-1/2 relative h-[400px] lg:h-full bg-slate-50 overflow-hidden group">
-               <AnimatePresence mode="wait">
-                  {isPlayingVideo && product.video ? (
-                    <motion.div 
-                      key="video"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="absolute inset-0 bg-black"
-                    >
-                       <video 
-                         src={product.video} 
-                         autoPlay 
-                         controls 
-                         className="w-full h-full object-cover"
-                         onEnded={() => setIsPlayingVideo(false)}
-                       />
-                    </motion.div>
-                  ) : (
-                    <motion.div 
-                      key="image"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="w-full h-full"
-                    >
-                       <ImageWithFallback 
-                         src={product.image} 
-                         alt={product.name}
-                         className="w-full h-full object-cover"
-                       />
-                       {product.video && (
-                         <button 
-                           onClick={() => setIsPlayingVideo(true)}
-                           className="absolute inset-0 flex items-center justify-center group/play"
-                         >
-                            <div className="w-20 h-20 bg-white/20 backdrop-blur-xl border border-white/30 rounded-full flex items-center justify-center group-hover/play:scale-110 transition-transform">
-                               <Play className="w-8 h-8 text-white fill-white" />
-                            </div>
-                         </button>
-                       )}
-                    </motion.div>
-                  )}
-               </AnimatePresence>
-               
-               {discount && (
-                 <div className="absolute top-8 left-8 bg-red-500 text-white px-4 py-2 rounded-full font-black text-xs shadow-xl">
-                   {discount} OFF
+            <div className="lg:w-1/2 relative h-[450px] lg:h-full bg-slate-50 overflow-hidden group flex flex-col">
+               <div className="flex-1 relative overflow-hidden">
+                 <AnimatePresence mode="wait">
+                    {isPlayingVideo && product.video ? (
+                      <motion.div 
+                        key="video"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 bg-black"
+                      >
+                         <video 
+                           src={product.video} 
+                           autoPlay 
+                           controls 
+                           className="w-full h-full object-cover"
+                           onEnded={() => setIsPlayingVideo(false)}
+                         />
+                      </motion.div>
+                    ) : (
+                      <motion.div 
+                        key={selectedImage}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="w-full h-full"
+                      >
+                         <ImageWithFallback 
+                           src={selectedImage} 
+                           alt={product.name}
+                           className="w-full h-full object-cover"
+                         />
+                         {product.video && (
+                           <button 
+                             onClick={() => setIsPlayingVideo(true)}
+                             className="absolute inset-0 flex items-center justify-center group/play"
+                           >
+                              <div className="w-20 h-20 bg-white/20 backdrop-blur-xl border border-white/30 rounded-full flex items-center justify-center group-hover/play:scale-110 transition-transform">
+                                 <Play className="w-8 h-8 text-white fill-white" />
+                              </div>
+                           </button>
+                         )}
+                      </motion.div>
+                    )}
+                 </AnimatePresence>
+                 
+                 {discount && (
+                   <div className="absolute top-8 left-8 bg-red-500 text-white px-4 py-2 rounded-full font-black text-xs shadow-xl z-10">
+                     {discount} OFF
+                   </div>
+                 )}
+               </div>
+
+               {/* Gallery Thumbnails */}
+               {galleryImages.length > 1 && (
+                 <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 p-3 bg-white/10 backdrop-blur-xl rounded-[2rem] border border-white/20 z-10">
+                   {galleryImages.map((img, idx) => (
+                     <button
+                       key={idx}
+                       onClick={() => { setSelectedImage(img); setIsPlayingVideo(false); }}
+                       className={`w-14 h-14 rounded-2xl overflow-hidden border-2 transition-all ${selectedImage === img ? 'border-white scale-110 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                     >
+                       <img src={img} className="w-full h-full object-cover" />
+                     </button>
+                   ))}
                  </div>
                )}
 
-               <div className="absolute bottom-8 left-8 flex gap-3">
+               <div className="absolute top-8 right-20 flex gap-3 lg:hidden">
                   <button className="p-3 bg-white/10 backdrop-blur-md rounded-2xl text-white hover:bg-white/20 transition-colors">
                      <Share2 className="w-5 h-5" />
                   </button>
