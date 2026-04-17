@@ -1,22 +1,14 @@
 import { NavigationBar } from '../components/NavigationBar';
 import { Footer } from '../components/Footer';
-import { Toaster } from 'sonner';
-import { Outlet, useLocation } from 'react-router';
-import { NewsletterPopup } from '../components/NewsletterPopup';
+import { Outlet } from 'react-router';
 
 export function MainLayout() {
-  const location = useLocation();
-
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col transition-colors duration-500">
-      <Toaster position="top-center" richColors />
-      <NewsletterPopup />
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <NavigationBar />
-
-      <main className="flex-1 pt-[160px] lg:pt-[180px] bg-white">
+      <main style={{ flex: 1, paddingTop: '160px' }}>
         <Outlet />
       </main>
-
       <Footer />
     </div>
   );
