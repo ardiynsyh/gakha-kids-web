@@ -4,6 +4,7 @@ import { Heart, ShoppingBag } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { useWishlist } from '../context/WishlistContext';
 import { calculateDiscountBadge } from '../components/ui/utils';
+import { SEO } from '../components/SEO';
 import { supabase } from '../../lib/supabase';
 import { useStore } from '../context/StoreContext';
 import { ProductModal } from '../components/ProductModal';
@@ -73,6 +74,10 @@ export function ShopPage() {
 
   return (
     <div className="max-w-[1800px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-12 min-h-[60vh]">
+      <SEO 
+        title={getTitle()} 
+        description={`Lihat koleksi ${getTitle()} di GAKHA. Streetwear premium dengan desain otentik budaya supporter.`} 
+      />
       <h1 className="text-[clamp(1.8rem,4vw,2.5rem)] font-extrabold text-[var(--text-primary)] mb-8 tracking-tight border-b border-[var(--border-color)] pb-4">{getTitle()}</h1>
       
       <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 transition-opacity duration-300 ${isLoading ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>

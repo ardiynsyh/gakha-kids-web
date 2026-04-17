@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router';
 import { supabase } from '../../lib/supabase';
+import { SEO } from '../components/SEO';
 
 export function InfoPage() {
   const { id } = useParams();
@@ -9,6 +10,7 @@ export function InfoPage() {
 
   useEffect(() => {
     async function fetchPage() {
+      setIsLoaded(true); // Wait, I used isLoaded instead of setIsLoading here in previous versions?
       setIsLoading(true);
       try {
         const { data } = await supabase
@@ -67,6 +69,7 @@ export function InfoPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-20 min-h-[50vh]">
+      <SEO title={getTitle()} />
       <h1 className="text-4xl font-black mb-10 text-center">{getTitle()}</h1>
       <div className="bg-white p-10 rounded-3xl border border-gray-100 shadow-sm leading-relaxed">
         {getContent()}
