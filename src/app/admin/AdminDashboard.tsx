@@ -108,10 +108,10 @@ export function AdminDashboard() {
           });
        }
 
-       // Juga polling produk sesekali untuk memastikan sinkronisasi stok
-       const { data: latestProducts } = await supabase.from('products').select('*').order('id', { ascending: false });
-       if (latestProducts) setProducts(latestProducts);
-    }, 10000); // Cek setiap 10 Detik untuk fallback (interval lebih santai untuk performa)
+       // Juga polling produk sesekali dikomentari agar tidak menimpa state saat sedang diedit
+       // const { data: latestProducts } = await supabase.from('products').select('*').order('id', { ascending: false });
+       // if (latestProducts) setProducts(latestProducts);
+    }, 10000); // Cek setiap 10 Detik untuk fallback pesanan saja
 
     return () => { 
       supabase.removeChannel(orderSubscription); 
