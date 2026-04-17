@@ -204,11 +204,11 @@ export function AdminDashboard() {
 
   const handleAddProduct = () => {
     const newProduct = {
-      id: Math.floor(Math.random() * 900000000) + 100000000,
-      name: "Produk Baru",
-      price: "150000",
+      id: Date.now() + Math.random(),
+      name: "",
+      price: "",
       originalPrice: "",
-      image: "https://images.unsplash.com/photo-1540855513560-112df639c947?auto=format&fit=crop&q=80&w=300",
+      image: "",
       image2: "",
       image3: "",
       image4: "",
@@ -216,7 +216,7 @@ export function AdminDashboard() {
       sizes: ["S", "M", "L", "XL", "XXL"],
       inventory: { "S": 10, "M": 10, "L": 10, "XL": 10, "XXL": 10 },
       weight: 200,
-      color: "Default"
+      color: "#ffffff"
     };
     setProducts([newProduct, ...products]);
   };
