@@ -21,10 +21,12 @@ export function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const { addToCart } = useCart();
   const [selectedSize, setSelectedSize] = useState<string>('');
-  const [selectedImage, setSelectedImage] = useState<string>(product.image);
+  const [selectedImage, setSelectedImage] = useState<string>(product?.image || '');
 
   useEffect(() => {
-    setSelectedImage(product.image);
+    if (product?.image) {
+      setSelectedImage(product.image);
+    }
   }, [product]);
 
   useEffect(() => {
