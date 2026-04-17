@@ -37,6 +37,7 @@ createRoot(document.getElementById("root")!).render(
                     <Route path="search" element={<SearchPage />} />
                     <Route path="track-order" element={<TrackOrderPage />} />
                   <Route path="checkout" element={<CheckoutPage />} />
+                  <Route path="*" element={<Navigate to="/" replace />} />
                   </Route>
                   <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
                   <Route path="/admin/login" element={<AdminLogin />} />
