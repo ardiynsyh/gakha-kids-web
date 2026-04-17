@@ -80,10 +80,13 @@ export function ShopPage() {
 
   return (
     <div className="max-w-[1800px] mx-auto px-[clamp(1.5rem,5vw,4rem)] py-12 min-h-[60vh]">
+      {/* SEO removed temporarily to debug blank page */}
+      {/* 
       <SEO 
         title={getTitle()} 
         description={`Lihat koleksi ${getTitle()} di GAKHA. Streetwear premium dengan desain otentik budaya supporter.`} 
       />
+      */}
       <h1 className="text-[clamp(1.8rem,4vw,2.5rem)] font-extrabold text-[var(--text-primary)] mb-8 tracking-tight border-b border-[var(--border-color)] pb-4">{getTitle()}</h1>
       
       {/* Products Grid */}

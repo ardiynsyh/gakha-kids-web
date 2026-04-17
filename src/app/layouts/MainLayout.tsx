@@ -13,7 +13,7 @@ export function MainLayout() {
       <NewsletterPopup />
       <NavigationBar />
 
-      <main className="flex-1 pt-[160px] lg:pt-[180px]">
+      <main className="flex-1 pt-[160px] lg:pt-[180px] bg-white">
         <Outlet />
       </main>
 
@@ -21,4 +21,3 @@ export function MainLayout() {
     </div>
   );
 }
-

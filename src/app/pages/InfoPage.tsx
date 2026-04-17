@@ -161,6 +161,7 @@ export function InfoPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12 min-h-[50vh]">
+      {/* <SEO title={getTitle()} /> */}
       <h1 className="text-[clamp(1.5rem,5vw,3rem)] font-black text-[var(--text-primary)] mb-8 text-center">{getTitle()}</h1>
       <div className="prose prose-lg max-w-none text-[var(--text-secondary)] bg-[var(--bg-primary)] p-[clamp(1rem,5vw,3rem)] rounded-[2.5rem] border border-[var(--border-color)] shadow-xl leading-relaxed antialiased">
         {getContent()}
