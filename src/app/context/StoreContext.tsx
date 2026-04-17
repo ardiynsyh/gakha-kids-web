@@ -26,12 +26,23 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setConfig({
            ...localConfig,
            ...data.config_data,
-           // Kunci ke list yang sesuai dengan Admin Dashboard secara permanen
            productCategories: [
              { id: 'all', name: 'SEMUA KATEGORI' },
              { id: 'new', name: 'NEW DROP' },
              { id: 'football', name: 'FOOTBALL CULTURE' },
              { id: 'regional', name: 'REGIONAL SERIES' },
+             { id: 'jakarta', name: 'JAKARTA' },
+             { id: 'bandung', name: 'BANDUNG' },
+             { id: 'surabaya', name: 'SURABAYA' },
+             { id: 'malang', name: 'MALANG' },
+             { id: 'bali', name: 'BALI' },
+             { id: 'makassar', name: 'MAKASSAR' },
+             { id: 'solo', name: 'SOLO' },
+             { id: 'semarang', name: 'SEMARANG' },
+             { id: 'medan', name: 'MEDAN' },
+             { id: 'jayapura', name: 'JAYAPURA' },
+             { id: 'samarinda', name: 'SAMARINDA' },
+             { id: 'sleman', name: 'SLEMAN' },
              { id: 'sale', name: 'PENAWARAN SPESIAL' },
              { id: 'accessories', name: 'AKSESORIS' }
            ]
