@@ -196,27 +196,13 @@ export function AdminDashboard() {
     setIsLoading(true);
     const tid = toast.loading("Sinkronisasi Penuh ke Cloud...");
     try {
-      // 1. Dapatkan semua ID produk di Supabase
-      const { data: remoteProducts } = await supabase.from('products').select('id');
-      const remoteIds = remoteProducts?.map(p => p.id) || [];
-      const localIds = products.map(p => p.id);
+      // 1. Upsert semua produk lokal (Tanpa menghapus produk lain di cloud)
+      // Ini memastikan produk baru tertambah dan produk lama diperbarui tanpa resiko kehilangan data lain
+      const { error } = await supabase.from('products').upsert(products, { onConflict: 'id' });
+      if (error) throw error;
 
-      // 2. Cari ID yang ada di Supabase tapi TIDAK ada di lokal (untuk dihapus)
-      const idsToDelete = remoteIds.filter(id => !localIds.includes(id));
-      
-      if (idsToDelete.length > 0) {
-        const { error: delError } = await supabase.from('products').delete().in('id', idsToDelete);
-        if (delError) throw delError;
-      }
-
-      // 3. Upsert semua produk lokal
-      for (const product of products) {
-        const { error } = await supabase.from('products').upsert(product, { onConflict: 'id' });
-        if (error) throw error;
-      }
-
-      toast.success(`Daftar Produk Sinkron! (${products.length} Aktif, ${idsToDelete.length} Dihapus)`, { id: tid });
-      await fetchData(); // Refresh ulang
+      toast.success(`Daftar Produk Terupdate! (${products.length} Produk)`, { id: tid });
+      await fetchData(); // Refresh ulang untuk sinkronisasi state
     } catch (e: any) { 
       console.error("SYNC ERROR:", e);
       toast.error(`Sync Gagal: ${e.message}`, { id: tid }); 
@@ -230,7 +216,7 @@ export function AdminDashboard() {
 
   const handleAddProduct = () => {
     const newProduct = {
-      id: Date.now() + Math.random(),
+      id: Math.floor(Date.now() + Math.random() * 1000),
       name: "",
       price: "",
       originalPrice: "",
