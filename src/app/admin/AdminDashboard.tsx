@@ -228,7 +228,8 @@ export function AdminDashboard() {
       sizes: ["S", "M", "L", "XL", "XXL"],
       inventory: { "S": 10, "M": 10, "L": 10, "XL": 10, "XXL": 10 },
       weight: 200,
-      color: "#ffffff"
+      color: "#ffffff",
+      created_at: new Date().toISOString()
     };
     setProducts([newProduct, ...products]);
   };
