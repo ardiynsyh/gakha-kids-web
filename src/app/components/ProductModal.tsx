@@ -51,7 +51,7 @@ export function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-3 lg:p-6">
+        <div className="fixed inset-0 z-[400] flex items-center justify-center p-3 lg:p-6">
           <SEO 
             title={product.seoTitle || product.name}
             description={product.seoDescription || `Beli ${product.name} di GAKHA.`}
@@ -111,7 +111,7 @@ export function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
             </div>
 
             {/* Content Section */}
-            <div className="lg:w-[55%] p-6 lg:p-12 flex flex-col h-full overflow-y-auto custom-scrollbar bg-white">
+            <div className="lg:w-[55%] p-6 lg:p-12 flex flex-col flex-1 min-h-0 overflow-y-auto custom-scrollbar bg-white">
                <div className="mb-8">
                   <div className="flex flex-wrap gap-2 mb-3">
                      {product.categories?.map((cat: string) => (
